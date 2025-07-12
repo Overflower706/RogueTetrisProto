@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 using OVFL.ECS;
+using Minomino;
 
 public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
@@ -9,7 +10,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
     [field: SerializeField]
     public IMiniSceneManager SceneManager { get; private set; }
-    private GameSceneManager _gameSceneManager => SceneManager as GameSceneManager;
+    private GameSceneManager gameSceneManager => SceneManager as GameSceneManager;
 
 
     [Header("관리 Canvas")]
@@ -55,6 +56,22 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                .OnComplete(() =>
                {
                    Canvas_Game.GetComponent<CanvasGroup>().interactable = true;
+
+                   var entities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
+                   if (entities.Count == 1)
+                   {
+                       var commandReqeust = entities[0].GetComponent<CommandRequestComponent>();
+                       commandReqeust.Requests.Enqueue(new CommandRequest()
+                       {
+                           Type = CommandType.StartGame,
+                           PayLoad = null
+                       });
+                   }
+                   else
+                   {
+                       Debug.LogWarning($"CommandRequestComponent가 {entities.Count}개 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                       gameSceneManager.ShowStageCanvas();
+                   }
                    //    LogicManager.Instance.StartGame();
                    //    TestViewUI.StartGame();
                });
@@ -99,7 +116,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         // 승리 로직 처리
         Debug.Log("승리!");
-        _gameSceneManager.ShowShopCanvas();
+        gameSceneManager.ShowShopCanvas();
     }
 
     private void OnLoseButtonClicked()

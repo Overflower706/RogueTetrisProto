@@ -6,6 +6,7 @@ namespace Minomino
     public class CommandSystem : ITickSystem, ICleanupSystem
     {
         public Context Context { get; set; }
+
         public void Tick(Context context)
         {
             var queueEntities = context.GetEntitiesWithComponent<CommandRequestComponent>();
@@ -37,7 +38,7 @@ namespace Minomino
 
         public void Cleanup(Context context)
         {
-            var commandEntities = context.GetEntitiesWithComponent<ICommand>();
+            var commandEntities = context.GetEntitiesWithComponent<CommandMarkerComponent>();
 
             foreach (var entity in commandEntities)
             {
@@ -54,6 +55,7 @@ namespace Minomino
                     command.Type = request.Type;
                     command.PayLoad = request.PayLoad;
                     entity.AddComponent(command);
+                    entity.AddComponent<CommandMarkerComponent>();
                     break;
                 // 향후 다른 명령 타입들 추가
                 default:

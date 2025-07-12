@@ -36,35 +36,36 @@ namespace Minos
             Systems.SetContext(Context);
 
             // 순서 중요
+            Systems.AddSystem<CommandSystem>();
             Systems.AddSystem<DataSystem>();
             Systems.AddSystem<GameStateSystem>();
-            Systems.AddSystem<CommandSystem>();
+            Systems.AddSystem<PlayerSystem>();
 
             // View 관련
 
-            var panelSceneManager = FindFirstObjectByType<PanelSceneManager>();
+            var panelSceneManager = FindFirstObjectByType<PanelSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(panelSceneManager);
 
-            var titleSceneManager = FindFirstObjectByType<TitleSceneManager>();
+            var titleSceneManager = FindFirstObjectByType<TitleSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(titleSceneManager);
-            var gameSceneManager = FindFirstObjectByType<GameSceneManager>();
+            var gameSceneManager = FindFirstObjectByType<GameSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(gameSceneManager);
-            var packSceneManager = FindFirstObjectByType<PackSceneManager>();
+            var packSceneManager = FindFirstObjectByType<PackSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(packSceneManager);
 
-            var titleCanvasManager = FindFirstObjectByType<TitleCanvasManager>();
+            var titleCanvasManager = FindFirstObjectByType<TitleCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(titleCanvasManager);
 
-            var bannerCanvasManager = FindFirstObjectByType<BannerCanvasManager>();
+            var bannerCanvasManager = FindFirstObjectByType<BannerCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(bannerCanvasManager);
-            var gameCanvasManager = FindFirstObjectByType<GameCanvasManager>();
+            var gameCanvasManager = FindFirstObjectByType<GameCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(gameCanvasManager);
-            var shopCanvasManager = FindFirstObjectByType<ShopCanvasManager>();
+            var shopCanvasManager = FindFirstObjectByType<ShopCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(shopCanvasManager);
-            var stageCanvasManager = FindFirstObjectByType<StageCanvasManager>();
+            var stageCanvasManager = FindFirstObjectByType<StageCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(stageCanvasManager);
 
-            var packCanvasManager = FindFirstObjectByType<PackCanvasManager>();
+            var packCanvasManager = FindFirstObjectByType<PackCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(packCanvasManager);
         }
     }

@@ -11,7 +11,7 @@ public enum SceneType
     Pack
 }
 
-public class PanelSceneManager : MonoBehaviour, ISetupSystem
+public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
 {
     public Context Context { get; set; }
 
@@ -43,14 +43,6 @@ public class PanelSceneManager : MonoBehaviour, ISetupSystem
         PackSceneManager.Init(this);
 
         LoadTitleScene();
-    }
-
-    private void Update()
-    {
-        // if (LogicManager.GameData.CurrentState == GameState.Playing)
-        // {
-        //     LogicManager.UpdateAutoFall(Time.deltaTime);
-        // }
     }
 
     public void LoadTitleScene()

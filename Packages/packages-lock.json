@@ -1,11 +1,10 @@
 {
   "dependencies": {
     "com.ovfl.ecs": {
-      "version": "https://github.com/Overflower706/ecs.git",
+      "version": "file:com.ovfl.ecs",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "915c79db11239f8fb4cbef77d3794f3e80d64125"
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.2d.animation": {
       "version": "10.2.0",

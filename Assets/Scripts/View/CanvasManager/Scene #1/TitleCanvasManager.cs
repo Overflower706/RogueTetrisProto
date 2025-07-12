@@ -78,7 +78,7 @@ public class TitleCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
     private void OnStartGameButtonClicked()
     {
-        // PanelSceneManager.Instance.LoadGameScene();
+        PanelSceneManager.Instance.LoadGameScene();
     }
 
     private void OnBackButtonClicked()
