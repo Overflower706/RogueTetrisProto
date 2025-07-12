@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Minomino;
 
 [System.Serializable]
 public class Game
@@ -30,13 +31,4 @@ public class Game
         TargetScore = 1000; // 기본 목표 점수
         Currency = 0;
     }
-}
-
-public enum GameState
-{
-    Playing,
-    LineClearAnimation,
-    GameOver,
-    Victory,
-    Shop
 }

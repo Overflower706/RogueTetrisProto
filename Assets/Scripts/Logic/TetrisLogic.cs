@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Minomino;
 
 public class TetrisLogic
 {

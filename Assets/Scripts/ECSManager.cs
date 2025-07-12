@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using OVFL.ECS;
+using Minomino;
 
 namespace Minos
 {
@@ -31,6 +32,14 @@ namespace Minos
         {
             Context = new Context();
             Systems = new Systems();
+
+            // Context를 Systems에 설정
+            Systems.SetContext(Context);
+
+            // 순서 중요
+            Systems.AddSystem<DataSystem>();
+            Systems.AddSystem<GameStateSystem>();
+            Systems.AddSystem<CommandSystem>();
         }
     }
 }

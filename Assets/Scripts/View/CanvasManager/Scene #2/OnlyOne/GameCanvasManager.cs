@@ -52,8 +52,8 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager
                .OnComplete(() =>
                {
                    Canvas_Game.GetComponent<CanvasGroup>().interactable = true;
-                   LogicManager.Instance.StartGame();
-                   TestViewUI.StartGame();
+                   //    LogicManager.Instance.StartGame();
+                   //    TestViewUI.StartGame();
                });
     }
 

@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Minomino;
 using UnityEngine;
 
 public enum SceneType

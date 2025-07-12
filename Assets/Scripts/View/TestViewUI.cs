@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using Minomino;
 
 public class TestViewUI : MonoBehaviour
 {

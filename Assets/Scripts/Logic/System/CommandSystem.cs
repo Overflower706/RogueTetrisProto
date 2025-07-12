@@ -1,0 +1,65 @@
+using OVFL.ECS;
+using UnityEngine;
+
+namespace Minomino
+{
+    public class CommandSystem : ITickSystem, ICleanupSystem
+    {
+        public Context Context { get; set; }
+        public void Tick(Context context)
+        {
+            var queueEntities = context.GetEntitiesWithComponent<CommandRequestComponent>();
+            if (queueEntities.Count == 0)
+            {
+                Debug.LogWarning("CommandQueueComponent가 있는 엔티티가 없습니다.");
+                return; // 명령 큐가 없으면 아무것도 하지 않음
+            }
+            else if (queueEntities.Count > 1)
+            {
+                Debug.LogWarning("CommandQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return; // 여러 엔티티가 있으면 경고 후 종료
+            }
+
+            var commandQueue = queueEntities[0].GetComponent<CommandRequestComponent>();
+
+            // 한 틱당 하나의 명령만 처리 (순서 보장)
+            if (commandQueue.Requests.Count > 0)
+            {
+                var request = commandQueue.Requests.Dequeue();
+
+                // 명령을 엔티티로 생성하여 다른 시스템들이 소비할 수 있도록 함
+                var commandEntity = context.CreateEntity();
+
+                // 명령 타입에 따라 적절한 컴포넌트 추가
+                AddCommandComponent(request, commandEntity);
+            }
+        }
+
+        public void Cleanup(Context context)
+        {
+            var commandEntities = context.GetEntitiesWithComponent<ICommand>();
+
+            foreach (var entity in commandEntities)
+            {
+                context.DestroyEntity(entity);
+            }
+        }
+
+        private void AddCommandComponent(CommandRequest request, Entity entity)
+        {
+            switch (request.Type)
+            {
+                case CommandType.StartGame:
+                    var command = new StartGameCommand();
+                    command.Type = request.Type;
+                    command.PayLoad = request.PayLoad;
+                    entity.AddComponent(command);
+                    break;
+                // 향후 다른 명령 타입들 추가
+                default:
+                    Debug.LogWarning($"알 수 없는 명령 타입: {request.Type}");
+                    break;
+            }
+        }
+    }
+}
