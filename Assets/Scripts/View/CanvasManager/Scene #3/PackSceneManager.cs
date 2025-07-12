@@ -1,12 +1,13 @@
 using DG.Tweening;
+using OVFL.ECS;
 using UnityEngine;
 
-public class PackSceneManager : MonoBehaviour, IMiniSceneManager
+public class PackSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
 {
+    public Context Context { get; set; }
+
     [Header("관리 캔버스")]
     [SerializeField] private PackCanvasManager CanvasManager_Pack;
-
-    public Game GameData => _panelSceneManager.GameData;
     private PanelSceneManager _panelSceneManager;
 
     public void Init(PanelSceneManager panelSceneManager)

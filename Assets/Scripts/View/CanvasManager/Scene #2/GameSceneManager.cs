@@ -1,9 +1,12 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using OVFL.ECS;
 
-public class GameSceneManager : MonoBehaviour, IMiniSceneManager
+public class GameSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
 {
+    public Context Context { get; set; }
+
     [Header("관리 캔버스(Always On)")]
     [SerializeField] private BannerCanvasManager CanvasManager_Banner;
 
@@ -15,7 +18,7 @@ public class GameSceneManager : MonoBehaviour, IMiniSceneManager
     private ICanvasManager _currentActiveCanvas;
 
     private PanelSceneManager _panelSceneManager;
-    public Game GameData => _panelSceneManager.GameData;
+
 
     public void Init(PanelSceneManager panelSceneManager)
     {

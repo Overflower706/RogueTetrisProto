@@ -1,12 +1,13 @@
 using DG.Tweening;
+using OVFL.ECS;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TitleCanvasManager : MonoBehaviour, ICanvasManager
+public class TitleCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
+    public Context Context { get; set; }
     [field: SerializeField]
     public IMiniSceneManager SceneManager { get; private set; }
-    public Game GameData => SceneManager.GameData;
 
     [Header("담당 캔버스")]
     [SerializeField] private Canvas Canvas_Title;
@@ -77,7 +78,7 @@ public class TitleCanvasManager : MonoBehaviour, ICanvasManager
 
     private void OnStartGameButtonClicked()
     {
-        PanelSceneManager.Instance.LoadGameScene();
+        // PanelSceneManager.Instance.LoadGameScene();
     }
 
     private void OnBackButtonClicked()

@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Minomino;
+using OVFL.ECS;
 using UnityEngine;
 
 public enum SceneType
@@ -10,11 +11,9 @@ public enum SceneType
     Pack
 }
 
-public class PanelSceneManager : MonoSingleton<PanelSceneManager>
+public class PanelSceneManager : MonoBehaviour, ISetupSystem
 {
-    [Header("직접 참조할 LogicManager")]
-    [SerializeField] private LogicManager LogicManager;
-    public Game GameData => LogicManager.GameData;
+    public Context Context { get; set; }
 
     private IMiniSceneManager _currentSceneManager;
 
@@ -37,10 +36,8 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>
         };
     }
 
-    private void Start()
+    public void Setup(Context context)
     {
-        LogicManager.Initialize();
-
         TitleSceneManager.Init(this);
         GameSceneManager.Init(this);
         PackSceneManager.Init(this);
@@ -50,10 +47,10 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>
 
     private void Update()
     {
-        if (LogicManager.GameData.CurrentState == GameState.Playing)
-        {
-            LogicManager.UpdateAutoFall(Time.deltaTime);
-        }
+        // if (LogicManager.GameData.CurrentState == GameState.Playing)
+        // {
+        //     LogicManager.UpdateAutoFall(Time.deltaTime);
+        // }
     }
 
     public void LoadTitleScene()
