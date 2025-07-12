@@ -1,5 +1,6 @@
 using UnityEngine;
 using NUnit.Framework;
+using Minomino;
 
 /// <summary>
 /// GameLogger의 Ghost Piece 기능을 테스트하는 클래스

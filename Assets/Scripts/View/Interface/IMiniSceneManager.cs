@@ -1,9 +1,7 @@
 using DG.Tweening;
-using UnityEngine;
 
 public interface IMiniSceneManager
 {
-    Game GameData { get; }
     // Dependeny Injection
     void Init(PanelSceneManager panelSceneManager);
     abstract Tween LoadScene();

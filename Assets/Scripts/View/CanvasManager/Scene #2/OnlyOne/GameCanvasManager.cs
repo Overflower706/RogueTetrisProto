@@ -1,13 +1,16 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using OVFL.ECS;
 
-public class GameCanvasManager : MonoBehaviour, ICanvasManager
+public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
+    public Context Context { get; set; }
+
     [field: SerializeField]
     public IMiniSceneManager SceneManager { get; private set; }
     private GameSceneManager _gameSceneManager => SceneManager as GameSceneManager;
-    public Game GameData => _gameSceneManager.GameData;
+
 
     [Header("관리 Canvas")]
     [SerializeField] private Canvas Canvas_Game;
@@ -52,8 +55,8 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager
                .OnComplete(() =>
                {
                    Canvas_Game.GetComponent<CanvasGroup>().interactable = true;
-                   LogicManager.Instance.StartGame();
-                   TestViewUI.StartGame();
+                   //    LogicManager.Instance.StartGame();
+                   //    TestViewUI.StartGame();
                });
     }
 
@@ -103,6 +106,6 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager
     {
         // 패배 로직 처리
         Debug.Log("패배!");
-        PanelSceneManager.Instance.LoadTitleScene();
+        // PanelSceneManager.Instance.LoadTitleScene();
     }
 }

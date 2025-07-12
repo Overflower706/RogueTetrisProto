@@ -1,12 +1,14 @@
 using UnityEngine;
 using DG.Tweening;
 using System;
+using OVFL.ECS;
 
-public class BannerCanvasManager : MonoBehaviour, ICanvasManager
+public class BannerCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
+    public Context Context { get; set; }
+
     [field: SerializeField]
     public IMiniSceneManager SceneManager { get; private set; }
-    public Game GameData => SceneManager.GameData;
 
     [Header("관리 Canvas")]
     [SerializeField] private Canvas Canvas_Banner;

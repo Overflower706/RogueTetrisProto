@@ -1,13 +1,16 @@
 using DG.Tweening;
+using OVFL.ECS;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ShopCanvasManager : MonoBehaviour, ICanvasManager
+public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
+    public Context Context { get; set; }
+
     [field: SerializeField]
     public IMiniSceneManager SceneManager { get; set; }
     private GameSceneManager GameSceneManager => SceneManager as GameSceneManager;
-    public Game GameData => GameSceneManager.GameData;
+
 
     [Header("관리 Canvas")]
     [SerializeField] private Canvas Canvas_Shop;
@@ -33,7 +36,7 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager
         Button_NextRound.onClick.AddListener(OnNextRoundButtonClicked);
         Button_BackToTitle.onClick.AddListener(() =>
         {
-            PanelSceneManager.Instance.LoadTitleScene();
+            // PanelSceneManager.Instance.LoadTitleScene();
         });
     }
 

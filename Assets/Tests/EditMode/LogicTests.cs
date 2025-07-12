@@ -3,6 +3,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using System.Text;
+using Minomino;
 
 public class LogicTests
 {

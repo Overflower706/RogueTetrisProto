@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Minomino;
 
 public class LogicManager : MonoSingleton<LogicManager>
 {
@@ -85,35 +86,6 @@ public class LogicManager : MonoSingleton<LogicManager>
 
         // 게임 재시작
         StartGame();
-    }
-
-    public void OpenShop()
-    {
-        if (GameData.CurrentState == GameState.Victory)
-        {
-            GameData.CurrentState = GameState.Shop;
-        }
-    }
-
-    public void CloseShop()
-    {
-        if (GameData.CurrentState == GameState.Shop)
-        {
-            GameData.CurrentState = GameState.Playing;
-            // 새로운 라운드 시작
-            GameData.TargetScore = Mathf.RoundToInt(GameData.TargetScore * 1.5f); // 목표 점수 증가
-        }
-    }
-
-    // 상점 관련 메서드들
-    public List<ShopItem> GetShopItems()
-    {
-        return shopLogic?.GenerateShopItems() ?? new List<ShopItem>();
-    }
-
-    public bool PurchaseShopItem(ShopItem item)
-    {
-        return shopLogic?.PurchaseItem(item) ?? false;
     }
 
     // View가 읽을 Game 데이터 접근자

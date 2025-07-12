@@ -1,13 +1,16 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using OVFL.ECS;
 
-public class StageCanvasManager : MonoBehaviour, ICanvasManager
+public class StageCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
+    public Context Context { get; set; }
+
     [field: SerializeField]
     public IMiniSceneManager SceneManager { get; set; }
     private GameSceneManager GameScene => SceneManager as GameSceneManager;
-    public Game GameData => GameScene.GameData;
+
 
     [Header("관리 Canvas")]
     [SerializeField] private Canvas Canvas_Stage;
@@ -64,7 +67,7 @@ public class StageCanvasManager : MonoBehaviour, ICanvasManager
         Button_StartSmallGame.onClick.AddListener(OnStartSmallGameClicked);
         Button_BackToTitle.onClick.AddListener(() =>
         {
-            PanelSceneManager.Instance.LoadTitleScene();
+            // PanelSceneManager.Instance.LoadTitleScene();
         });
 
         Canvas_Stage.gameObject.SetActive(false);

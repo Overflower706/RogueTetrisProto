@@ -1,3 +1,4 @@
+using Minomino;
 using UnityEngine;
 
 [System.Serializable]
@@ -63,11 +64,6 @@ public class Tetrimino
         }
         return point;
     }
-}
-
-public enum TetriminoType
-{
-    I, O, T, S, Z, J, L
 }
 
 [System.Serializable]
