@@ -70,6 +70,12 @@ namespace Minomino
             {
                 DisplayTetriminoOnBoard(board, currentTetrimino, context);
             }
+
+            var holdTetriminoEntities = context.GetEntitiesWithComponent<HoldTetriminoCommand>();
+            if (holdTetriminoEntities.Count > 0)
+            {
+                ProcessHoldCommand();
+            }
         }
 
         private BoardComponent GetBoardComponent(Context context)
@@ -431,6 +437,27 @@ namespace Minomino
 
             // 새 상태로 테트리미노 표시
             DisplayTetriminoOnBoard(board, currentTetrimino, Context);
+        }
+
+        /// <summary>
+        /// Hold 처리 - 현재 테트리미노를 보드에서 제거
+        /// </summary>
+        private void ProcessHoldCommand()
+        {
+            var board = GetBoardComponent(Context);
+            var currentTetrimino = GetCurrentTetrimino();
+            var currentEntity = GetCurrentTetriminoEntity(Context);
+
+            if (board == null || currentTetrimino == null || currentEntity == null)
+                return;
+
+            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
+            if (tetriminoComponent == null) return;
+
+            // 보드에서 현재 테트리미노 제거
+            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
+
+            Debug.Log("Hold: 보드에서 현재 테트리미노 제거 완료");
         }
 
         private CommandRequestComponent GetCommandRequestComponent()

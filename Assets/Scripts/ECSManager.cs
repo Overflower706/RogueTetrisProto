@@ -43,6 +43,7 @@ namespace Minos
             Systems.AddSystem<ScoreSystem>();
             Systems.AddSystem<TetriminoSystem>();
             Systems.AddSystem<BoardSystem>();
+            Systems.AddSystem<HoldSystem>();
 
             Systems.AddSystem<ExampleInputSystem>();
 

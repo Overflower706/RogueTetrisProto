@@ -46,9 +46,9 @@ namespace Minomino
             if (generateCommandEntities.Count > 0)
             {
                 // GenerateTetriminoCommand가 있는 경우, Tetrimino를 생성
-                if (TryGenerateTetrimino())
+                if (TryGenerateTetrimino(out var tetriminoComponent))
                 {
-                    Debug.Log("새로운 Tetrimino 생성 완료");
+                    Debug.Log($"새로운 Tetrimino 생성 완료. Type: {tetriminoComponent.Type}, Color: {tetriminoComponent.Color}");
                 }
                 else
                 {
@@ -57,28 +57,31 @@ namespace Minomino
             }
         }
 
-        private bool TryGenerateTetrimino()
+        private bool TryGenerateTetrimino(out TetriminoComponent tetriminoComponent)
         {
-            var queueComponent = GetTetriminoQueueComponent();
-            if (queueComponent == null)
+            tetriminoComponent = null; // 초기화
             {
-                Debug.LogWarning("TetriminoQueueComponent가 없습니다. 큐를 생성할 수 없습니다.");
-                return false; // 큐가 없으면 생성 실패
+                var queueComponent = GetTetriminoQueueComponent();
+                if (queueComponent == null)
+                {
+                    Debug.LogWarning("TetriminoQueueComponent가 없습니다. 큐를 생성할 수 없습니다.");
+                    return false; // 큐가 없으면 생성 실패
+                }
+
+                if (queueComponent.TetriminoQueue.Count == 0)
+                {
+                    Debug.LogWarning("Tetrimino 큐가 비어 있습니다. 새로운 Tetrimino를 생성할 수 없습니다.");
+                    return false; // 큐가 비어 있으면 생성 실패
+                }
+
+                // 큐에서 Tetrimino를 꺼내서 현재 테트리미노로 설정
+                var nextTetriminoEntity = queueComponent.TetriminoQueue.Dequeue();
+                tetriminoComponent = nextTetriminoEntity.GetComponent<TetriminoComponent>();
+                var currentTetriminoComponent = nextTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
+                currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+
+                return true;
             }
-
-            if (queueComponent.TetriminoQueue.Count == 0)
-            {
-                Debug.LogWarning("Tetrimino 큐가 비어 있습니다. 새로운 Tetrimino를 생성할 수 없습니다.");
-                return false; // 큐가 비어 있으면 생성 실패
-            }
-
-            // 큐에서 Tetrimino를 꺼내서 현재 테트리미노로 설정
-            var nextTetriminoEntity = queueComponent.TetriminoQueue.Dequeue();
-            var nextTetriminoComponent = nextTetriminoEntity.GetComponent<TetriminoComponent>();
-            var currentTetriminoComponent = nextTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
-            currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-
-            return true;
         }
 
         private TetriminoQueueComponent GetTetriminoQueueComponent()

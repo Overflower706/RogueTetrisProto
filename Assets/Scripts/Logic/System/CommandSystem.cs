@@ -99,6 +99,13 @@ namespace Minomino
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
 
+                case CommandType.Hold:
+                    var holdCommand = new HoldTetriminoCommand();
+                    holdCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(holdCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
                 case CommandType.GenerateTetrimino:
                     var generateCommand = new GenerateTetriminoCommand();
                     generateCommand.PayLoad = request.PayLoad;
