@@ -331,4 +331,69 @@ public class GameBoardPanel : MonoBehaviour
         var ghostPositions = GetHardDropGhostPositions(board);
         SetGhostCellColors(ghostPositions, new Color(0.2f, 0.2f, 0.2f, 1f), new Color(0.8f, 0.8f, 0.8f, 1f));
     }
+
+    /// <summary>
+    /// 게임 종료 시 보드를 청소하고 다음 게임을 위해 초기화
+    /// </summary>
+    public void Clear()
+    {
+        _isInit = false;
+        Context = null;
+
+        // 기존 테트리미노 오브젝트들 모두 제거
+        foreach (var kvp in _tetriminoObjects)
+        {
+            if (kvp.Value != null)
+            {
+                Destroy(kvp.Value);
+            }
+        }
+        _tetriminoObjects.Clear();
+
+        // 그리드 셀들 제거
+        if (_gridCells != null)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                for (int x = 0; x < _width; x++)
+                {
+                    if (_gridCells[x, y] != null)
+                    {
+                        Destroy(_gridCells[x, y]);
+                    }
+                }
+            }
+            _gridCells = null;
+        }
+
+        // GridParent 하위의 모든 자식 오브젝트 제거 (혹시 놓친 것들)
+        if (GridParent != null)
+        {
+            foreach (Transform child in GridParent)
+            {
+                if (child != null)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+        }
+
+        // TetriminoParent 하위의 모든 자식 오브젝트 제거
+        if (TetriminoParent != null)
+        {
+            foreach (Transform child in TetriminoParent)
+            {
+                if (child != null)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+        }
+
+        // 크기 변수 초기화
+        _width = 0;
+        _height = 0;
+
+        Debug.Log("GameBoardPanel 청소 완료 - 다음 게임을 위해 준비됨");
+    }
 }

@@ -43,7 +43,7 @@ namespace Minomino
             var commandRequest = commandRequestEntity.GetComponent<CommandRequestComponent>();
 
             // 방향키 좌 (현재 테트리미노 좌측 이동)
-            if (keyboard.aKey.wasPressedThisFrame)
+            if (keyboard.leftArrowKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 좌측 이동 (←)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -54,7 +54,7 @@ namespace Minomino
             }
 
             // 방향키 우 (현재 테트리미노 우측 이동)
-            if (keyboard.dKey.wasPressedThisFrame)
+            if (keyboard.rightArrowKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 우측 이동 (→)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -65,7 +65,7 @@ namespace Minomino
             }
 
             // 방향키 위 (홀드)
-            if (keyboard.wKey.wasPressedThisFrame)
+            if (keyboard.cKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 홀드 (↑)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -76,7 +76,7 @@ namespace Minomino
             }
 
             // 방향키 아래 (소프트 드롭)
-            if (keyboard.sKey.wasPressedThisFrame)
+            if (keyboard.downArrowKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 소프트 드롭 (↓)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -98,9 +98,9 @@ namespace Minomino
             }
 
             // Z키 (회전 반시계 방향)
-            if (keyboard.qKey.wasPressedThisFrame)
+            if (keyboard.zKey.wasPressedThisFrame)
             {
-                Debug.Log("입력: 반시계 회전 (Z)");
+                Debug.Log("입력: 반시계 회전");
                 commandRequest.Requests.Enqueue(new CommandRequest
                 {
                     Type = CommandType.RotateCounterClockwise,
@@ -109,9 +109,9 @@ namespace Minomino
             }
 
             // X키 (회전 시계 방향)
-            if (keyboard.eKey.wasPressedThisFrame)
+            if (keyboard.xKey.wasPressedThisFrame)
             {
-                Debug.Log("입력: 시계 회전 (X)");
+                Debug.Log("입력: 시계 회전");
                 commandRequest.Requests.Enqueue(new CommandRequest
                 {
                     Type = CommandType.RotateClockwise,

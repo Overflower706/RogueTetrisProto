@@ -35,6 +35,9 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     [SerializeField] private TetriminoImage[] nextTetriminoImages = new TetriminoImage[3];
     [SerializeField] private TextMeshProUGUI restCountText;
 
+    // 게임 상태 감시용
+    private GameState _lastGameState = GameState.None;
+
 
     #region ICanvasManager
 
@@ -98,6 +101,9 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
     private void Update()
     {
+        // GameState 변화 감시
+        MonitorGameState();
+
         if (gameboardPanel.IsInit)
         {
             // 게임 보드 상태 업데이트
@@ -135,6 +141,19 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
     public void Clear()
     {
+        // GameBoardPanel 청소
+        if (gameboardPanel != null)
+        {
+            gameboardPanel.Clear();
+        }
+
+        // 미리보기 이미지들 청소
+        holdTetriminoImage?.ClearDisplay();
+        for (int i = 0; i < nextTetriminoImages.Length; i++)
+        {
+            nextTetriminoImages[i]?.ClearDisplay();
+        }
+
         // 원위치
         _gameRectTransform.anchoredPosition = _gameOriginalPosition;
         Button_Win.onClick.RemoveListener(OnWinButtonClicked);
@@ -154,7 +173,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         // 패배 로직 처리
         Debug.Log("패배!");
-        // PanelSceneManager.Instance.LoadTitleScene();
+        PanelSceneManager.Instance.LoadTitleScene();
     }
 
     #endregion
@@ -312,5 +331,41 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
         // 큐에 남은 테트리미노 개수 가져오기
         int remainingCount = queueComponent.TetriminoQueue.Count;
         restCountText.text = $"{remainingCount}";
+    }
+
+    /// <summary>
+    /// 게임 상태 변화를 감시하여 버튼 활성화 처리
+    /// </summary>
+    private void MonitorGameState()
+    {
+        var gameStateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+        if (gameStateEntities.Count == 0) return;
+
+        var gameStateComponent = gameStateEntities[0].GetComponent<GameStateComponent>();
+        var currentGameState = gameStateComponent.CurrentState;
+
+        // 게임 상태가 변경된 경우 버튼 활성화 처리
+        if (currentGameState != _lastGameState)
+        {
+            _lastGameState = currentGameState;
+
+            switch (currentGameState)
+            {
+                case GameState.Victory:
+                    Button_Win.gameObject.SetActive(true);
+                    Button_Lose.gameObject.SetActive(false);
+                    Debug.Log("승리! Win 버튼 활성화");
+                    break;
+                case GameState.GameOver:
+                    Button_Win.gameObject.SetActive(false);
+                    Button_Lose.gameObject.SetActive(true);
+                    Debug.Log("게임 오버! Lose 버튼 활성화");
+                    break;
+                case GameState.Playing:
+                    Button_Win.gameObject.SetActive(false);
+                    Button_Lose.gameObject.SetActive(false);
+                    break;
+            }
+        }
     }
 }

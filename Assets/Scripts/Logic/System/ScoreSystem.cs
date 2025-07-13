@@ -22,7 +22,7 @@ namespace Minomino
             if (commandEntities.Count > 0)
             {
                 score.CurrentScore = 0;
-                score.TargetScore = 500; // 예시로 500점으로 
+                score.TargetScore = 100; // 예시로 500점으로 
 
                 Debug.Log("게임 시작, 초기 점수 설정: " + score.CurrentScore);
             }
