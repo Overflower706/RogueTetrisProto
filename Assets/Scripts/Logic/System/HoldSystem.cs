@@ -9,6 +9,13 @@ namespace Minomino
 
         public void Tick(Context context)
         {
+            var state = GetState();
+
+            if (state.CurrentState != GameState.Playing)
+            {
+                return;
+            }
+
             // Hold 명령을 감지
             var holdCommandEntities = context.GetEntitiesWithComponent<HoldTetriminoCommand>();
             if (holdCommandEntities.Count > 0)
@@ -142,6 +149,23 @@ namespace Minomino
             }
 
             return commandRequestEntities[0].GetComponent<CommandRequestComponent>();
+        }
+
+        private GameStateComponent GetState()
+        {
+            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+            if (stateEntities.Count == 0)
+            {
+                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (stateEntities.Count > 1)
+            {
+                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return stateEntities[0].GetComponent<GameStateComponent>();
         }
     }
 }
