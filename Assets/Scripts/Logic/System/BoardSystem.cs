@@ -543,27 +543,43 @@ namespace Minomino
         /// </summary>
         private void DropLinesDown(BoardComponent board, List<int> clearedLines)
         {
-            // 제거된 줄들을 오름차순으로 정렬
-            clearedLines.Sort();
+            // 제거되지 않은 줄들을 아래부터 다시 배치
+            var remainingLines = new List<int[]>();
 
-            // 각 제거된 줄에 대해 위의 블록들을 아래로 이동
-            foreach (int clearedLineY in clearedLines)
+            // 아래부터 위로 검사하면서 제거되지 않은 줄들을 수집
+            for (int y = 0; y < BoardComponent.HEIGHT; y++)
             {
-                // 제거된 줄 위의 모든 줄을 한 칸씩 아래로 이동
-                for (int y = clearedLineY; y < BoardComponent.HEIGHT - 1; y++)
+                if (!clearedLines.Contains(y))
                 {
+                    // 이 줄은 제거되지 않았으므로 보존
+                    int[] line = new int[BoardComponent.WIDTH];
                     for (int x = 0; x < BoardComponent.WIDTH; x++)
                     {
-                        board.Board[x, y] = board.Board[x, y + 1];
+                        line[x] = board.Board[x, y];
                     }
-                }
-
-                // 맨 위 줄은 빈 줄로 설정
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
-                {
-                    board.Board[x, BoardComponent.HEIGHT - 1] = 0;
+                    remainingLines.Add(line);
                 }
             }
+
+            // 보드를 모두 0으로 초기화
+            for (int y = 0; y < BoardComponent.HEIGHT; y++)
+            {
+                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                {
+                    board.Board[x, y] = 0;
+                }
+            }
+
+            // 남은 줄들을 아래부터 다시 배치
+            for (int i = 0; i < remainingLines.Count; i++)
+            {
+                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                {
+                    board.Board[x, i] = remainingLines[i][x];
+                }
+            }
+
+            Debug.Log($"줄 드롭 완료: {clearedLines.Count}줄 제거됨, {remainingLines.Count}줄 남음");
         }
 
         private CommandRequestComponent GetCommandRequestComponent()
