@@ -112,6 +112,19 @@ namespace Minomino
                     entity.AddComponent(generateCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
+
+                case CommandType.LineClear:
+                    var lineClearCommand = new LineClearCommand();
+                    // PayLoad에서 줄 클리어 정보 추출
+                    if (request.PayLoad is (int linesCleared, int tetriminoEntityId))
+                    {
+                        lineClearCommand.LinesCleared = linesCleared;
+                        lineClearCommand.TetriminoEntityId = tetriminoEntityId;
+                    }
+                    entity.AddComponent(lineClearCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
                 // 향후 다른 명령 타입들 추가
                 default:
                     Debug.LogWarning($"알 수 없는 명령 타입: {request.Type}");

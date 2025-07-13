@@ -26,5 +26,6 @@ namespace Minomino
         RotateCounterClockwise = 7, // 반시계 방향 회전 (Z키)
         Hold = 8,                   // 홀드 (방향키 위)
         GenerateTetrimino = 9, // 테트리미노 생성
+        LineClear = 10, // 줄 클리어 이벤트
     }
 }

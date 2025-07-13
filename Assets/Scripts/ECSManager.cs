@@ -40,9 +40,9 @@ namespace Minos
             Systems.AddSystem<CommandSystem>();
             Systems.AddSystem<GameStateSystem>();
             Systems.AddSystem<PlayerSystem>();
-            Systems.AddSystem<ScoreSystem>();
             Systems.AddSystem<TetriminoSystem>();
             Systems.AddSystem<BoardSystem>();
+            Systems.AddSystem<ScoreSystem>();
             Systems.AddSystem<HoldSystem>();
 
             Systems.AddSystem<ExampleInputSystem>();

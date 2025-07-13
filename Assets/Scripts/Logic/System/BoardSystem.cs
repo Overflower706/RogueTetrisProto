@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using OVFL.ECS;
 using UnityEngine;
 
@@ -375,6 +376,25 @@ namespace Minomino
             // 현재 테트리미노 Entity에서 CurrentTetriminoComponent 제거
             currentEntity.RemoveComponent<CurrentTetriminoComponent>();
 
+            // 줄 완성 검증 및 제거
+            int clearedLines = CheckAndClearCompletedLines(board);
+            if (clearedLines > 0)
+            {
+                Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
+
+                // ScoreSystem에 줄 클리어 이벤트 전달
+                var scoreCommandRequest = GetCommandRequestComponent();
+                if (scoreCommandRequest != null)
+                {
+                    scoreCommandRequest.Requests.Enqueue(new CommandRequest
+                    {
+                        Type = CommandType.LineClear,
+                        PayLoad = (clearedLines, currentEntity.ID)
+                    });
+                    Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {currentEntity.ID}");
+                }
+            }
+
             // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
             var commandRequest = GetCommandRequestComponent();
             if (commandRequest != null)
@@ -458,6 +478,92 @@ namespace Minomino
             ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
 
             Debug.Log("Hold: 보드에서 현재 테트리미노 제거 완료");
+        }
+
+        /// <summary>
+        /// 완성된 줄 검증 및 제거
+        /// </summary>
+        private int CheckAndClearCompletedLines(BoardComponent board)
+        {
+            if (board?.Board == null) return 0;
+
+            var completedLines = new List<int>();
+
+            // 아래부터 위로 검사하여 완성된 줄 찾기
+            for (int y = 0; y < BoardComponent.HEIGHT; y++)
+            {
+                if (IsLineCompleted(board, y))
+                {
+                    completedLines.Add(y);
+                }
+            }
+
+            // 완성된 줄이 있으면 제거
+            if (completedLines.Count > 0)
+            {
+                ClearCompletedLines(board, completedLines);
+                DropLinesDown(board, completedLines);
+            }
+
+            return completedLines.Count;
+        }
+
+        /// <summary>
+        /// 특정 줄이 완성되었는지 검사
+        /// </summary>
+        private bool IsLineCompleted(BoardComponent board, int lineY)
+        {
+            for (int x = 0; x < BoardComponent.WIDTH; x++)
+            {
+                if (board.Board[x, lineY] == 0) // 빈 칸이 있으면 완성되지 않음
+                {
+                    return false;
+                }
+            }
+            return true; // 모든 칸이 채워짐
+        }
+
+        /// <summary>
+        /// 완성된 줄들을 제거 (0으로 설정)
+        /// </summary>
+        private void ClearCompletedLines(BoardComponent board, List<int> completedLines)
+        {
+            foreach (int lineY in completedLines)
+            {
+                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                {
+                    board.Board[x, lineY] = 0;
+                }
+                Debug.Log($"줄 {lineY} 제거됨");
+            }
+        }
+
+        /// <summary>
+        /// 제거된 줄 위의 블록들을 아래로 떨어뜨리기
+        /// </summary>
+        private void DropLinesDown(BoardComponent board, List<int> clearedLines)
+        {
+            // 제거된 줄들을 오름차순으로 정렬
+            clearedLines.Sort();
+
+            // 각 제거된 줄에 대해 위의 블록들을 아래로 이동
+            foreach (int clearedLineY in clearedLines)
+            {
+                // 제거된 줄 위의 모든 줄을 한 칸씩 아래로 이동
+                for (int y = clearedLineY; y < BoardComponent.HEIGHT - 1; y++)
+                {
+                    for (int x = 0; x < BoardComponent.WIDTH; x++)
+                    {
+                        board.Board[x, y] = board.Board[x, y + 1];
+                    }
+                }
+
+                // 맨 위 줄은 빈 줄로 설정
+                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                {
+                    board.Board[x, BoardComponent.HEIGHT - 1] = 0;
+                }
+            }
         }
 
         private CommandRequestComponent GetCommandRequestComponent()
