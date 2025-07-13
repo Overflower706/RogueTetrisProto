@@ -65,12 +65,7 @@ namespace Minomino
             // 현재 테트리미노를 홀드로 변경
             // CurrentTetriminoComponent 제거
             currentTetriminoEntity.RemoveComponent<CurrentTetriminoComponent>();
-
-            // HoldTetriminoComponent 추가 (이미 존재하지 않는 경우에만)
-            if (!currentTetriminoEntity.HasComponent<HoldTetriminoComponent>())
-            {
-                currentTetriminoEntity.AddComponent<HoldTetriminoComponent>();
-            }
+            currentTetriminoEntity.AddComponent<HoldTetriminoComponent>();
 
             // 새로운 테트리미노 생성 요청
             RequestNewTetrimino();
@@ -101,7 +96,7 @@ namespace Minomino
             var newCurrentComponent = holdTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
 
             // 홀드된 테트리미노를 기본 스폰 위치와 회전으로 리셋
-            newCurrentComponent.Position = new UnityEngine.Vector2Int(5, 18); // 스폰 위치
+            newCurrentComponent.Position = new Vector2Int(5, 18); // 스폰 위치
             var holdTetrimino = holdTetriminoEntity.GetComponent<TetriminoComponent>();
             holdTetrimino.Rotation = 0; // 회전 초기화
 

@@ -1,7 +1,6 @@
 using OVFL.ECS;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Minomino
 {
@@ -60,20 +59,27 @@ namespace Minomino
         private bool TryGenerateTetrimino(out TetriminoComponent tetriminoComponent)
         {
             tetriminoComponent = null; // 초기화
-            {
-                var queueComponent = GetTetriminoQueueComponent();
-                if (queueComponent == null)
-                {
-                    Debug.LogWarning("TetriminoQueueComponent가 없습니다. 큐를 생성할 수 없습니다.");
-                    return false; // 큐가 없으면 생성 실패
-                }
+            var queueComponent = GetTetriminoQueue();
 
-                if (queueComponent.TetriminoQueue.Count == 0)
+            if (queueComponent.TetriminoQueue.Count == 0)
+            {
+                if (Context.GetEntitiesWithComponent<HoldTetriminoComponent>().Count == 0)
                 {
-                    Debug.LogWarning("Tetrimino 큐가 비어 있습니다. 새로운 Tetrimino를 생성할 수 없습니다.");
+                    Debug.LogWarning("Tetrimino 큐도 비어 있고 홀드 된 Tetrimino도 없습니다.");
                     return false; // 큐가 비어 있으면 생성 실패
                 }
-
+                else
+                {
+                    Debug.Log("Tetrimino 큐가 비어 있습니다. Hold된 Tetrimino를 사용합니다.");
+                    var holdEntity = GetHoldTetriminoEntity();
+                    holdEntity.RemoveComponent<HoldTetriminoComponent>();
+                    holdEntity.AddComponent<CurrentTetriminoComponent>();
+                    tetriminoComponent = holdEntity.GetComponent<TetriminoComponent>();
+                    return true;
+                }
+            }
+            else
+            {
                 // 큐에서 Tetrimino를 꺼내서 현재 테트리미노로 설정
                 var nextTetriminoEntity = queueComponent.TetriminoQueue.Dequeue();
                 tetriminoComponent = nextTetriminoEntity.GetComponent<TetriminoComponent>();
@@ -84,7 +90,7 @@ namespace Minomino
             }
         }
 
-        private TetriminoQueueComponent GetTetriminoQueueComponent()
+        private TetriminoQueueComponent GetTetriminoQueue()
         {
             var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
             if (queueEntities.Count == 0)
@@ -98,6 +104,23 @@ namespace Minomino
                 return null; // 여러 엔티티가 있으면 경고 후 null 반환
             }
             return queueEntities[0].GetComponent<TetriminoQueueComponent>();
+        }
+
+        private Entity GetHoldTetriminoEntity()
+        {
+            var holdEntities = Context.GetEntitiesWithComponent<HoldTetriminoComponent>();
+            if (holdEntities.Count == 0)
+            {
+                Debug.LogWarning("HoldTetriminoComponent가 있는 엔티티가 없습니다.");
+                return null; // 홀드가 없으면 null 반환
+            }
+            else if (holdEntities.Count > 1)
+            {
+                Debug.LogWarning("HoldTetriminoComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null; // 여러 엔티티가 있으면 경고 후 null 반환
+            }
+
+            return holdEntities[0]; ;
         }
 
         /// <summary>
