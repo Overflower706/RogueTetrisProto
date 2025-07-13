@@ -10,9 +10,9 @@ namespace Minomino
         // 점수 계산 상수
         private const int BASE_LINE_SCORE = 100;
         private const int SINGLE_LINE = 1;
-        private const int DOUBLE_LINE = 3;
-        private const int TRIPLE_LINE = 5;
-        private const int TETRIS_LINE = 8;
+        private const int DOUBLE_LINE = 2;
+        private const int TRIPLE_LINE = 3;
+        private const int TETRIS_LINE = 4;
 
         public void Tick(Context context)
         {

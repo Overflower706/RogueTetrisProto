@@ -31,9 +31,9 @@ namespace Minomino
 
             if (state.CurrentState != GameState.Playing) return;
 
-            var score = GetScore();
             var currentTetrimino = Context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
             var tetriminoQueue = GetTetriminoQueue();
+            var score = GetScore();
 
             // 게임 종료 조건 예시: 점수가 목표 점수에 도달하면 게임 종료
             if (score.CurrentScore >= score.TargetScore)
@@ -51,8 +51,6 @@ namespace Minomino
 
                 return;
             }
-
-            Debug.Log($"{currentTetrimino.Count}개의 현재 테트리미노가 있습니다. {tetriminoQueue.TetriminoQueue.Count}개의 대기 중인 테트리미노가 있습니다.");
 
             if (tetriminoQueue.TetriminoQueue.Count == 0 && currentTetrimino.Count == 0)
             {
