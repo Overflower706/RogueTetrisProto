@@ -80,7 +80,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                    //    LogicManager.Instance.StartGame();
                    //    TestViewUI.StartGame();
 
-                   gameboardPanel.InitGrid();
+                   gameboardPanel.Init(Context);
                });
     }
 
