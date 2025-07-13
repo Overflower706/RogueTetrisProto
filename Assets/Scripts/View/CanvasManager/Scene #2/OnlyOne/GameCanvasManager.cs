@@ -86,11 +86,8 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
     private void Update()
     {
-        if (Canvas_Game.gameObject.activeSelf)
+        if (gameboardPanel.IsInit)
         {
-            // 게임 상태 업데이트
-            TestViewUI.UpdateGameState();
-
             // 게임 보드 상태 업데이트
             var entities = Context.GetEntitiesWithComponent<BoardComponent>();
             if (entities.Count == 1)
