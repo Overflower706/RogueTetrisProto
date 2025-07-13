@@ -8,14 +8,14 @@ namespace Minomino
         public Context Context { get; set; }
         public void Setup(Context context)
         {
-            var state = GetStateComponent(context);
+            var state = GetStateComponent();
             state.CurrentState = GameState.Initial;
             state.GameTime = 0f;
         }
 
         public void Tick(Context context)
         {
-            var state = GetStateComponent(context);
+            var state = GetStateComponent();
 
             if (state == null)
             {
@@ -31,9 +31,9 @@ namespace Minomino
             }
         }
 
-        private GameStateComponent GetStateComponent(Context context)
+        private GameStateComponent GetStateComponent()
         {
-            var stateEntities = context.GetEntitiesWithComponent<GameStateComponent>();
+            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
             if (stateEntities.Count == 0)
             {
                 Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");

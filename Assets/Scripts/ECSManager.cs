@@ -36,10 +36,13 @@ namespace Minos
             Systems.SetContext(Context);
 
             // 순서 중요
-            Systems.AddSystem<CommandSystem>();
             Systems.AddSystem<DataSystem>();
+            Systems.AddSystem<CommandSystem>();
             Systems.AddSystem<GameStateSystem>();
             Systems.AddSystem<PlayerSystem>();
+            Systems.AddSystem<ScoreSystem>();
+            Systems.AddSystem<TetriminoSystem>();
+            Systems.AddSystem<BoardSystem>();
 
             // View 관련
 
