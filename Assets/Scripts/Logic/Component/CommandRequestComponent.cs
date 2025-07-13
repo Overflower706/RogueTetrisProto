@@ -17,9 +17,13 @@ namespace Minomino
     public enum CommandType : ushort
     {
         StartGame = 1,
-        // 추후 다른 메시지들 추가 예정
-        // MoveLeft = 2,
-        // MoveRight = 3,
-        // Rotate = 4,
+        // 테트리미노 이동 및 조작 명령
+        MoveLeft = 2,
+        MoveRight = 3,
+        SoftDrop = 4,
+        HardDrop = 5,
+        RotateClockwise = 6,        // 시계 방향 회전 (X키)
+        RotateCounterClockwise = 7, // 반시계 방향 회전 (Z키)
+        Hold = 8,                   // 홀드 (방향키 위)
     }
 }

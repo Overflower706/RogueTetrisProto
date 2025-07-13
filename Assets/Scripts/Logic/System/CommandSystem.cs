@@ -51,10 +51,37 @@ namespace Minomino
             switch (request.Type)
             {
                 case CommandType.StartGame:
-                    var command = new StartGameCommand();
-                    command.Type = request.Type;
-                    command.PayLoad = request.PayLoad;
-                    entity.AddComponent(command);
+                    var startCommand = new StartGameCommand();
+                    startCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(startCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
+                // TODO: MoveLeft와 MoveRight 명령은 BoardSystem에서 직접 처리
+                case CommandType.MoveLeft:
+                    var moveLeftCommand = new MoveLeftCommand();
+                    moveLeftCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(moveLeftCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
+                case CommandType.MoveRight:
+                    var moveRightCommand = new MoveRightCommand();
+                    moveRightCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(moveRightCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+                case CommandType.SoftDrop:
+                    var softDropCommand = new SoftDropCommand();
+                    softDropCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(softDropCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
+                case CommandType.HardDrop:
+                    var hardDropCommand = new HardDropCommand();
+                    hardDropCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(hardDropCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
                 // 향후 다른 명령 타입들 추가

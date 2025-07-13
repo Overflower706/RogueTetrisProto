@@ -1,6 +1,6 @@
 namespace Minomino
 {
-    public class StartGameCommand : ICommand
+    public class SoftDropCommand : ICommand
     {
         public object PayLoad { get; set; }
     }

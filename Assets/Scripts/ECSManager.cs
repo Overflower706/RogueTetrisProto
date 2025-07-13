@@ -44,6 +44,8 @@ namespace Minos
             Systems.AddSystem<TetriminoSystem>();
             Systems.AddSystem<BoardSystem>();
 
+            Systems.AddSystem<ExampleInputSystem>();
+
             // View 관련
 
             var panelSceneManager = FindFirstObjectByType<PanelSceneManager>(FindObjectsInactive.Include);
