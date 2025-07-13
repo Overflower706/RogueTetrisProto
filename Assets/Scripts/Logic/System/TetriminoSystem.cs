@@ -78,7 +78,7 @@ namespace Minomino
             var currentTetriminoComponent = nextTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
             currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
 
-            return false;
+            return true;
         }
 
         private TetriminoQueueComponent GetTetriminoQueueComponent()

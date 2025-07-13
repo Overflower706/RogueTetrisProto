@@ -1,6 +1,5 @@
 using OVFL.ECS;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace Minomino
 {
@@ -24,13 +23,6 @@ namespace Minomino
                     {
                         board.Board[x, y] = 0; // 빈 칸을 0으로 초기화
                     }
-                }
-
-                // CurrentTetriminoComponent를 찾아서 Board에 표시
-                var currentTetrimino = GetCurrentTetrimino();
-                if (currentTetrimino != null)
-                {
-                    DisplayTetriminoOnBoard(board, currentTetrimino, context);
                 }
 
                 Debug.Log("게임 시작, 보드 초기화 완료");
@@ -58,6 +50,13 @@ namespace Minomino
             if (hardDropEntities.Count > 0)
             {
                 ProcessHardDrop();
+            }
+
+            // CurrentTetriminoComponent를 찾아서 Board에 표시
+            var currentTetrimino = GetCurrentTetrimino();
+            if (currentTetrimino != null)
+            {
+                DisplayTetriminoOnBoard(board, currentTetrimino, context);
             }
         }
 
@@ -127,8 +126,6 @@ namespace Minomino
                     board.Board[pos.x, pos.y] = entityId;
                 }
             }
-
-            Debug.Log($"Tetrimino {tetriminoComponent.Type} 표시됨 - 위치: {currentTetrimino.Position}, Entity ID: {entityId}");
         }
 
         /// <summary>
