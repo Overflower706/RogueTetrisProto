@@ -43,7 +43,7 @@ namespace Minomino
             var commandRequest = commandRequestEntity.GetComponent<CommandRequestComponent>();
 
             // 방향키 좌 (현재 테트리미노 좌측 이동)
-            if (keyboard.dKey.wasPressedThisFrame)
+            if (keyboard.aKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 좌측 이동 (←)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -54,7 +54,7 @@ namespace Minomino
             }
 
             // 방향키 우 (현재 테트리미노 우측 이동)
-            if (keyboard.aKey.wasPressedThisFrame)
+            if (keyboard.dKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 우측 이동 (→)");
                 commandRequest.Requests.Enqueue(new CommandRequest
