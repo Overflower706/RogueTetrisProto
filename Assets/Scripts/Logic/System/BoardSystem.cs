@@ -52,6 +52,18 @@ namespace Minomino
                 ProcessHardDrop();
             }
 
+            var rotateClockwiseEntities = context.GetEntitiesWithComponent<RotateClockwiseCommand>();
+            if (rotateClockwiseEntities.Count > 0)
+            {
+                ProcessRotateCommand(true); // true = 시계방향
+            }
+
+            var rotateCounterClockwiseEntities = context.GetEntitiesWithComponent<RotateCounterClockwiseCommand>();
+            if (rotateCounterClockwiseEntities.Count > 0)
+            {
+                ProcessRotateCommand(false); // false = 반시계방향
+            }
+
             // CurrentTetriminoComponent를 찾아서 Board에 표시
             var currentTetrimino = GetCurrentTetrimino();
             if (currentTetrimino != null)
@@ -368,6 +380,57 @@ namespace Minomino
                 });
                 Debug.Log("새로운 테트리미노 생성 요청됨");
             }
+        }
+
+        /// <summary>
+        /// 회전 처리 - 테트리미노를 시계방향 또는 반시계방향으로 회전
+        /// </summary>
+        private void ProcessRotateCommand(bool clockwise)
+        {
+            var board = GetBoardComponent(Context);
+            var currentTetrimino = GetCurrentTetrimino();
+            var currentEntity = GetCurrentTetriminoEntity(Context);
+
+            if (board == null || currentTetrimino == null || currentEntity == null)
+                return;
+
+            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
+            if (tetriminoComponent == null) return;
+
+            // 현재 위치에서 테트리미노 제거
+            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
+
+            // 회전 계산
+            int originalRotation = tetriminoComponent.Rotation;
+            int newRotation;
+
+            if (clockwise)
+            {
+                newRotation = (originalRotation + 1) % 4; // 시계방향 회전
+            }
+            else
+            {
+                newRotation = (originalRotation - 1 + 4) % 4; // 반시계방향 회전
+            }
+
+            // 임시로 회전 적용
+            tetriminoComponent.Rotation = newRotation;
+
+            // 회전 후 충돌 검사
+            if (CanMoveTo(board, tetriminoComponent, currentTetrimino.Position, Context))
+            {
+                // 회전 가능하면 성공
+                Debug.Log($"Tetrimino 회전 성공: {(clockwise ? "시계방향" : "반시계방향")} - 새 회전: {newRotation}");
+            }
+            else
+            {
+                // 회전 불가능하면 원래 회전으로 되돌림
+                tetriminoComponent.Rotation = originalRotation;
+                Debug.Log($"Tetrimino 회전 실패: {(clockwise ? "시계방향" : "반시계방향")} - 충돌 또는 경계");
+            }
+
+            // 새 상태로 테트리미노 표시
+            DisplayTetriminoOnBoard(board, currentTetrimino, Context);
         }
 
         private CommandRequestComponent GetCommandRequestComponent()

@@ -56,30 +56,49 @@ namespace Minomino
                     entity.AddComponent(startCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
+
                 case CommandType.MoveLeft:
                     var moveLeftCommand = new MoveLeftCommand();
                     moveLeftCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(moveLeftCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
+
                 case CommandType.MoveRight:
                     var moveRightCommand = new MoveRightCommand();
                     moveRightCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(moveRightCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
+
                 case CommandType.SoftDrop:
                     var softDropCommand = new SoftDropCommand();
                     softDropCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(softDropCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
+
                 case CommandType.HardDrop:
                     var hardDropCommand = new HardDropCommand();
                     hardDropCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(hardDropCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
+
+                case CommandType.RotateClockwise:
+                    var rotateClockwiseCommand = new RotateClockwiseCommand();
+                    rotateClockwiseCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(rotateClockwiseCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
+                case CommandType.RotateCounterClockwise:
+                    var rotateCounterClockwiseCommand = new RotateCounterClockwiseCommand();
+                    rotateCounterClockwiseCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(rotateCounterClockwiseCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
                 case CommandType.GenerateTetrimino:
                     var generateCommand = new GenerateTetriminoCommand();
                     generateCommand.PayLoad = request.PayLoad;
