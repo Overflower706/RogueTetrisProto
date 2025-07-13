@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Minomino
 {
-    public class GameStateSystem : ISetupSystem, ITickSystem
+    public class GameStateSystem : ISetupSystem, ITickSystem, ICleanupSystem
     {
         public Context Context { get; set; }
         public void Setup(Context context)
@@ -23,17 +23,52 @@ namespace Minomino
                 state.CurrentState = GameState.Playing;
                 Debug.Log("게임 시작");
             }
+        }
+
+        public void Cleanup(Context context)
+        {
+            var state = GetState();
+
+            if (state.CurrentState != GameState.Playing) return;
 
             var score = GetScore();
+            var currentTetrimino = Context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
+            var tetriminoQueue = GetTetriminoQueue();
 
-            if (state.CurrentState == GameState.Playing)
+            // 게임 종료 조건 예시: 점수가 목표 점수에 도달하면 게임 종료
+            if (score.CurrentScore >= score.TargetScore)
             {
-                // 게임 종료 조건 예시: 점수가 목표 점수에 도달하면 게임 종료
-                if (score.CurrentScore >= score.TargetScore)
+                state.CurrentState = GameState.Victory;
+                Debug.Log("게임 종료, 목표 점수 도달");
+
+                // 게임 종료 명령 생성
+                var commandComponent = GetCommandRequest();
+                commandComponent.Requests.Enqueue(new CommandRequest
                 {
-                    state.CurrentState = GameState.Victory;
-                    Debug.Log("게임 종료, 목표 점수 도달");
-                }
+                    Type = CommandType.EndGame,
+                    PayLoad = null
+                });
+
+                return;
+            }
+
+            Debug.Log($"{currentTetrimino.Count}개의 현재 테트리미노가 있습니다. {tetriminoQueue.TetriminoQueue.Count}개의 대기 중인 테트리미노가 있습니다.");
+
+            if (tetriminoQueue.TetriminoQueue.Count == 0 && currentTetrimino.Count == 0)
+            {
+                // 테트리미노가 더 이상 없을 때 게임 종료
+                Debug.Log("게임 종료, 테트리미노가 더 이상 없습니다.");
+
+                state.CurrentState = GameState.GameOver;
+                Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");
+
+                // 게임 종료 명령 생성
+                var commandComponent = GetCommandRequest();
+                commandComponent.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.EndGame,
+                    PayLoad = null
+                });
             }
         }
 
@@ -69,6 +104,39 @@ namespace Minomino
             }
 
             return scoreEntities[0].GetComponent<ScoreComponent>();
+        }
+
+        private CommandRequestComponent GetCommandRequest()
+        {
+            var commandRequestEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
+            if (commandRequestEntities.Count == 0)
+            {
+                Debug.LogWarning("CommandRequestComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (commandRequestEntities.Count > 1)
+            {
+                Debug.LogWarning("CommandRequestComponent가 여러 엔티티에 존재합니다. 첫 번째 엔티티를 사용합니다.");
+            }
+
+            return commandRequestEntities[0].GetComponent<CommandRequestComponent>();
+        }
+
+        private TetriminoQueueComponent GetTetriminoQueue()
+        {
+            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+            if (queueEntities.Count == 0)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (queueEntities.Count > 1)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
         }
     }
 }

@@ -9,6 +9,13 @@ namespace Minomino
 
         public void Tick(Context context)
         {
+            var state = GetState();
+
+            if (state.CurrentState != GameState.Playing)
+            {
+                return;
+            }
+
             // Hold 명령을 감지
             var holdCommandEntities = context.GetEntitiesWithComponent<HoldTetriminoCommand>();
             if (holdCommandEntities.Count > 0)
@@ -65,12 +72,7 @@ namespace Minomino
             // 현재 테트리미노를 홀드로 변경
             // CurrentTetriminoComponent 제거
             currentTetriminoEntity.RemoveComponent<CurrentTetriminoComponent>();
-
-            // HoldTetriminoComponent 추가 (이미 존재하지 않는 경우에만)
-            if (!currentTetriminoEntity.HasComponent<HoldTetriminoComponent>())
-            {
-                currentTetriminoEntity.AddComponent<HoldTetriminoComponent>();
-            }
+            currentTetriminoEntity.AddComponent<HoldTetriminoComponent>();
 
             // 새로운 테트리미노 생성 요청
             RequestNewTetrimino();
@@ -101,7 +103,7 @@ namespace Minomino
             var newCurrentComponent = holdTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
 
             // 홀드된 테트리미노를 기본 스폰 위치와 회전으로 리셋
-            newCurrentComponent.Position = new UnityEngine.Vector2Int(5, 18); // 스폰 위치
+            newCurrentComponent.Position = new Vector2Int(5, 18); // 스폰 위치
             var holdTetrimino = holdTetriminoEntity.GetComponent<TetriminoComponent>();
             holdTetrimino.Rotation = 0; // 회전 초기화
 
@@ -147,6 +149,23 @@ namespace Minomino
             }
 
             return commandRequestEntities[0].GetComponent<CommandRequestComponent>();
+        }
+
+        private GameStateComponent GetState()
+        {
+            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+            if (stateEntities.Count == 0)
+            {
+                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (stateEntities.Count > 1)
+            {
+                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return stateEntities[0].GetComponent<GameStateComponent>();
         }
     }
 }

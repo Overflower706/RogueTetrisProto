@@ -57,6 +57,13 @@ namespace Minomino
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
 
+                case CommandType.EndGame:
+                    var endCommand = new EndGameCommand();
+                    endCommand.PayLoad = request.PayLoad;
+                    entity.AddComponent(endCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
                 case CommandType.MoveLeft:
                     var moveLeftCommand = new MoveLeftCommand();
                     moveLeftCommand.PayLoad = request.PayLoad;

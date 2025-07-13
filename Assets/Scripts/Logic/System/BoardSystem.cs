@@ -10,8 +10,8 @@ namespace Minomino
 
         public void Tick(Context context)
         {
-            var board = GetBoardComponent(context);
-            if (board == null) return;
+            var board = GetBoard();
+            var state = GetState();
 
             var startEntities = context.GetEntitiesWithComponent<StartGameCommand>();
             if (startEntities.Count > 0)
@@ -28,6 +28,16 @@ namespace Minomino
 
                 Debug.Log("게임 시작, 보드 초기화 완료");
             }
+
+            var endEntities = Context.GetEntitiesWithComponent<EndGameCommand>();
+            if (endEntities.Count > 0)
+            {
+                // 게임 종료 로직
+                Debug.Log("게임 종료, 보드 상태 유지");
+                return; // 게임이 종료되면 더 이상 처리하지 않음
+            }
+
+            if (state.CurrentState != GameState.Playing) return;
 
             var moveLeftEntities = context.GetEntitiesWithComponent<MoveLeftCommand>();
             if (moveLeftEntities.Count > 0)
@@ -79,9 +89,9 @@ namespace Minomino
             }
         }
 
-        private BoardComponent GetBoardComponent(Context context)
+        private BoardComponent GetBoard()
         {
-            var boardEntities = context.GetEntitiesWithComponent<BoardComponent>();
+            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
 
             if (boardEntities.Count == 0)
             {
@@ -95,6 +105,24 @@ namespace Minomino
             }
 
             return boardEntities[0].GetComponent<BoardComponent>();
+        }
+
+        private GameStateComponent GetState()
+        {
+            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+
+            if (stateEntities.Count == 0)
+            {
+                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (stateEntities.Count > 1)
+            {
+                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return stateEntities[0].GetComponent<GameStateComponent>();
         }
 
         /// <summary>
@@ -192,7 +220,7 @@ namespace Minomino
         /// </summary>
         private void ProcessMoveCommand(Context context, CommandType commandType)
         {
-            var board = GetBoardComponent(context);
+            var board = GetBoard();
             var currentTetrimino = GetCurrentTetrimino();
             var currentEntity = GetCurrentTetriminoEntity(context);
 
@@ -287,7 +315,7 @@ namespace Minomino
         /// </summary>
         private void ProcessSoftDrop()
         {
-            var board = GetBoardComponent(Context);
+            var board = GetBoard();
             var currentTetrimino = GetCurrentTetrimino();
             var currentEntity = GetCurrentTetriminoEntity(Context);
 
@@ -326,7 +354,7 @@ namespace Minomino
         /// </summary>
         private void ProcessHardDrop()
         {
-            var board = GetBoardComponent(Context);
+            var board = GetBoard();
             var currentTetrimino = GetCurrentTetrimino();
             var currentEntity = GetCurrentTetriminoEntity(Context);
 
@@ -413,7 +441,7 @@ namespace Minomino
         /// </summary>
         private void ProcessRotateCommand(bool clockwise)
         {
-            var board = GetBoardComponent(Context);
+            var board = GetBoard();
             var currentTetrimino = GetCurrentTetrimino();
             var currentEntity = GetCurrentTetriminoEntity(Context);
 
@@ -464,7 +492,7 @@ namespace Minomino
         /// </summary>
         private void ProcessHoldCommand()
         {
-            var board = GetBoardComponent(Context);
+            var board = GetBoard();
             var currentTetrimino = GetCurrentTetrimino();
             var currentEntity = GetCurrentTetriminoEntity(Context);
 
@@ -504,10 +532,9 @@ namespace Minomino
                         int entityId = board.Board[x, y];
                         if (entityId > 0)
                         {
-                            // Entity ID를 통해 테트리미노 색상 찾기
-                            var entity = Context.GetEntities()[entityId];
-                            var tetriminoComponent = entity?.GetComponent<TetriminoComponent>();
-                            lineColors[x] = tetriminoComponent?.Color ?? TetriminoColor.Red;
+                            // Entity ID를 통해 테트리미노 색상 찾기 (더 안전한 방법)
+                            var tetriminoColor = FindTetriminoColorByEntityId(entityId);
+                            lineColors[x] = tetriminoColor;
                         }
                         else
                         {
@@ -618,6 +645,34 @@ namespace Minomino
             }
 
             return commandEntities[0].GetComponent<CommandRequestComponent>();
+        }
+
+        /// <summary>
+        /// Entity ID로 테트리미노 색상 찾기 (안전한 방법)
+        /// </summary>
+        private TetriminoColor FindTetriminoColorByEntityId(int entityId)
+        {
+            try
+            {
+                // 모든 TetriminoComponent를 가진 엔티티들을 순회
+                var tetriminoEntities = Context.GetEntitiesWithComponent<TetriminoComponent>();
+                foreach (var entity in tetriminoEntities)
+                {
+                    if (entity.ID == entityId)
+                    {
+                        var tetriminoComponent = entity.GetComponent<TetriminoComponent>();
+                        return tetriminoComponent?.Color ?? TetriminoColor.Red;
+                    }
+                }
+
+                Debug.LogWarning($"Entity ID {entityId}에 해당하는 TetriminoComponent를 찾을 수 없음");
+                return TetriminoColor.Red; // 기본값
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"FindTetriminoColorByEntityId 오류: {ex.Message}");
+                return TetriminoColor.Red; // 기본값
+            }
         }
     }
 }
