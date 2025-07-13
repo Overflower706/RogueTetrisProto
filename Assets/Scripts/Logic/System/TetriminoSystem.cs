@@ -11,8 +11,8 @@ namespace Minomino
 
         public void Tick(Context context)
         {
-            var commandEntities = context.GetEntitiesWithComponent<StartGameCommand>();
-            if (commandEntities.Count > 0)
+            var startEntities = context.GetEntitiesWithComponent<StartGameCommand>();
+            if (startEntities.Count > 0)
             {
                 // 게임 시작
                 // SevenBag 시스템을 사용하여 Tetrimino 큐 생성
@@ -41,6 +41,60 @@ namespace Minomino
                 Debug.Log($"첫 번째 Tetrimino 생성, Type: {firstTetriminoComponent.Type}, Color: {firstTetriminoComponent.ColorValue}, Position: {currentTetriminoComponent.Position}");
                 Debug.Log($"Tetrimino 생성 완료: {queueComponent.TetriminoQueue.Count}개 대기 중");
             }
+
+            var generateCommandEntities = context.GetEntitiesWithComponent<GenerateTetriminoCommand>();
+            if (generateCommandEntities.Count > 0)
+            {
+                // GenerateTetriminoCommand가 있는 경우, Tetrimino를 생성
+                if (TryGenerateTetrimino())
+                {
+                    Debug.Log("새로운 Tetrimino 생성 완료");
+                }
+                else
+                {
+                    Debug.LogWarning("Tetrimino 생성 실패: 큐가 비어 있거나 큐 컴포넌트가 없음");
+                }
+            }
+        }
+
+        private bool TryGenerateTetrimino()
+        {
+            var queueComponent = GetTetriminoQueueComponent();
+            if (queueComponent == null)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 없습니다. 큐를 생성할 수 없습니다.");
+                return false; // 큐가 없으면 생성 실패
+            }
+
+            if (queueComponent.TetriminoQueue.Count == 0)
+            {
+                Debug.LogWarning("Tetrimino 큐가 비어 있습니다. 새로운 Tetrimino를 생성할 수 없습니다.");
+                return false; // 큐가 비어 있으면 생성 실패
+            }
+
+            // 큐에서 Tetrimino를 꺼내서 현재 테트리미노로 설정
+            var nextTetriminoEntity = queueComponent.TetriminoQueue.Dequeue();
+            var nextTetriminoComponent = nextTetriminoEntity.GetComponent<TetriminoComponent>();
+            var currentTetriminoComponent = nextTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
+            currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+
+            return false;
+        }
+
+        private TetriminoQueueComponent GetTetriminoQueueComponent()
+        {
+            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+            if (queueEntities.Count == 0)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
+                return null; // 큐가 없으면 null 반환
+            }
+            else if (queueEntities.Count > 1)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null; // 여러 엔티티가 있으면 경고 후 null 반환
+            }
+            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
         }
 
         /// <summary>
@@ -48,7 +102,7 @@ namespace Minomino
         /// 7가지 타입 × 4가지 색상 = 28가지 조합을 모두 1개씩 포함
         /// </summary>
         /// <returns>28가지 조합이 무작위로 섞인 TetriminoComponent 큐</returns>
-        public static Queue<TetriminoComponent> GenerateRandomQueue()
+        private Queue<TetriminoComponent> GenerateRandomQueue()
         {
             List<TetriminoComponent> allCombinations = new List<TetriminoComponent>();
 
@@ -102,7 +156,7 @@ namespace Minomino
         /// 7-bag 규칙: 같은 타입이 최대 7번째에 다시 나오는 것이 보장됨
         /// </summary>
         /// <returns>7-bag 시스템으로 생성된 28개의 TetriminoComponent 큐 (색상별 4백)</returns>
-        public static Queue<TetriminoComponent> GenerateSevenBagQueue()
+        private Queue<TetriminoComponent> GenerateSevenBagQueue()
         {
             Queue<TetriminoComponent> queue = new Queue<TetriminoComponent>();
 

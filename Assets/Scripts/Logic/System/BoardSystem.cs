@@ -295,9 +295,10 @@ namespace Minomino
             }
             else
             {
-                // 이동 불가능하면 현재 위치에 고정 (여기서는 단순히 원위치)
-                Debug.Log("SoftDrop 실패: 바닥 또는 충돌");
-                // TODO: 여기서 테트리미노를 고정하고 새로운 테트리미노 생성 로직 추가 필요
+                // 이동 불가능하면 현재 위치에 고정
+                Debug.Log("SoftDrop 실패: 바닥 또는 충돌 - 테트리미노 고정");
+                FixTetrimino(board, currentTetrimino, tetriminoComponent, currentEntity);
+                return; // 고정 후에는 DisplayTetriminoOnBoard 호출하지 않음
             }
 
             // 새 위치에 테트리미노 표시
@@ -344,10 +345,50 @@ namespace Minomino
             currentTetrimino.Position = newPosition;
             Debug.Log($"HardDrop 성공: {newPosition}");
 
-            // 새 위치에 테트리미노 표시
+            // HardDrop 후에는 즉시 테트리미노를 고정하고 새로운 테트리미노 생성
+            FixTetrimino(board, currentTetrimino, tetriminoComponent, currentEntity);
+        }
+
+        /// <summary>
+        /// 테트리미노를 고정하고 새로운 테트리미노 생성 요청
+        /// </summary>
+        private void FixTetrimino(BoardComponent board, CurrentTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
+        {
+            // 현재 위치에 테트리미노 표시 (고정)
             DisplayTetriminoOnBoard(board, currentTetrimino, Context);
 
-            // TODO: HardDrop 후에는 즉시 테트리미노를 고정하고 새로운 테트리미노 생성해야 함
+            // 현재 테트리미노 Entity에서 CurrentTetriminoComponent 제거
+            currentEntity.RemoveComponent<CurrentTetriminoComponent>();
+
+            // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
+            var commandRequest = GetCommandRequestComponent();
+            if (commandRequest != null)
+            {
+                commandRequest.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.GenerateTetrimino,
+                    PayLoad = null
+                });
+                Debug.Log("새로운 테트리미노 생성 요청됨");
+            }
+        }
+
+        private CommandRequestComponent GetCommandRequestComponent()
+        {
+            var commandEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
+
+            if (commandEntities.Count == 0)
+            {
+                Debug.LogWarning("CommandRequestComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (commandEntities.Count > 1)
+            {
+                Debug.LogWarning("CommandRequestComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return commandEntities[0].GetComponent<CommandRequestComponent>();
         }
     }
 }
