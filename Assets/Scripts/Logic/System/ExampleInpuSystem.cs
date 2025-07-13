@@ -43,7 +43,7 @@ namespace Minomino
             var commandRequest = commandRequestEntity.GetComponent<CommandRequestComponent>();
 
             // 방향키 좌 (현재 테트리미노 좌측 이동)
-            if (keyboard.leftArrowKey.wasPressedThisFrame)
+            if (keyboard.dKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 좌측 이동 (←)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -54,7 +54,7 @@ namespace Minomino
             }
 
             // 방향키 우 (현재 테트리미노 우측 이동)
-            if (keyboard.rightArrowKey.wasPressedThisFrame)
+            if (keyboard.aKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 우측 이동 (→)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -65,7 +65,7 @@ namespace Minomino
             }
 
             // 방향키 위 (홀드)
-            if (keyboard.upArrowKey.wasPressedThisFrame)
+            if (keyboard.wKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 홀드 (↑)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -76,7 +76,7 @@ namespace Minomino
             }
 
             // 방향키 아래 (소프트 드롭)
-            if (keyboard.downArrowKey.wasPressedThisFrame)
+            if (keyboard.sKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 소프트 드롭 (↓)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -98,7 +98,7 @@ namespace Minomino
             }
 
             // Z키 (회전 반시계 방향)
-            if (keyboard.zKey.wasPressedThisFrame)
+            if (keyboard.qKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 반시계 회전 (Z)");
                 commandRequest.Requests.Enqueue(new CommandRequest
@@ -109,7 +109,7 @@ namespace Minomino
             }
 
             // X키 (회전 시계 방향)
-            if (keyboard.xKey.wasPressedThisFrame)
+            if (keyboard.eKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 시계 회전 (X)");
                 commandRequest.Requests.Enqueue(new CommandRequest
