@@ -38,7 +38,7 @@ namespace Minomino
                 var currentTetriminoComponent = firstTetrimino.AddComponent<CurrentTetriminoComponent>();
                 currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
 
-                Debug.Log($"첫 번째 Tetrimino 생성, Type: {firstTetriminoComponent.Type}, Color: {firstTetriminoComponent.ColorValue}, Position: {currentTetriminoComponent.Position}");
+                Debug.Log($"첫 번째 Tetrimino 생성, Type: {firstTetriminoComponent.Type}, Color: {firstTetriminoComponent.Color}, Position: {currentTetriminoComponent.Position}");
                 Debug.Log($"Tetrimino 생성 완료: {queueComponent.TetriminoQueue.Count}개 대기 중");
             }
 
@@ -111,7 +111,8 @@ namespace Minomino
                                     TetriminoType.S, TetriminoType.Z, TetriminoType.J, TetriminoType.L };
 
             // 4가지 색상 (1~4)
-            int[] colors = { 1, 2, 3, 4 };
+            TetriminoColor[] colors = { TetriminoColor.Red, TetriminoColor.Green,
+                                        TetriminoColor.Blue, TetriminoColor.Yellow };
 
             // 모든 타입과 색상 조합을 리스트에 추가 (28가지)
             foreach (var type in types)
@@ -123,7 +124,7 @@ namespace Minomino
                         Type = type,
                         Shape = GetShapeForType(type),
                         Rotation = 0,
-                        ColorValue = color
+                        Color = color
                     };
 
                     allCombinations.Add(tetrimino);
@@ -171,7 +172,7 @@ namespace Minomino
             for (int colorIndex = 0; colorIndex < 4; colorIndex++)
             {
                 colorBags[colorIndex] = new List<TetriminoComponent>();
-                int color = colorIndex + 1; // 1~4 색상
+                TetriminoColor color = (TetriminoColor)colorIndex + 1; // 1~4 색상
 
                 // 7가지 타입을 해당 색상으로 생성
                 foreach (var type in types)
@@ -181,7 +182,7 @@ namespace Minomino
                         Type = type,
                         Shape = GetShapeForType(type),
                         Rotation = 0,
-                        ColorValue = color
+                        Color = color
                     };
 
                     colorBags[colorIndex].Add(tetrimino);
