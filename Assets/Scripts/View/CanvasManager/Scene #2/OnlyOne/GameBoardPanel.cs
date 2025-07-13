@@ -141,7 +141,6 @@ public class GameBoardPanel : MonoBehaviour
 
         // UI 업데이트
         UpdateGhostEffect(board);
-        LogCurrentAndHoldTetrimino();
         UpdateHoldUI();
     }
 
@@ -324,86 +323,6 @@ public class GameBoardPanel : MonoBehaviour
         return point;
     }
 
-    /// <summary>
-    /// 현재 테트리미노와 홀드된 테트리미노 정보를 로그로 출력
-    /// </summary>
-    private void LogCurrentAndHoldTetrimino()
-    {
-        if (Context == null) return;
-
-        var logBuilder = new System.Text.StringBuilder();
-        logBuilder.AppendLine("=== 테트리미노 상태 정보 ===");
-
-        // 현재 테트리미노 정보
-        LogCurrentTetrimino(logBuilder);
-        
-        // 홀드된 테트리미노 정보
-        LogHoldTetrimino(logBuilder);
-
-        logBuilder.AppendLine("================================");
-        Debug.Log(logBuilder.ToString());
-    }
-
-    /// <summary>
-    /// 현재 테트리미노 정보를 로그에 추가
-    /// </summary>
-    private void LogCurrentTetrimino(System.Text.StringBuilder logBuilder)
-    {
-        var (currentTetrimino, currentPosition) = GetCurrentTetriminoWithPosition();
-        
-        if (currentTetrimino != null && currentPosition != null)
-        {
-            logBuilder.AppendLine($"[현재 테트리미노]");
-            logBuilder.AppendLine($"  - 타입: {currentTetrimino.Type}");
-            logBuilder.AppendLine($"  - 색상: {currentTetrimino.Color}");
-            logBuilder.AppendLine($"  - 위치: ({currentPosition.Position.x}, {currentPosition.Position.y})");
-            logBuilder.AppendLine($"  - 회전: {currentTetrimino.Rotation}");
-            
-            // 블록 위치들
-            if (currentTetrimino.Shape != null)
-            {
-                logBuilder.AppendLine($"  - 블록 위치들:");
-                for (int i = 0; i < currentTetrimino.Shape.Length; i++)
-                {
-                    Vector2Int rotatedPos = RotatePoint(currentTetrimino.Shape[i], currentTetrimino.Rotation);
-                    Vector2Int worldPos = currentPosition.Position + rotatedPos;
-                    logBuilder.AppendLine($"    [{i}] Local({currentTetrimino.Shape[i].x}, {currentTetrimino.Shape[i].y}) → World({worldPos.x}, {worldPos.y})");
-                }
-            }
-        }
-        else
-        {
-            logBuilder.AppendLine("[현재 테트리미노] 없음");
-        }
-    }
-
-    /// <summary>
-    /// 홀드 테트리미노 정보를 로그에 추가
-    /// </summary>
-    private void LogHoldTetrimino(System.Text.StringBuilder logBuilder)
-    {
-        var holdTetrimino = GetHoldTetrimino();
-        
-        if (holdTetrimino != null)
-        {
-            logBuilder.AppendLine($"[홀드 테트리미노]");
-            logBuilder.AppendLine($"  - 타입: {holdTetrimino.Type}");
-            logBuilder.AppendLine($"  - 색상: {holdTetrimino.Color}");
-            
-            if (holdTetrimino.Shape != null)
-            {
-                logBuilder.AppendLine($"  - 기본 형태:");
-                for (int i = 0; i < holdTetrimino.Shape.Length; i++)
-                {
-                    logBuilder.AppendLine($"    [{i}] ({holdTetrimino.Shape[i].x}, {holdTetrimino.Shape[i].y})");
-                }
-            }
-        }
-        else
-        {
-            logBuilder.AppendLine("[홀드 테트리미노] 없음");
-        }
-    }
 
     /// <summary>
     /// 현재 테트리미노와 위치 정보를 함께 가져오는 헬퍼 메서드

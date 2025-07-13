@@ -25,6 +25,8 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
     [Header("게임 보드 패널")]
     [SerializeField] private GameBoardPanel gameboardPanel;
+    [Header("게임 스코어 패널")]
+    [SerializeField] private ScoreBoardPanel scoreBoardPanel;
 
 
     private RectTransform _gameRectTransform;
@@ -81,6 +83,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                    //    TestViewUI.StartGame();
 
                    gameboardPanel.Init(Context);
+                   scoreBoardPanel.Init(Context);
                });
     }
 
