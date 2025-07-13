@@ -377,7 +377,7 @@ namespace Minomino
             currentEntity.RemoveComponent<CurrentTetriminoComponent>();
 
             // 줄 완성 검증 및 제거
-            int clearedLines = CheckAndClearCompletedLines(board);
+            var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines(board);
             if (clearedLines > 0)
             {
                 Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
@@ -389,7 +389,7 @@ namespace Minomino
                     scoreCommandRequest.Requests.Enqueue(new CommandRequest
                     {
                         Type = CommandType.LineClear,
-                        PayLoad = (clearedLines, currentEntity.ID)
+                        PayLoad = (clearedLines, currentEntity.ID, completedLinesColors)
                     });
                     Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {currentEntity.ID}");
                 }
@@ -483,11 +483,12 @@ namespace Minomino
         /// <summary>
         /// 완성된 줄 검증 및 제거
         /// </summary>
-        private int CheckAndClearCompletedLines(BoardComponent board)
+        private (int clearedCount, TetriminoColor[][] completedLinesColors) CheckAndClearCompletedLines(BoardComponent board)
         {
-            if (board?.Board == null) return 0;
+            if (board?.Board == null) return (0, null);
 
             var completedLines = new List<int>();
+            var completedLinesColors = new List<TetriminoColor[]>();
 
             // 아래부터 위로 검사하여 완성된 줄 찾기
             for (int y = 0; y < BoardComponent.HEIGHT; y++)
@@ -495,6 +496,25 @@ namespace Minomino
                 if (IsLineCompleted(board, y))
                 {
                     completedLines.Add(y);
+
+                    // 해당 줄의 색상 정보 수집
+                    TetriminoColor[] lineColors = new TetriminoColor[BoardComponent.WIDTH];
+                    for (int x = 0; x < BoardComponent.WIDTH; x++)
+                    {
+                        int entityId = board.Board[x, y];
+                        if (entityId > 0)
+                        {
+                            // Entity ID를 통해 테트리미노 색상 찾기
+                            var entity = Context.GetEntities()[entityId];
+                            var tetriminoComponent = entity?.GetComponent<TetriminoComponent>();
+                            lineColors[x] = tetriminoComponent?.Color ?? TetriminoColor.Red;
+                        }
+                        else
+                        {
+                            lineColors[x] = TetriminoColor.Red; // 기본값 (실제로는 발생하지 않아야 함)
+                        }
+                    }
+                    completedLinesColors.Add(lineColors);
                 }
             }
 
@@ -505,7 +525,7 @@ namespace Minomino
                 DropLinesDown(board, completedLines);
             }
 
-            return completedLines.Count;
+            return (completedLines.Count, completedLinesColors.ToArray());
         }
 
         /// <summary>
