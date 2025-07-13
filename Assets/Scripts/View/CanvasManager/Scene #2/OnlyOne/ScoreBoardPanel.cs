@@ -47,7 +47,6 @@ public class ScoreBoardPanel : MonoBehaviour
         if (targetScoreText != null)
             targetScoreText.text = $"{scoreComponent.TargetScore:N0}";
             
-            Debug.Log(scoreComponent.CurrentScore + " / " + scoreComponent.TargetScore);
     }
 
     /// <summary>

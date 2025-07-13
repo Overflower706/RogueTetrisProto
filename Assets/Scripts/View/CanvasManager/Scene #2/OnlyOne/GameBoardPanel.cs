@@ -20,9 +20,6 @@ public class GameBoardPanel : MonoBehaviour
     [SerializeField] private RectTransform GridParent;
     [SerializeField] private Transform TetriminoParent;
 
-    [Header("홀드 테트리미노 UI")]
-    [SerializeField] private Transform HoldTetriminoParent;
-    [SerializeField] private GameObject HoldTetriminoPrefab;
 
     private int _width;
     private int _height;
@@ -33,17 +30,11 @@ public class GameBoardPanel : MonoBehaviour
     // (x, y) => 블록 오브젝트
     private Dictionary<Vector2Int, GameObject> _tetriminoObjects = new();
 
-    // 홀드 UI 관련
-    private GameObject[,] _holdAnchors; // 4x4 홀드 앵커 (항상 켜짐)
-    private GameObject[,] _holdImages; // 4x4 홀드 이미지 (블록 표시용)
-    private const int HOLD_SIZE = 4;
-
     public void Init(Context context)
     {
         Context = context;
         _isInit = true;
         InitGrid();
-        InitHoldArea();
     }
 
     private void InitGrid()
@@ -65,44 +56,6 @@ public class GameBoardPanel : MonoBehaviour
                 var gridCell = Instantiate(GridCellPrefab, GridParent);
                 _gridCells[x, y] = gridCell;
             }
-        }
-    }
-
-    /// <summary>
-    /// 4x4 홀드 영역 초기화
-    /// </summary>
-    private void InitHoldArea()
-    {
-        if (HoldTetriminoParent == null)
-        {
-            Debug.LogWarning("HoldTetriminoParent가 설정되지 않았습니다.");
-            return;
-        }
-
-        _holdAnchors = new GameObject[HOLD_SIZE, HOLD_SIZE];
-        _holdImages = new GameObject[HOLD_SIZE, HOLD_SIZE];
-
-        // GridLayoutGroup의 자식들(Anchor)을 가져와서 배열에 저장
-        int index = 0;
-        foreach (Transform anchorTransform in HoldTetriminoParent)
-        {
-            if (index >= HOLD_SIZE * HOLD_SIZE) break;
-            
-            int x = index % HOLD_SIZE;
-            int y = index / HOLD_SIZE;
-            
-            GameObject anchor = anchorTransform.gameObject;
-            _holdAnchors[x, y] = anchor;
-            
-            // Anchor의 첫 번째 자식이 Image_Tetrimino
-            if (anchor.transform.childCount > 0)
-            {
-                GameObject imageObj = anchor.transform.GetChild(0).gameObject;
-                _holdImages[x, y] = imageObj;
-                imageObj.SetActive(false); // 초기에는 비활성화
-            }
-            
-            index++;
         }
     }
 
@@ -141,80 +94,6 @@ public class GameBoardPanel : MonoBehaviour
 
         // UI 업데이트
         UpdateGhostEffect(board);
-        UpdateHoldUI();
-    }
-
-    /// <summary>
-    /// 홀드 테트리미노 UI 업데이트
-    /// </summary>
-    private void UpdateHoldUI()
-    {
-        ClearHoldUI();
-        
-        var holdTetrimino = GetHoldTetrimino();
-        if (holdTetrimino != null)
-        {
-            DisplayHoldTetrimino(holdTetrimino);
-        }
-    }
-
-    /// <summary>
-    /// 홀드된 테트리미노를 가져오는 헬퍼 메서드
-    /// </summary>
-    private TetriminoComponent GetHoldTetrimino()
-    {
-        var holdEntities = Context.GetEntitiesWithComponent<HoldTetriminoComponent>();
-        return holdEntities?.Count > 0 ? holdEntities[0].GetComponent<TetriminoComponent>() : null;
-    }
-
-    /// <summary>
-    /// 모든 홀드 이미지 비활성화
-    /// </summary>
-    private void ClearHoldUI()
-    {
-        if (_holdImages == null) return;
-
-        for (int i = 0; i < HOLD_SIZE * HOLD_SIZE; i++)
-        {
-            int x = i % HOLD_SIZE;
-            int y = i / HOLD_SIZE;
-            _holdImages[x, y]?.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// 홀드된 테트리미노를 4x4 영역에 표시
-    /// </summary>
-    private void DisplayHoldTetrimino(TetriminoComponent tetrimino)
-    {
-        if (_holdImages == null || tetrimino?.Shape == null) return;
-
-        Color tetriminoColor = GetTetriminoColor(tetrimino.Color);
-        Vector2Int centerOffset = new Vector2Int(1, 1); // 4x4에서 중앙 기준
-
-        foreach (var shapePos in tetrimino.Shape)
-        {
-            Vector2Int holdPos = centerOffset + shapePos;
-            
-            if (IsValidHoldPosition(holdPos))
-            {
-                var holdImage = _holdImages[holdPos.x, holdPos.y];
-                if (holdImage != null)
-                {
-                    holdImage.SetActive(true);
-                    var image = holdImage.GetComponent<Image>();
-                    if (image != null) image.color = tetriminoColor;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 홀드 위치가 유효한지 확인하는 헬퍼 메서드
-    /// </summary>
-    private bool IsValidHoldPosition(Vector2Int pos)
-    {
-        return pos.x >= 0 && pos.x < HOLD_SIZE && pos.y >= 0 && pos.y < HOLD_SIZE;
     }
 
     /// <summary>
@@ -321,21 +200,6 @@ public class GameBoardPanel : MonoBehaviour
             point.y = temp;
         }
         return point;
-    }
-
-
-    /// <summary>
-    /// 현재 테트리미노와 위치 정보를 함께 가져오는 헬퍼 메서드
-    /// </summary>
-    private (TetriminoComponent tetrimino, CurrentTetriminoComponent position) GetCurrentTetriminoWithPosition()
-    {
-        var currentEntities = Context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
-        if (currentEntities?.Count > 0)
-        {
-            var entity = currentEntities[0];
-            return (entity.GetComponent<TetriminoComponent>(), entity.GetComponent<CurrentTetriminoComponent>());
-        }
-        return (null, null);
     }
 
     /// <summary>
