@@ -3,6 +3,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using OVFL.ECS;
 using Minomino;
+using UnityEngine.InputSystem;
 
 public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
@@ -21,6 +22,10 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     [SerializeField] private Button Button_Win;
     [SerializeField] private Button Button_Lose;
     [SerializeField] private TestViewUI TestViewUI;
+
+    [Header("게임 보드 패널")]
+    [SerializeField] private GameBoardPanel gameboardPanel;
+
 
     private RectTransform _gameRectTransform;
     private Vector2 _gameOriginalPosition;
@@ -74,6 +79,8 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                    }
                    //    LogicManager.Instance.StartGame();
                    //    TestViewUI.StartGame();
+
+                   gameboardPanel.InitGrid();
                });
     }
 
@@ -83,6 +90,18 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
         {
             // 게임 상태 업데이트
             TestViewUI.UpdateGameState();
+
+            // 게임 보드 상태 업데이트
+            var entities = Context.GetEntitiesWithComponent<BoardComponent>();
+            if (entities.Count == 1)
+            {
+                var boardComponent = entities[0].GetComponent<BoardComponent>();
+                gameboardPanel.SetBoard(boardComponent);
+            }
+            else
+            {
+                Debug.LogWarning($"BoardComponent가 {entities.Count}개 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+            }
         }
     }
 
