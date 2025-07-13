@@ -5,6 +5,7 @@ using OVFL.ECS;
 using Minomino;
 using UnityEngine.InputSystem;
 using System.Linq;
+using TMPro;
 
 public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
@@ -32,6 +33,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     [Header("미리보기 UI")]
     [SerializeField] private TetriminoImage holdTetriminoImage;
     [SerializeField] private TetriminoImage[] nextTetriminoImages = new TetriminoImage[3];
+    [SerializeField] private TextMeshProUGUI restCountText;
 
 
     #region ICanvasManager
@@ -69,28 +71,28 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                .SetEase(Ease.OutQuart)
                .OnComplete(() =>
                {
-                    Canvas_Game.GetComponent<CanvasGroup>().interactable = true;
+                   Canvas_Game.GetComponent<CanvasGroup>().interactable = true;
 
-                    var entities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
-                    if (entities.Count == 1)
-                    {
-                        var commandReqeust = entities[0].GetComponent<CommandRequestComponent>();
-                        commandReqeust.Requests.Enqueue(new CommandRequest()
-                        {
-                            Type = CommandType.StartGame,
-                            PayLoad = null
-                        });
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"CommandRequestComponent가 {entities.Count}개 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                        gameSceneManager.ShowStageCanvas();
-                    }
-                    
-                    // 게임 보드 및 스코어 패널 초기화
-                    gameboardPanel.Init(Context);
-                    scoreBoardPanel.Init(Context);
-                    InitPreviewImages(); 
+                   var entities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
+                   if (entities.Count == 1)
+                   {
+                       var commandReqeust = entities[0].GetComponent<CommandRequestComponent>();
+                       commandReqeust.Requests.Enqueue(new CommandRequest()
+                       {
+                           Type = CommandType.StartGame,
+                           PayLoad = null
+                       });
+                   }
+                   else
+                   {
+                       Debug.LogWarning($"CommandRequestComponent가 {entities.Count}개 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                       gameSceneManager.ShowStageCanvas();
+                   }
+
+                   // 게임 보드 및 스코어 패널 초기화
+                   gameboardPanel.Init(Context);
+                   scoreBoardPanel.Init(Context);
+                   InitPreviewImages();
                });
     }
 
@@ -180,9 +182,10 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     private void UpdatePreviewUI()
     {
         if (Context == null) return;
-        
+
         UpdateHoldUI();
         UpdateNextTetriminoUI();
+        UpdateRestCountText();
     }
 
 
@@ -210,7 +213,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     private void UpdateNextTetriminoUI()
     {
         if (nextTetriminoImages == null) return;
-        
+
         var nextTetriminos = GetNextTetriminos();
 
         for (int i = 0; i < nextTetriminoImages.Length; i++)
@@ -242,7 +245,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
             // 큐가 없으면 빈 배열 반환 (모든 미리보기 UI가 클리어됨)
             return new TetriminoComponent[0];
         }
-        
+
         if (queueEntities.Count > 1)
         {
             Debug.LogWarning($"TetriminoQueueComponent가 {queueEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
@@ -258,7 +261,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
         // 큐에서 앞에서부터 최대 3개까지 가져오기 (큐를 수정하지 않고 미리보기만)
         var queueArray = queueComponent.TetriminoQueue.ToArray();
         var maxCount = Mathf.Min(3, queueArray.Length);
-        
+
         if (maxCount == 0)
         {
             // 큐가 비어있으면 빈 배열 반환 (모든 미리보기 UI가 클리어됨)
@@ -283,5 +286,31 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         var holdEntities = Context.GetEntitiesWithComponent<HoldTetriminoComponent>();
         return holdEntities?.Count > 0 ? holdEntities[0].GetComponent<TetriminoComponent>() : null;
+    }
+
+    private void UpdateRestCountText()
+    {
+        var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+        if (queueEntities == null || queueEntities.Count == 0)
+        {
+            restCountText.text = "-----";
+            return;
+        }
+
+        if (queueEntities.Count > 1)
+        {
+            Debug.LogWarning($"TetriminoQueueComponent가 {queueEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
+        }
+
+        var queueComponent = queueEntities[0].GetComponent<TetriminoQueueComponent>();
+        if (queueComponent?.TetriminoQueue == null)
+        {
+            restCountText.text = "+++++";
+            return;
+        }
+
+        // 큐에 남은 테트리미노 개수 가져오기
+        int remainingCount = queueComponent.TetriminoQueue.Count;
+        restCountText.text = $"{remainingCount}";
     }
 }
