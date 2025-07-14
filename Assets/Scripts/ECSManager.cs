@@ -13,18 +13,18 @@ namespace Minos
         {
             Initialize();
 
-            Systems.Setup(Context);
+            Systems.Setup();
         }
 
         private void Update()
         {
-            Systems.Tick(Context);
-            Systems.Cleanup(Context);
+            Systems.Tick();
+            Systems.Cleanup();
         }
 
         private void OnDestroy()
         {
-            Systems.Teardown(Context);
+            Systems.Teardown();
         }
 
         private void Initialize()

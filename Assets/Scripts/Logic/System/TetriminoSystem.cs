@@ -4,13 +4,17 @@ using System.Collections.Generic;
 
 namespace Minomino
 {
-    public class TetriminoSystem : ITickSystem
+    public class TetriminoSystem : ISetupSystem, ITickSystem
     {
         public Context Context { get; set; }
 
-        public void Tick(Context context)
+        public void Setup()
         {
-            var startEntities = context.GetEntitiesWithComponent<StartGameCommand>();
+        }
+
+        public void Tick()
+        {
+            var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (startEntities.Count > 0)
             {
                 // 게임 시작
@@ -26,7 +30,7 @@ namespace Minomino
                 // Context에서 TetriminoQueueComponent.TetriminoQueue.enqueue(entity);
                 foreach (var tetriminoComponent in tetriminoQueue)
                 {
-                    var tetriminoEntity = context.CreateEntity();
+                    var tetriminoEntity = Context.CreateEntity();
                     tetriminoEntity.AddComponent(tetriminoComponent);
                     queueComponent.TetriminoQueue.Enqueue(tetriminoEntity);
                 }
@@ -34,14 +38,14 @@ namespace Minomino
                 // 이후 첫 번째 Tetrimino를 꺼내서 CurrentTetrimino Component 부착
                 var firstTetrimino = queueComponent.TetriminoQueue.Dequeue();
                 var firstTetriminoComponent = firstTetrimino.GetComponent<TetriminoComponent>();
-                var currentTetriminoComponent = firstTetrimino.AddComponent<CurrentTetriminoComponent>();
+                var currentTetriminoComponent = firstTetrimino.AddComponent<BoardTetriminoComponent>();
                 currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
 
                 Debug.Log($"첫 번째 Tetrimino 생성, Type: {firstTetriminoComponent.Type}, Color: {firstTetriminoComponent.Color}, Position: {currentTetriminoComponent.Position}");
                 Debug.Log($"Tetrimino 생성 완료: {queueComponent.TetriminoQueue.Count}개 대기 중");
             }
 
-            var generateCommandEntities = context.GetEntitiesWithComponent<GenerateTetriminoCommand>();
+            var generateCommandEntities = Context.GetEntitiesWithComponent<GenerateTetriminoCommand>();
             if (generateCommandEntities.Count > 0)
             {
                 // GenerateTetriminoCommand가 있는 경우, Tetrimino를 생성
@@ -73,7 +77,7 @@ namespace Minomino
                     Debug.Log("Tetrimino 큐가 비어 있습니다. Hold된 Tetrimino를 사용합니다.");
                     var holdEntity = GetHoldTetriminoEntity();
                     holdEntity.RemoveComponent<HoldTetriminoComponent>();
-                    holdEntity.AddComponent<CurrentTetriminoComponent>();
+                    holdEntity.AddComponent<BoardTetriminoComponent>();
                     tetriminoComponent = holdEntity.GetComponent<TetriminoComponent>();
                     return true;
                 }
@@ -83,7 +87,7 @@ namespace Minomino
                 // 큐에서 Tetrimino를 꺼내서 현재 테트리미노로 설정
                 var nextTetriminoEntity = queueComponent.TetriminoQueue.Dequeue();
                 tetriminoComponent = nextTetriminoEntity.GetComponent<TetriminoComponent>();
-                var currentTetriminoComponent = nextTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
+                var currentTetriminoComponent = nextTetriminoEntity.AddComponent<BoardTetriminoComponent>();
                 currentTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
 
                 return true;
@@ -293,6 +297,16 @@ namespace Minomino
                 default:
                     return new Vector2Int[] { new Vector2Int(0, 0) };
             }
+        }
+
+        public void Tick(Context context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Setup(Context context)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -136,13 +136,13 @@ public class GameBoardPanel : MonoBehaviour
     private Vector2Int[] GetHardDropGhostPositions(BoardComponent board)
     {
         // 1. 현재 테트리미노 엔티티 찾기
-        var currentEntities = Context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
+        var currentEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
         if (currentEntities == null || currentEntities.Count == 0)
             return null;
 
         var entity = currentEntities[0];
         var tetrimino = entity.GetComponent<TetriminoComponent>();
-        var current = entity.GetComponent<CurrentTetriminoComponent>();
+        var current = entity.GetComponent<BoardTetriminoComponent>();
         if (tetrimino == null || current == null)
             return null;
 
@@ -207,7 +207,7 @@ public class GameBoardPanel : MonoBehaviour
     /// </summary>
     private (TetriminoComponent tetrimino, int entityId) GetCurrentTetriminoInfo()
     {
-        var currentEntities = Context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
+        var currentEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
         if (currentEntities != null && currentEntities.Count > 0)
         {
             var entity = currentEntities[0];
@@ -235,11 +235,11 @@ public class GameBoardPanel : MonoBehaviour
     {
         GameObject tetriminoObj = GetOrCreateTetriminoObject(pos);
         var image = tetriminoObj.GetComponent<Image>();
-        
+
         // 색상 설정
         Color color = GetTetriminoColorById(tetriminoId, currentTetrimino, currentEntityId);
         image.color = color;
-        
+
         tetriminoObj.SetActive(true);
     }
 
@@ -261,7 +261,7 @@ public class GameBoardPanel : MonoBehaviour
         // 위치 설정
         SetTetriminoPosition(gridCellRect, tetriminoRect);
         _tetriminoObjects[pos] = tetriminoObj;
-        
+
         return tetriminoObj;
     }
 
@@ -272,7 +272,7 @@ public class GameBoardPanel : MonoBehaviour
     {
         Vector2 worldPos = gridCellRect.TransformPoint(gridCellRect.rect.center);
         RectTransform tetriminoParentRect = TetriminoParent as RectTransform;
-        
+
         if (tetriminoParentRect != null)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -302,8 +302,8 @@ public class GameBoardPanel : MonoBehaviour
 
         // 배치된 블록인 경우
         var placedTetrimino = FindEntityById(tetriminoId);
-        return placedTetrimino != null 
-            ? GetTetriminoColor(placedTetrimino.Color) 
+        return placedTetrimino != null
+            ? GetTetriminoColor(placedTetrimino.Color)
             : Color.white;
     }
 

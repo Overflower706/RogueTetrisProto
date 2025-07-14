@@ -6,18 +6,18 @@ namespace Minomino
     public class GameStateSystem : ISetupSystem, ITickSystem, ICleanupSystem
     {
         public Context Context { get; set; }
-        public void Setup(Context context)
+        public void Setup()
         {
             var state = GetState();
             state.CurrentState = GameState.Initial;
             state.GameTime = 0f;
         }
 
-        public void Tick(Context context)
+        public void Tick()
         {
             var state = GetState();
 
-            var commandEntities = context.GetEntitiesWithComponent<StartGameCommand>();
+            var commandEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (commandEntities.Count > 0)
             {
                 state.CurrentState = GameState.Playing;
@@ -25,13 +25,13 @@ namespace Minomino
             }
         }
 
-        public void Cleanup(Context context)
+        public void Cleanup()
         {
             var state = GetState();
 
             if (state.CurrentState != GameState.Playing) return;
 
-            var currentTetrimino = Context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
+            var currentTetrimino = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
             var tetriminoQueue = GetTetriminoQueue();
             var score = GetScore();
 

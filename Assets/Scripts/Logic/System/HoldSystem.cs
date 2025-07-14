@@ -7,7 +7,7 @@ namespace Minomino
     {
         public Context Context { get; set; }
 
-        public void Tick(Context context)
+        public void Tick()
         {
             var state = GetState();
 
@@ -17,10 +17,10 @@ namespace Minomino
             }
 
             // Hold 명령을 감지
-            var holdCommandEntities = context.GetEntitiesWithComponent<HoldTetriminoCommand>();
+            var holdCommandEntities = Context.GetEntitiesWithComponent<HoldTetriminoCommand>();
             if (holdCommandEntities.Count > 0)
             {
-                ProcessHoldCommand(context);
+                ProcessHoldCommand(Context);
             }
         }
 
@@ -30,7 +30,7 @@ namespace Minomino
         private void ProcessHoldCommand(Context context)
         {
             // 현재 테트리미노 엔티티 찾기
-            var currentTetriminoEntities = context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
+            var currentTetriminoEntities = context.GetEntitiesWithComponent<BoardTetriminoComponent>();
             if (currentTetriminoEntities.Count == 0)
             {
                 Debug.LogWarning("Hold: 현재 테트리미노가 없습니다.");
@@ -38,7 +38,7 @@ namespace Minomino
             }
 
             var currentTetriminoEntity = currentTetriminoEntities[0];
-            var currentTetrimino = currentTetriminoEntity.GetComponent<CurrentTetriminoComponent>();
+            var currentTetrimino = currentTetriminoEntity.GetComponent<BoardTetriminoComponent>();
             var currentTetriminoComponent = currentTetriminoEntity.GetComponent<TetriminoComponent>();
 
             if (currentTetrimino == null || currentTetriminoComponent == null)
@@ -71,7 +71,7 @@ namespace Minomino
 
             // 현재 테트리미노를 홀드로 변경
             // CurrentTetriminoComponent 제거
-            currentTetriminoEntity.RemoveComponent<CurrentTetriminoComponent>();
+            currentTetriminoEntity.RemoveComponent<BoardTetriminoComponent>();
             currentTetriminoEntity.AddComponent<HoldTetriminoComponent>();
 
             // 새로운 테트리미노 생성 요청
@@ -100,7 +100,7 @@ namespace Minomino
             // 2. 홀드된 테트리미노를 현재 테트리미노로 변경
             // 홀드 엔티티에서 HoldTetriminoComponent 제거하고 CurrentTetriminoComponent 추가
             holdTetriminoEntity.RemoveComponent<HoldTetriminoComponent>();
-            var newCurrentComponent = holdTetriminoEntity.AddComponent<CurrentTetriminoComponent>();
+            var newCurrentComponent = holdTetriminoEntity.AddComponent<BoardTetriminoComponent>();
 
             // 홀드된 테트리미노를 기본 스폰 위치와 회전으로 리셋
             newCurrentComponent.Position = new Vector2Int(5, 18); // 스폰 위치
@@ -108,7 +108,7 @@ namespace Minomino
             holdTetrimino.Rotation = 0; // 회전 초기화
 
             // 3. 현재 테트리미노를 홀드로 변경
-            currentTetriminoEntity.RemoveComponent<CurrentTetriminoComponent>();
+            currentTetriminoEntity.RemoveComponent<BoardTetriminoComponent>();
             currentTetriminoEntity.AddComponent<HoldTetriminoComponent>();
 
             // 현재 테트리미노의 회전도 초기화
