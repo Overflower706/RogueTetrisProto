@@ -7,11 +7,11 @@ namespace Minomino
     {
         public Context Context { get; set; }
 
-        public void Tick(Context context)
+        public void Tick()
         {
             var player = GetPlayerComponent();
 
-            var commandEntities = context.GetEntitiesWithComponent<StartGameCommand>();
+            var commandEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (commandEntities.Count > 0)
             {
                 player.Currency = 0;

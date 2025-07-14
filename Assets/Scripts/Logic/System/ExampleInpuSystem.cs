@@ -11,14 +11,14 @@ namespace Minomino
         private Keyboard keyboard;
         private bool isStarted = false; // 게임 시작 여부 확인용.
 
-        public void Setup(Context context)
+        public void Setup()
         {
             keyboard = Keyboard.current;
         }
 
-        public void Tick(Context context)
+        public void Tick()
         {
-            var commandEntities = context.GetEntitiesWithComponent<StartGameCommand>();
+            var commandEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (commandEntities.Count > 0 && !isStarted)
             {
                 isStarted = true; // 게임 시작 상태로 설정
@@ -38,7 +38,7 @@ namespace Minomino
             // x (회전 시계 방향)
 
             // CommandRequestComponent 찾기
-            var commandRequestEntity = GetCommandRequestEntity(context);
+            var commandRequestEntity = GetCommandRequestEntity();
 
             var commandRequest = commandRequestEntity.GetComponent<CommandRequestComponent>();
 
@@ -123,9 +123,9 @@ namespace Minomino
         /// <summary>
         /// CommandRequestComponent가 있는 엔티티를 찾기
         /// </summary>
-        private Entity GetCommandRequestEntity(Context context)
+        private Entity GetCommandRequestEntity()
         {
-            var commandRequestEntities = context.GetEntitiesWithComponent<CommandRequestComponent>();
+            var commandRequestEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
 
             if (commandRequestEntities.Count == 0)
             {

@@ -8,12 +8,12 @@ namespace Minomino
     {
         public Context Context { get; set; }
 
-        public void Tick(Context context)
+        public void Tick()
         {
             var board = GetBoard();
             var state = GetState();
 
-            var startEntities = context.GetEntitiesWithComponent<StartGameCommand>();
+            var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (startEntities.Count > 0)
             {
                 // 초기 보드 설정 로직
@@ -39,37 +39,37 @@ namespace Minomino
 
             if (state.CurrentState != GameState.Playing) return;
 
-            var moveLeftEntities = context.GetEntitiesWithComponent<MoveLeftCommand>();
+            var moveLeftEntities = Context.GetEntitiesWithComponent<MoveLeftCommand>();
             if (moveLeftEntities.Count > 0)
             {
                 ProcessMoveCommand(Context, CommandType.MoveLeft);
             }
 
-            var moveRightEntities = context.GetEntitiesWithComponent<MoveRightCommand>();
+            var moveRightEntities = Context.GetEntitiesWithComponent<MoveRightCommand>();
             if (moveRightEntities.Count > 0)
             {
                 ProcessMoveCommand(Context, CommandType.MoveRight);
             }
 
-            var softDropEntities = context.GetEntitiesWithComponent<SoftDropCommand>();
+            var softDropEntities = Context.GetEntitiesWithComponent<SoftDropCommand>();
             if (softDropEntities.Count > 0)
             {
                 ProcessSoftDrop();
             }
 
-            var hardDropEntities = context.GetEntitiesWithComponent<HardDropCommand>();
+            var hardDropEntities = Context.GetEntitiesWithComponent<HardDropCommand>();
             if (hardDropEntities.Count > 0)
             {
                 ProcessHardDrop();
             }
 
-            var rotateClockwiseEntities = context.GetEntitiesWithComponent<RotateClockwiseCommand>();
+            var rotateClockwiseEntities = Context.GetEntitiesWithComponent<RotateClockwiseCommand>();
             if (rotateClockwiseEntities.Count > 0)
             {
                 ProcessRotateCommand(true); // true = 시계방향
             }
 
-            var rotateCounterClockwiseEntities = context.GetEntitiesWithComponent<RotateCounterClockwiseCommand>();
+            var rotateCounterClockwiseEntities = Context.GetEntitiesWithComponent<RotateCounterClockwiseCommand>();
             if (rotateCounterClockwiseEntities.Count > 0)
             {
                 ProcessRotateCommand(false); // false = 반시계방향
@@ -79,10 +79,10 @@ namespace Minomino
             var currentTetrimino = GetCurrentTetrimino();
             if (currentTetrimino != null)
             {
-                DisplayTetriminoOnBoard(board, currentTetrimino, context);
+                DisplayTetriminoOnBoard(board, currentTetrimino, Context);
             }
 
-            var holdTetriminoEntities = context.GetEntitiesWithComponent<HoldTetriminoCommand>();
+            var holdTetriminoEntities = Context.GetEntitiesWithComponent<HoldTetriminoCommand>();
             if (holdTetriminoEntities.Count > 0)
             {
                 ProcessHoldCommand();
@@ -130,7 +130,7 @@ namespace Minomino
         /// </summary>
         private Entity GetCurrentTetriminoEntity(Context context)
         {
-            var currentTetriminoEntities = context.GetEntitiesWithComponent<CurrentTetriminoComponent>();
+            var currentTetriminoEntities = context.GetEntitiesWithComponent<BoardTetriminoComponent>();
 
             if (currentTetriminoEntities.Count == 0)
             {
@@ -143,16 +143,16 @@ namespace Minomino
         /// <summary>
         /// CurrentTetriminoComponent 가져오기
         /// </summary>
-        private CurrentTetriminoComponent GetCurrentTetrimino()
+        private BoardTetriminoComponent GetCurrentTetrimino()
         {
             var entity = GetCurrentTetriminoEntity(Context);
-            return entity?.GetComponent<CurrentTetriminoComponent>();
+            return entity?.GetComponent<BoardTetriminoComponent>();
         }
 
         /// <summary>
         /// Board에 테트리미노 표시 (Entity ID로 저장)
         /// </summary>
-        private void DisplayTetriminoOnBoard(BoardComponent board, CurrentTetriminoComponent currentTetrimino, Context context)
+        private void DisplayTetriminoOnBoard(BoardComponent board, BoardTetriminoComponent currentTetrimino, Context context)
         {
             var currentEntity = GetCurrentTetriminoEntity(context);
             if (currentEntity == null) return;
@@ -267,7 +267,7 @@ namespace Minomino
         /// <summary>
         /// Board에서 테트리미노 제거
         /// </summary>
-        private void ClearTetriminoFromBoard(BoardComponent board, CurrentTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
+        private void ClearTetriminoFromBoard(BoardComponent board, BoardTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
         {
             var blockPositions = GetTetriminoWorldPositions(tetriminoComponent, currentTetrimino.Position);
             int entityId = currentEntity.ID;
@@ -396,44 +396,44 @@ namespace Minomino
         /// <summary>
         /// 테트리미노를 고정하고 새로운 테트리미노 생성 요청
         /// </summary>
-        private void FixTetrimino(BoardComponent board, CurrentTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
+        private void FixTetrimino(BoardComponent board, BoardTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
         {
             // 현재 위치에 테트리미노 표시 (고정)
             DisplayTetriminoOnBoard(board, currentTetrimino, Context);
 
             // 현재 테트리미노 Entity에서 CurrentTetriminoComponent 제거
-            currentEntity.RemoveComponent<CurrentTetriminoComponent>();
+            // currentEntity.RemoveComponent<CurrentTetriminoComponent>();
 
-            // 줄 완성 검증 및 제거
-            var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines(board);
-            if (clearedLines > 0)
-            {
-                Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
+            // // 줄 완성 검증 및 제거
+            // var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines(board);
+            // if (clearedLines > 0)
+            // {
+            //     Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
 
-                // ScoreSystem에 줄 클리어 이벤트 전달
-                var scoreCommandRequest = GetCommandRequestComponent();
-                if (scoreCommandRequest != null)
-                {
-                    scoreCommandRequest.Requests.Enqueue(new CommandRequest
-                    {
-                        Type = CommandType.LineClear,
-                        PayLoad = (clearedLines, currentEntity.ID, completedLinesColors)
-                    });
-                    Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {currentEntity.ID}");
-                }
-            }
+            //     // ScoreSystem에 줄 클리어 이벤트 전달
+            //     var scoreCommandRequest = GetCommandRequestComponent();
+            //     if (scoreCommandRequest != null)
+            //     {
+            //         scoreCommandRequest.Requests.Enqueue(new CommandRequest
+            //         {
+            //             Type = CommandType.LineClear,
+            //             PayLoad = (clearedLines, currentEntity.ID, completedLinesColors)
+            //         });
+            //         Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {currentEntity.ID}");
+            //     }
+            // }
 
-            // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
-            var commandRequest = GetCommandRequestComponent();
-            if (commandRequest != null)
-            {
-                commandRequest.Requests.Enqueue(new CommandRequest
-                {
-                    Type = CommandType.GenerateTetrimino,
-                    PayLoad = null
-                });
-                Debug.Log("새로운 테트리미노 생성 요청됨");
-            }
+            // // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
+            // var commandRequest = GetCommandRequestComponent();
+            // if (commandRequest != null)
+            // {
+            //     commandRequest.Requests.Enqueue(new CommandRequest
+            //     {
+            //         Type = CommandType.GenerateTetrimino,
+            //         PayLoad = null
+            //     });
+            //     Debug.Log("새로운 테트리미노 생성 요청됨");
+            // }
         }
 
         /// <summary>

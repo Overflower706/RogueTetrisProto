@@ -5,14 +5,14 @@ namespace Minomino
     public class DataSystem : ISetupSystem
     {
         public Context Context { get; set; }
-        public void Setup(Context context)
+        public void Setup()
         {
-            var gameEntity = context.CreateEntity();
+            var gameEntity = Context.CreateEntity();
             gameEntity.AddComponent<GameStateComponent>();
             gameEntity.AddComponent<ScoreComponent>();
             gameEntity.AddComponent<BoardComponent>();
 
-            var playerEntiy = context.CreateEntity();
+            var playerEntiy = Context.CreateEntity();
             playerEntiy.AddComponent<PlayerComponent>();
 
             var commandReuqestEntty = Context.CreateEntity();

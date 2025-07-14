@@ -7,9 +7,9 @@ namespace Minomino
     {
         public Context Context { get; set; }
 
-        public void Tick(Context context)
+        public void Tick()
         {
-            var queueEntities = context.GetEntitiesWithComponent<CommandRequestComponent>();
+            var queueEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
             if (queueEntities.Count == 0)
             {
                 Debug.LogWarning("CommandQueueComponent가 있는 엔티티가 없습니다.");
@@ -29,20 +29,20 @@ namespace Minomino
                 var request = commandQueue.Requests.Dequeue();
 
                 // 명령을 엔티티로 생성하여 다른 시스템들이 소비할 수 있도록 함
-                var commandEntity = context.CreateEntity();
+                var commandEntity = Context.CreateEntity();
 
                 // 명령 타입에 따라 적절한 컴포넌트 추가
                 AddCommandComponent(request, commandEntity);
             }
         }
 
-        public void Cleanup(Context context)
+        public void Cleanup()
         {
-            var commandEntities = context.GetEntitiesWithComponent<CommandMarkerComponent>();
+            var commandEntities = Context.GetEntitiesWithComponent<CommandMarkerComponent>();
 
             foreach (var entity in commandEntities)
             {
-                context.DestroyEntity(entity);
+                Context.DestroyEntity(entity);
             }
         }
 

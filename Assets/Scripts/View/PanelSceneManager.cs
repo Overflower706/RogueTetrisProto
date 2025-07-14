@@ -36,7 +36,7 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
         };
     }
 
-    public void Setup(Context context)
+    public void Setup()
     {
         TitleSceneManager.Init(this);
         GameSceneManager.Init(this);

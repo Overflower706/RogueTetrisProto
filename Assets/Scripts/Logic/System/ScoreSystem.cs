@@ -14,7 +14,7 @@ namespace Minomino
         private const int TRIPLE_LINE = 3;
         private const int TETRIS_LINE = 4;
 
-        public void Tick(Context context)
+        public void Tick()
         {
             var score = GetScoreComponent();
 
