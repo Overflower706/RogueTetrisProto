@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using OVFL.ECS;
+using Unity.VisualScripting.YamlDotNet.Core;
 using UnityEngine;
 
 namespace Minomino
@@ -10,13 +11,11 @@ namespace Minomino
 
         public void Tick()
         {
-            var board = GetBoard();
-            var state = GetState();
-
             var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (startEntities.Count > 0)
             {
                 // 초기 보드 설정 로직
+                var board = GetBoard();
                 board.Board = new int[BoardComponent.WIDTH, BoardComponent.HEIGHT];
                 for (int x = 0; x < BoardComponent.WIDTH; x++)
                 {
@@ -33,59 +32,73 @@ namespace Minomino
             if (endEntities.Count > 0)
             {
                 // 게임 종료 로직
-                Debug.Log("게임 종료, 보드 상태 유지");
+                Debug.Log("게임 종료, 보드 초기화");
+                var board = GetBoard();
+                board.Board = new int[BoardComponent.WIDTH, BoardComponent.HEIGHT];
+                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                {
+                    for (int y = 0; y < BoardComponent.HEIGHT; y++)
+                    {
+                        board.Board[x, y] = 0; // 빈 칸으로 초기화
+                    }
+                }
+
                 return; // 게임이 종료되면 더 이상 처리하지 않음
             }
 
+            var state = GetState();
             if (state.CurrentState != GameState.Playing) return;
+
+            var currentEntity = GetCurrentTetriminoEntity();
+
+            if (currentEntity == null)
+            {
+                Debug.LogWarning("현재 테트리미노가 없습니다. 뭔가 잘못됨");
+                return; // 현재 테트리미노가 없으면 더 이상 처리하지 않음. 사실 없으면 안되긴 하는데.
+            }
+
+            MarkTetriminoToBoard(currentEntity);
 
             var moveLeftEntities = Context.GetEntitiesWithComponent<MoveLeftCommand>();
             if (moveLeftEntities.Count > 0)
             {
-                ProcessMoveCommand(Context, CommandType.MoveLeft);
+                ProcessMove(currentEntity, false);
             }
 
             var moveRightEntities = Context.GetEntitiesWithComponent<MoveRightCommand>();
             if (moveRightEntities.Count > 0)
             {
-                ProcessMoveCommand(Context, CommandType.MoveRight);
-            }
-
-            var softDropEntities = Context.GetEntitiesWithComponent<SoftDropCommand>();
-            if (softDropEntities.Count > 0)
-            {
-                ProcessSoftDrop();
-            }
-
-            var hardDropEntities = Context.GetEntitiesWithComponent<HardDropCommand>();
-            if (hardDropEntities.Count > 0)
-            {
-                ProcessHardDrop();
+                ProcessMove(currentEntity, true);
             }
 
             var rotateClockwiseEntities = Context.GetEntitiesWithComponent<RotateClockwiseCommand>();
             if (rotateClockwiseEntities.Count > 0)
             {
-                ProcessRotateCommand(true); // true = 시계방향
+                ProcessRotate(currentEntity, true); // true = 시계방향
             }
 
             var rotateCounterClockwiseEntities = Context.GetEntitiesWithComponent<RotateCounterClockwiseCommand>();
             if (rotateCounterClockwiseEntities.Count > 0)
             {
-                ProcessRotateCommand(false); // false = 반시계방향
+                ProcessRotate(currentEntity, false); // false = 반시계방향
             }
 
-            // CurrentTetriminoComponent를 찾아서 Board에 표시
-            var currentTetrimino = GetCurrentTetrimino();
-            if (currentTetrimino != null)
+            var softDropEntities = Context.GetEntitiesWithComponent<SoftDropCommand>();
+            if (softDropEntities.Count > 0)
             {
-                DisplayTetriminoOnBoard(board, currentTetrimino, Context);
+                ProcessSoftDrop(currentEntity);
             }
 
-            var holdTetriminoEntities = Context.GetEntitiesWithComponent<HoldTetriminoCommand>();
-            if (holdTetriminoEntities.Count > 0)
+            var hardDropEntities = Context.GetEntitiesWithComponent<HardDropCommand>();
+            if (hardDropEntities.Count > 0)
             {
-                ProcessHoldCommand();
+                ProcessHardDrop(currentEntity);
+            }
+
+            var holdEntities = Context.GetEntitiesWithComponent<HoldTetriminoCommand>();
+            if (holdEntities.Count > 0)
+            {
+                ClearTetriminoFromBoard(currentEntity);
             }
         }
 
@@ -128,63 +141,63 @@ namespace Minomino
         /// <summary>
         /// CurrentTetriminoComponent를 가진 엔티티 찾기
         /// </summary>
-        private Entity GetCurrentTetriminoEntity(Context context)
+        private Entity GetCurrentTetriminoEntity()
         {
-            var currentTetriminoEntities = context.GetEntitiesWithComponent<BoardTetriminoComponent>();
-
-            if (currentTetriminoEntities.Count == 0)
+            var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+            foreach (var entity in tetriminoEntities)
             {
-                return null;
-            }
-
-            return currentTetriminoEntities[0];
-        }
-
-        /// <summary>
-        /// CurrentTetriminoComponent 가져오기
-        /// </summary>
-        private BoardTetriminoComponent GetCurrentTetrimino()
-        {
-            var entity = GetCurrentTetriminoEntity(Context);
-            return entity?.GetComponent<BoardTetriminoComponent>();
-        }
-
-        /// <summary>
-        /// Board에 테트리미노 표시 (Entity ID로 저장)
-        /// </summary>
-        private void DisplayTetriminoOnBoard(BoardComponent board, BoardTetriminoComponent currentTetrimino, Context context)
-        {
-            var currentEntity = GetCurrentTetriminoEntity(context);
-            if (currentEntity == null) return;
-
-            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
-            if (tetriminoComponent == null) return;
-
-            // Shape과 Rotation 기반으로 실제 블록 위치들 계산
-            var blockPositions = GetTetriminoWorldPositions(tetriminoComponent, currentTetrimino.Position);
-
-            // Board에 Entity ID 기록
-            int entityId = currentEntity.ID;
-
-            foreach (var pos in blockPositions)
-            {
-                if (IsValidPosition(pos))
+                var tetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
+                if (tetriminoComponent.State == BoardTetriminoState.Current)
                 {
-                    board.Board[pos.x, pos.y] = entityId;
+                    return entity; // 현재 상태의 테트리미노 엔티티 반환
                 }
             }
+
+            return null;
         }
 
         /// <summary>
-        /// 테트리미노의 실제 월드 위치들 계산
+        /// 해당 위치로 이동 가능한지 확인
         /// </summary>
-        private Vector2Int[] GetTetriminoWorldPositions(TetriminoComponent tetrimino, Vector2Int position)
+        private bool CanMoveTo(Entity tetrimino, Vector2Int newPosition)
         {
-            Vector2Int[] worldPositions = new Vector2Int[tetrimino.Shape.Length];
+            var worldPositions = GetTetriminoWorldPositions(tetrimino, newPosition);
 
-            for (int i = 0; i < tetrimino.Shape.Length; i++)
+            foreach (var position in worldPositions)
             {
-                Vector2Int rotatedShape = RotateShape(tetrimino.Shape[i], tetrimino.Rotation);
+                // 보드 경계 체크
+                if (!IsValidPosition(position))
+                {
+                    return false;
+                }
+
+                var board = GetBoard();
+
+                // 고정된 블록과 충돌 체크 (0이 아닌 다른 Entity ID가 있으면 충돌)
+                // 단, 현재 테트리미노 자신의 ID는 제외 (이동 중이므로)
+
+                if (board.Board[position.x, position.y] > 0 && board.Board[position.x, position.y] != tetrimino.ID)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 특정 위치 기준으로 테트리미노의 실제 월드 위치들 계산
+        /// </summary>
+        private Vector2Int[] GetTetriminoWorldPositions(Entity tetrimino, Vector2Int position)
+        {
+            var tetriminoComponent = tetrimino.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetrimino.GetComponent<BoardTetriminoComponent>();
+
+            Vector2Int[] worldPositions = new Vector2Int[tetriminoComponent.Shape.Length];
+
+            for (int i = 0; i < tetriminoComponent.Shape.Length; i++)
+            {
+                Vector2Int rotatedShape = RotateShape(tetriminoComponent.Shape[i], boardTetrimino.Rotation);
                 worldPositions[i] = position + rotatedShape;
             }
 
@@ -194,16 +207,16 @@ namespace Minomino
         /// <summary>
         /// Shape를 회전시키는 메서드
         /// </summary>
-        private Vector2Int RotateShape(Vector2Int point, int rotation)
+        private Vector2Int RotateShape(Vector2Int shape, int rotation)
         {
             // 90도씩 시계방향 회전
             for (int i = 0; i < rotation; i++)
             {
-                int temp = point.x;
-                point.x = -point.y;
-                point.y = temp;
+                int temp = shape.x;
+                shape.x = -shape.y;
+                shape.y = temp;
             }
-            return point;
+            return shape;
         }
 
         /// <summary>
@@ -218,244 +231,61 @@ namespace Minomino
         /// <summary>
         /// 실제 이동 처리
         /// </summary>
-        private void ProcessMoveCommand(Context context, CommandType commandType)
+        private void ProcessMove(Entity tetriminoEntity, bool isRight)
         {
+            ClearTetriminoFromBoard(tetriminoEntity);
+
             var board = GetBoard();
-            var currentTetrimino = GetCurrentTetrimino();
-            var currentEntity = GetCurrentTetriminoEntity(context);
 
-            if (board == null || currentTetrimino == null || currentEntity == null)
-                return;
-
-            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
-            if (tetriminoComponent == null) return;
-
-            // 현재 위치에서 테트리미노 제거
-            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
 
             // 이동 방향 결정
             Vector2Int moveDirection = Vector2Int.zero;
-            switch (commandType)
+            if (isRight)
             {
-                case CommandType.MoveLeft:
-                    moveDirection = Vector2Int.left;
-                    break;
-                case CommandType.MoveRight:
-                    moveDirection = Vector2Int.right;
-                    break;
+                moveDirection = Vector2Int.right;
+
+            }
+            else
+            {
+                moveDirection = Vector2Int.left;
             }
 
             // 새 위치 계산
-            Vector2Int newPosition = currentTetrimino.Position + moveDirection;
+            Vector2Int newPosition = boardTetrimino.Position + moveDirection;
 
             // 충돌 검사
-            if (CanMoveTo(board, tetriminoComponent, newPosition, context))
+            if (CanMoveTo(tetriminoEntity, newPosition))
             {
                 // 이동 가능하면 위치 업데이트
-                currentTetrimino.Position = newPosition;
-                Debug.Log($"Tetrimino {commandType} 이동 성공: {newPosition}");
+                boardTetrimino.Position = newPosition;
+                Debug.Log($"Tetrimino isRight : {isRight} 이동 성공: {newPosition}");
             }
             else
             {
-                Debug.Log($"Tetrimino {commandType} 이동 실패: 충돌 또는 경계");
+                Debug.Log($"Tetrimino isRight : {isRight} 이동 실패: 충돌 또는 경계");
             }
 
-            // 새 위치에 테트리미노 표시
-            DisplayTetriminoOnBoard(board, currentTetrimino, context);
+            MarkTetriminoToBoard(tetriminoEntity);
         }
 
-        /// <summary>
-        /// Board에서 테트리미노 제거
-        /// </summary>
-        private void ClearTetriminoFromBoard(BoardComponent board, BoardTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
-        {
-            var blockPositions = GetTetriminoWorldPositions(tetriminoComponent, currentTetrimino.Position);
-            int entityId = currentEntity.ID;
-
-            foreach (var pos in blockPositions)
-            {
-                if (IsValidPosition(pos) && board.Board[pos.x, pos.y] == entityId)
-                {
-                    board.Board[pos.x, pos.y] = 0; // 빈 칸으로 설정
-                }
-            }
-        }
-
-        /// <summary>
-        /// 해당 위치로 이동 가능한지 확인
-        /// </summary>
-        private bool CanMoveTo(BoardComponent board, TetriminoComponent tetrimino, Vector2Int newPosition, Context context)
-        {
-            var blockPositions = GetTetriminoWorldPositions(tetrimino, newPosition);
-
-            foreach (var pos in blockPositions)
-            {
-                // 보드 경계 체크
-                if (!IsValidPosition(pos))
-                {
-                    return false;
-                }
-
-                // 고정된 블록과 충돌 체크 (0이 아닌 다른 Entity ID가 있으면 충돌)
-                // 단, 현재 테트리미노 자신의 ID는 제외 (이동 중이므로)
-                var currentEntity = GetCurrentTetriminoEntity(Context);
-                int currentEntityId = currentEntity?.ID ?? -1;
-
-                if (board.Board[pos.x, pos.y] > 0 && board.Board[pos.x, pos.y] != currentEntityId)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// SoftDrop 처리 - 테트리미노를 한 칸 아래로 이동
-        /// </summary>
-        private void ProcessSoftDrop()
-        {
-            var board = GetBoard();
-            var currentTetrimino = GetCurrentTetrimino();
-            var currentEntity = GetCurrentTetriminoEntity(Context);
-
-            if (board == null || currentTetrimino == null || currentEntity == null)
-                return;
-
-            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
-            if (tetriminoComponent == null) return;
-
-            // 현재 위치에서 테트리미노 제거
-            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
-
-            // 아래로 한 칸 이동 시도
-            Vector2Int newPosition = currentTetrimino.Position + Vector2Int.down;
-
-            if (CanMoveTo(board, tetriminoComponent, newPosition, Context))
-            {
-                // 이동 가능하면 위치 업데이트
-                currentTetrimino.Position = newPosition;
-                Debug.Log($"SoftDrop 성공: {newPosition}");
-            }
-            else
-            {
-                // 이동 불가능하면 현재 위치에 고정
-                Debug.Log("SoftDrop 실패: 바닥 또는 충돌 - 테트리미노 고정");
-                FixTetrimino(board, currentTetrimino, tetriminoComponent, currentEntity);
-                return; // 고정 후에는 DisplayTetriminoOnBoard 호출하지 않음
-            }
-
-            // 새 위치에 테트리미노 표시
-            DisplayTetriminoOnBoard(board, currentTetrimino, Context);
-        }
-
-        /// <summary>
-        /// HardDrop 처리 - 테트리미노를 바닥까지 즉시 이동
-        /// </summary>
-        private void ProcessHardDrop()
-        {
-            var board = GetBoard();
-            var currentTetrimino = GetCurrentTetrimino();
-            var currentEntity = GetCurrentTetriminoEntity(Context);
-
-            if (board == null || currentTetrimino == null || currentEntity == null)
-                return;
-
-            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
-            if (tetriminoComponent == null) return;
-
-            // 현재 위치에서 테트리미노 제거
-            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
-
-            // 가능한 가장 아래까지 이동
-            Vector2Int newPosition = currentTetrimino.Position;
-            Vector2Int testPosition = newPosition;
-
-            // 아래로 계속 이동하면서 충돌하지 않는 가장 낮은 위치 찾기
-            while (true)
-            {
-                testPosition = newPosition + Vector2Int.down;
-                if (CanMoveTo(board, tetriminoComponent, testPosition, Context))
-                {
-                    newPosition = testPosition;
-                }
-                else
-                {
-                    break; // 더 이상 이동할 수 없으면 중단
-                }
-            }
-
-            // 최종 위치로 이동
-            currentTetrimino.Position = newPosition;
-            Debug.Log($"HardDrop 성공: {newPosition}");
-
-            // HardDrop 후에는 즉시 테트리미노를 고정하고 새로운 테트리미노 생성
-            FixTetrimino(board, currentTetrimino, tetriminoComponent, currentEntity);
-        }
-
-        /// <summary>
-        /// 테트리미노를 고정하고 새로운 테트리미노 생성 요청
-        /// </summary>
-        private void FixTetrimino(BoardComponent board, BoardTetriminoComponent currentTetrimino, TetriminoComponent tetriminoComponent, Entity currentEntity)
-        {
-            // 현재 위치에 테트리미노 표시 (고정)
-            DisplayTetriminoOnBoard(board, currentTetrimino, Context);
-
-            // 현재 테트리미노 Entity에서 CurrentTetriminoComponent 제거
-            // currentEntity.RemoveComponent<CurrentTetriminoComponent>();
-
-            // // 줄 완성 검증 및 제거
-            // var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines(board);
-            // if (clearedLines > 0)
-            // {
-            //     Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
-
-            //     // ScoreSystem에 줄 클리어 이벤트 전달
-            //     var scoreCommandRequest = GetCommandRequestComponent();
-            //     if (scoreCommandRequest != null)
-            //     {
-            //         scoreCommandRequest.Requests.Enqueue(new CommandRequest
-            //         {
-            //             Type = CommandType.LineClear,
-            //             PayLoad = (clearedLines, currentEntity.ID, completedLinesColors)
-            //         });
-            //         Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {currentEntity.ID}");
-            //     }
-            // }
-
-            // // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
-            // var commandRequest = GetCommandRequestComponent();
-            // if (commandRequest != null)
-            // {
-            //     commandRequest.Requests.Enqueue(new CommandRequest
-            //     {
-            //         Type = CommandType.GenerateTetrimino,
-            //         PayLoad = null
-            //     });
-            //     Debug.Log("새로운 테트리미노 생성 요청됨");
-            // }
-        }
 
         /// <summary>
         /// 회전 처리 - 테트리미노를 시계방향 또는 반시계방향으로 회전
         /// </summary>
-        private void ProcessRotateCommand(bool clockwise)
+        private void ProcessRotate(Entity tetriminoEntity, bool clockwise)
         {
-            var board = GetBoard();
-            var currentTetrimino = GetCurrentTetrimino();
-            var currentEntity = GetCurrentTetriminoEntity(Context);
-
-            if (board == null || currentTetrimino == null || currentEntity == null)
-                return;
-
-            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
-            if (tetriminoComponent == null) return;
-
             // 현재 위치에서 테트리미노 제거
-            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
+            ClearTetriminoFromBoard(tetriminoEntity);
+
+            var board = GetBoard();
+
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
 
             // 회전 계산
-            int originalRotation = tetriminoComponent.Rotation;
+            int originalRotation = boardTetrimino.Rotation;
             int newRotation;
 
             if (clockwise)
@@ -468,52 +298,184 @@ namespace Minomino
             }
 
             // 임시로 회전 적용
-            tetriminoComponent.Rotation = newRotation;
+            boardTetrimino.Rotation = newRotation;
 
             // 회전 후 충돌 검사
-            if (CanMoveTo(board, tetriminoComponent, currentTetrimino.Position, Context))
+            if (CanMoveTo(tetriminoEntity, boardTetrimino.Position))
             {
                 // 회전 가능하면 성공
+                boardTetrimino.Rotation = newRotation; // 실제 회전 적용
                 Debug.Log($"Tetrimino 회전 성공: {(clockwise ? "시계방향" : "반시계방향")} - 새 회전: {newRotation}");
             }
             else
             {
                 // 회전 불가능하면 원래 회전으로 되돌림
-                tetriminoComponent.Rotation = originalRotation;
+                boardTetrimino.Rotation = originalRotation;
                 Debug.Log($"Tetrimino 회전 실패: {(clockwise ? "시계방향" : "반시계방향")} - 충돌 또는 경계");
             }
 
-            // 새 상태로 테트리미노 표시
-            DisplayTetriminoOnBoard(board, currentTetrimino, Context);
+            // 테트리미노 표시
+            MarkTetriminoToBoard(tetriminoEntity);
         }
 
         /// <summary>
-        /// Hold 처리 - 현재 테트리미노를 보드에서 제거
+        /// SoftDrop 처리 - 테트리미노를 한 칸 아래로 이동
         /// </summary>
-        private void ProcessHoldCommand()
+        private void ProcessSoftDrop(Entity tetriminoEntity)
+        {
+            // 현재 위치에서 테트리미노 제거
+            ClearTetriminoFromBoard(tetriminoEntity);
+
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+
+            // 아래로 한 칸 이동 시도
+            Vector2Int newPosition = boardTetrimino.Position + Vector2Int.down;
+
+            if (CanMoveTo(tetriminoEntity, newPosition))
+            {
+                // 이동 가능하면 위치 업데이트
+                boardTetrimino.Position = newPosition;
+                Debug.Log($"SoftDrop 성공: {newPosition}");
+                MarkTetriminoToBoard(tetriminoEntity);
+            }
+            else
+            {
+                // 이동 불가능하면 현재 위치에 고정
+                Debug.Log("SoftDrop 실패: 바닥 또는 충돌 - 테트리미노 고정");
+                MarkTetriminoToBoard(tetriminoEntity);
+                FixTetrimino(tetriminoEntity);
+                return;
+            }
+        }
+
+        /// <summary>
+        /// HardDrop 처리 - 테트리미노를 바닥까지 즉시 이동
+        /// </summary>
+        private void ProcessHardDrop(Entity tetriminoEntity)
+        {
+            ClearTetriminoFromBoard(tetriminoEntity);
+
+            var board = GetBoard();
+
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+
+            // 가능한 가장 아래까지 이동
+            Vector2Int newPosition = boardTetrimino.Position;
+            Vector2Int testPosition = newPosition;
+
+            // 아래로 계속 이동하면서 충돌하지 않는 가장 낮은 위치 찾기
+            while (true)
+            {
+                testPosition = newPosition + Vector2Int.down;
+                if (CanMoveTo(tetriminoEntity, testPosition))
+                {
+                    newPosition = testPosition;
+                }
+                else
+                {
+                    break; // 더 이상 이동할 수 없으면 중단
+                }
+            }
+
+            // 최종 위치로 이동
+            boardTetrimino.Position = newPosition;
+            Debug.Log($"HardDrop 성공: {newPosition}");
+
+            // HardDrop 후에는 즉시 테트리미노를 고정하고 새로운 테트리미노 
+            MarkTetriminoToBoard(tetriminoEntity);
+            FixTetrimino(tetriminoEntity);
+        }
+
+        /// <summary>
+        /// Board에 테트리미노 표시 (Entity ID로 저장)
+        /// </summary>
+        private void MarkTetriminoToBoard(Entity tetriminoEntity)
         {
             var board = GetBoard();
-            var currentTetrimino = GetCurrentTetrimino();
-            var currentEntity = GetCurrentTetriminoEntity(Context);
 
-            if (board == null || currentTetrimino == null || currentEntity == null)
-                return;
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
 
-            var tetriminoComponent = currentEntity.GetComponent<TetriminoComponent>();
-            if (tetriminoComponent == null) return;
+            // Shape과 Rotation 기반으로 실제 블록 위치들 계산
+            var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
 
-            // 보드에서 현재 테트리미노 제거
-            ClearTetriminoFromBoard(board, currentTetrimino, tetriminoComponent, currentEntity);
+            foreach (var position in blockPositions)
+            {
+                if (IsValidPosition(position))
+                {
+                    board.Board[position.x, position.y] = tetriminoEntity.ID; // Entity ID로 테트리미노 표시
+                }
+            }
+        }
 
-            Debug.Log("Hold: 보드에서 현재 테트리미노 제거 완료");
+        private void ClearTetriminoFromBoard(Entity tetriminoEntity)
+        {
+            var board = GetBoard();
+
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+
+            // Shape과 Rotation 기반으로 실제 블록 위치들 계산
+            var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
+
+            foreach (var position in blockPositions)
+            {
+                if (IsValidPosition(position))
+                {
+                    board.Board[position.x, position.y] = 0; // 빈 칸으로 설정
+                }
+            }
+        }
+
+        /// <summary>
+        /// 테트리미노를 고정하고 새로운 테트리미노 생성 요청
+        /// </summary>
+        private void FixTetrimino(Entity tetriminoEntity)
+        {
+            // 현재 위치에 테트리미노 표시 (고정)
+            tetriminoEntity.RemoveComponent<BoardTetriminoComponent>();
+            Debug.Log("Board System : 테트리스 고정할게~");
+
+            // 줄 완성 검증 및 제거
+            var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines();
+            if (clearedLines > 0)
+            {
+                Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
+
+                // ScoreSystem에 줄 클리어 이벤트 전달
+                var scoreCommandRequest = GetCommandRequestComponent();
+                if (scoreCommandRequest != null)
+                {
+                    scoreCommandRequest.Requests.Enqueue(new CommandRequest
+                    {
+                        Type = CommandType.LineClear,
+                        PayLoad = (clearedLines, tetriminoEntity.ID, completedLinesColors)
+                    });
+                    Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {tetriminoEntity.ID}");
+                }
+            }
+
+            // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
+            var commandRequest = GetCommandRequestComponent();
+            if (commandRequest != null)
+            {
+                commandRequest.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.GenerateTetrimino,
+                    PayLoad = null
+                });
+                Debug.Log("새로운 테트리미노 생성 요청됨");
+            }
         }
 
         /// <summary>
         /// 완성된 줄 검증 및 제거
         /// </summary>
-        private (int clearedCount, TetriminoColor[][] completedLinesColors) CheckAndClearCompletedLines(BoardComponent board)
+        private (int clearedCount, TetriminoColor[][] completedLinesColors) CheckAndClearCompletedLines()
         {
-            if (board?.Board == null) return (0, null);
+            var board = GetBoard();
 
             var completedLines = new List<int>();
             var completedLinesColors = new List<TetriminoColor[]>();

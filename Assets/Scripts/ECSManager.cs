@@ -38,12 +38,18 @@ namespace Minos
             // 순서 중요
             Systems.AddSystem<DataSystem>();
             Systems.AddSystem<CommandSystem>();
+
             Systems.AddSystem<GameStateSystem>();
             Systems.AddSystem<PlayerSystem>();
-            Systems.AddSystem<TetriminoSystem>();
-            Systems.AddSystem<BoardSystem>();
             Systems.AddSystem<ScoreSystem>();
+
+            Systems.AddSystem<TetriminoSystem>();
+
+            Systems.AddSystem<CurrentTetriminoSystem>();
+
+            Systems.AddSystem<BoardSystem>(); // Board측에서 Hold에 대해 지우고나서 HoldSystem이 BoardTetriminoState를 바꿔야함
             Systems.AddSystem<HoldSystem>();
+
 
             Systems.AddSystem<ExampleInputSystem>();
 

@@ -31,8 +31,6 @@ namespace Minomino
 
             if (state.CurrentState != GameState.Playing) return;
 
-            var currentTetrimino = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
-            var tetriminoQueue = GetTetriminoQueue();
             var score = GetScore();
 
             // 게임 종료 조건 예시: 점수가 목표 점수에 도달하면 게임 종료
@@ -52,11 +50,26 @@ namespace Minomino
                 return;
             }
 
-            if (tetriminoQueue.TetriminoQueue.Count == 0 && currentTetrimino.Count == 0)
-            {
-                // 테트리미노가 더 이상 없을 때 게임 종료
-                Debug.Log("게임 종료, 테트리미노가 더 이상 없습니다.");
+            var tetriminoQueue = GetTetriminoQueue();
+            var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
 
+            int count = 0;
+            foreach (var entity in boardTetriminoEntities)
+            {
+                var boardTetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
+                if (boardTetriminoComponent.State == BoardTetriminoState.Current)
+                {
+                    count++;
+                }
+
+                if (boardTetriminoComponent.State == BoardTetriminoState.Hold)
+                {
+                    count++;
+                }
+            }
+
+            if (tetriminoQueue.TetriminoQueue.Count == 0 && count == 0)
+            {
                 state.CurrentState = GameState.GameOver;
                 Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");
 

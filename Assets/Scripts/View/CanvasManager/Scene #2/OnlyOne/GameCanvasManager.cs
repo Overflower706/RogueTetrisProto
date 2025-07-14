@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using System.Linq;
 using TMPro;
 
-public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
+public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
 {
     public Context Context { get; set; }
 
@@ -96,7 +96,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                });
     }
 
-    private void Update()
+    public void Tick()
     {
         // GameState 변화 감시
         MonitorGameState();
@@ -212,10 +212,11 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         if (holdTetriminoImage == null) return;
 
-        var holdTetrimino = GetHoldTetrimino();
-        if (holdTetrimino != null)
+        var holdTetriminoEntity = GetHoldTetriminoEntity();
+        if (holdTetriminoEntity != null)
         {
-            holdTetriminoImage.UpdateImage(holdTetrimino);
+            var tetriminoComponent = holdTetriminoEntity.GetComponent<TetriminoComponent>();
+            holdTetriminoImage.UpdateImage(tetriminoComponent);
         }
         else
         {
@@ -298,10 +299,19 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     /// <summary>
     /// 홀드된 테트리미노를 가져오는 헬퍼 메서드
     /// </summary>
-    private TetriminoComponent GetHoldTetrimino()
+    private Entity GetHoldTetriminoEntity()
     {
-        var holdEntities = Context.GetEntitiesWithComponent<HoldTetriminoComponent>();
-        return holdEntities?.Count > 0 ? holdEntities[0].GetComponent<TetriminoComponent>() : null;
+        var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+        foreach (var entity in tetriminoEntities)
+        {
+            var boardTetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
+            if (boardTetriminoComponent.State == BoardTetriminoState.Hold)
+            {
+                return entity;
+            }
+        }
+
+        return null;
     }
 
     private void UpdateRestCountText()

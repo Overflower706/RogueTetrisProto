@@ -136,25 +136,38 @@ public class GameBoardPanel : MonoBehaviour
     private Vector2Int[] GetHardDropGhostPositions(BoardComponent board)
     {
         // 1. 현재 테트리미노 엔티티 찾기
-        var currentEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
-        if (currentEntities == null || currentEntities.Count == 0)
-            return null;
+        Entity currentEntity = null;
+        var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+        foreach (var boardTetriminoEntity in boardTetriminoEntities)
+        {
+            var boardTetriminoComponent = boardTetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            if (boardTetriminoComponent.State == BoardTetriminoState.Current)
+            {
+                currentEntity = boardTetriminoEntity;
+                break;
+            }
+        }
 
-        var entity = currentEntities[0];
-        var tetrimino = entity.GetComponent<TetriminoComponent>();
-        var current = entity.GetComponent<BoardTetriminoComponent>();
-        if (tetrimino == null || current == null)
+        if (currentEntity == null)
+        {
+            Debug.LogWarning("현재 테트리미노 엔티티를 찾을 수 없습니다.");
+            return null;
+        }
+
+        var tetrimino = currentEntity.GetComponent<TetriminoComponent>();
+        var boardTetrimino = currentEntity.GetComponent<BoardTetriminoComponent>();
+        if (tetrimino == null || boardTetrimino == null)
             return null;
 
         // 2. 회전 적용된 shape 구하기
         Vector2Int[] rotatedShape = new Vector2Int[tetrimino.Shape.Length];
         for (int i = 0; i < tetrimino.Shape.Length; i++)
-            rotatedShape[i] = RotatePoint(tetrimino.Shape[i], tetrimino.Rotation);
+            rotatedShape[i] = RotatePoint(tetrimino.Shape[i], boardTetrimino.Rotation);
 
-        int entityId = entity.ID;
+        int entityId = currentEntity.ID;
 
         // 3. 하드롭 위치 계산 (자기 자신은 무시)
-        Vector2Int dropPosition = current.Position;
+        Vector2Int dropPosition = boardTetrimino.Position;
         while (true)
         {
             Vector2Int testPosition = dropPosition + Vector2Int.down;
