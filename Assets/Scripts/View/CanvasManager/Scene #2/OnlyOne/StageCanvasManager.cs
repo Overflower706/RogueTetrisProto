@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 using OVFL.ECS;
+using Minomino;
 
 public class StageCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 {
@@ -65,9 +66,12 @@ public class StageCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
         // StartSmallGame만 이벤트 등록합니다.
         Button_StartSmallGame.onClick.AddListener(OnStartSmallGameClicked);
+        Button_StartBigGame.onClick.AddListener(OnStartBigGameClicked);
+        Button_StartBossGame.onClick.AddListener(OnStartBossGameClicked);
+
         Button_BackToTitle.onClick.AddListener(() =>
         {
-            // PanelSceneManager.Instance.LoadTitleScene();
+            PanelSceneManager.Instance.LoadTitleScene();
         });
 
         Canvas_Stage.gameObject.SetActive(false);
@@ -88,7 +92,6 @@ public class StageCanvasManager : MonoBehaviour, ICanvasManager, ISystem
 
         sequence.AppendCallback(() => Canvas_Stage.GetComponent<CanvasGroup>().interactable = false);
         sequence.AppendCallback(() => Panel_SmallBlind.SetActive(true));
-        sequence.AppendCallback(() => Button_StartSmallGame.interactable = true);
         sequence.Append(DOTween.To(() => _smallBlindRectTransform.anchoredPosition,
                                    x => _smallBlindRectTransform.anchoredPosition = x,
                                    _smallBlindOriginalPosition, 0.5f)
@@ -111,6 +114,30 @@ public class StageCanvasManager : MonoBehaviour, ICanvasManager, ISystem
                                    x => _backToStartRectTransform.anchoredPosition = x,
                                    _backToStartOriginalPosition, 0.5f)
                                .SetEase(Ease.OutQuart));
+
+        sequence.AppendCallback(() =>
+        {
+            var player = Context.GetEntitiesWithComponent<PlayerComponent>()[0].GetComponent<PlayerComponent>();
+            Button_StartSmallGame.interactable = false;
+            Button_StartBigGame.interactable = false;
+            Button_StartBossGame.interactable = false;
+
+            switch (player.Stage)
+            {
+                case 1:
+                    Button_StartSmallGame.interactable = true;
+                    break;
+                case 2:
+                    Button_StartBigGame.interactable = true;
+                    break;
+                case 3:
+                    Button_StartBossGame.interactable = true;
+                    break;
+                default:
+                    Debug.LogWarning("알 수 없는 스테이지입니다: " + player.Stage);
+                    break;
+            }
+        });
         sequence.AppendCallback(() => Canvas_Stage.GetComponent<CanvasGroup>().interactable = true);
 
         return sequence;
@@ -184,6 +211,22 @@ public class StageCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         Debug.Log("Small Game 시작!");
         Button_StartSmallGame.interactable = false; // 버튼 비활성화
+
+        GameScene.ShowGameCanvas();
+    }
+
+    private void OnStartBigGameClicked()
+    {
+        Debug.Log("Big Game 시작!");
+        Button_StartBigGame.interactable = false; // 버튼 비활성화
+
+        GameScene.ShowGameCanvas();
+    }
+
+    private void OnStartBossGameClicked()
+    {
+        Debug.Log("Boss Game 시작!");
+        Button_StartBossGame.interactable = false; // 버튼 비활성화
 
         GameScene.ShowGameCanvas();
     }

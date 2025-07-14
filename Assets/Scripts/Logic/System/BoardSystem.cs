@@ -461,6 +461,9 @@ namespace Minomino
             tetriminoEntity.RemoveComponent<BoardTetriminoComponent>();
             Debug.Log("Board System : 테트리스 고정할게~");
 
+            // 게임 오버 감지 (테트리미노 고정 직후)
+            CheckAndHandleGameOver(tetriminoEntity);
+
             // 줄 완성 검증 및 제거
             var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines();
             if (clearedLines > 0)
@@ -659,6 +662,115 @@ namespace Minomino
                 return TetriminoColor.Red; // 기본값
             }
         }
+
+        #region Game Over Detection System
+
+        /// <summary>
+        /// 게임 오버 상태 감지 및 처리
+        /// </summary>
+        private void CheckAndHandleGameOver(Entity tetriminoEntity)
+        {
+            var gameStateComponent = GetState();
+            if (gameStateComponent == null || gameStateComponent.CurrentState != GameState.Playing)
+            {
+                return;
+            }
+
+            // 하이브리드 게임 오버 감지
+            // 1. 높이 기반 감지 (버퍼 존 포함)
+            if (IsGameOverByHeight())
+            {
+                Debug.Log("게임 오버: 높이 기반 감지 (버퍼 존 초과)");
+                TriggerGameOver();
+                return;
+            }
+
+            // 2. 스폰 위치 충돌 감지
+            if (IsGameOverBySpawnCollision())
+            {
+                Debug.Log("게임 오버: 스폰 위치 충돌 감지");
+                TriggerGameOver();
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 높이 기반 게임 오버 감지 (버퍼 존 포함)
+        /// </summary>
+        private bool IsGameOverByHeight()
+        {
+            var board = GetBoard();
+
+            // 상위 2줄(18, 19줄)에 블록이 있는지 확인 (버퍼 존)
+            for (int y = BoardComponent.HEIGHT - 2; y < BoardComponent.HEIGHT; y++)
+            {
+                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                {
+                    if (board.Board[x, y] != 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 스폰 위치 충돌 기반 게임 오버 감지
+        /// </summary>
+        private bool IsGameOverBySpawnCollision()
+        {
+            var board = GetBoard();
+
+            // 일반적인 테트리미노 스폰 위치 (중앙 상단)
+            Vector2Int spawnPosition = new Vector2Int(BoardComponent.WIDTH / 2, BoardComponent.HEIGHT - 1);
+
+            // 스폰 위치와 주변 영역 확인
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 0; dy++)
+                {
+                    int x = spawnPosition.x + dx;
+                    int y = spawnPosition.y + dy;
+
+                    if (x >= 0 && x < BoardComponent.WIDTH && y >= 0 && y < BoardComponent.HEIGHT)
+                    {
+                        if (board.Board[x, y] != 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 게임 오버 상태 트리거
+        /// </summary>
+        private void TriggerGameOver()
+        {
+            var gameStateComponent = GetState();
+            if (gameStateComponent != null)
+            {
+                gameStateComponent.CurrentState = GameState.GameOver;
+                Debug.Log("게임 오버 상태로 전환됨");
+            }
+
+            // 게임 오버 이벤트 전송
+            var commandRequest = GetCommandRequestComponent();
+            if (commandRequest != null)
+            {
+                commandRequest.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.EndGame,
+                    PayLoad = null
+                });
+                Debug.Log("게임 오버 이벤트 전송됨");
+            }
+        }
+
+        #endregion
 
         // ========================================
         // Wall Kick System (Shape-Based Rotation)
@@ -897,6 +1009,27 @@ namespace Minomino
             // 90도(수직) → 180도(수평) 또는 270도(수직) → 0도(수평)
             return (fromRotation == 1 && toRotation == 2) ||
                    (fromRotation == 3 && toRotation == 0);
+        }
+
+        /// <summary>
+        /// GameStateComponent 가져오기
+        /// </summary>
+        private GameStateComponent GetGameStateComponent()
+        {
+            var gameStateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+
+            if (gameStateEntities.Count == 0)
+            {
+                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (gameStateEntities.Count > 1)
+            {
+                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return gameStateEntities[0].GetComponent<GameStateComponent>();
         }
     }
 }

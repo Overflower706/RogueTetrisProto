@@ -16,15 +16,26 @@ namespace Minomino
 
         public void Tick()
         {
-            var score = GetScoreComponent();
+            var score = GetScore();
 
-            var commandEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
-            if (commandEntities.Count > 0)
+            var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
+            if (startEntities.Count > 0)
             {
+                var player = GetPlayer();
+
                 score.CurrentScore = 0;
-                score.TargetScore = 100; // 예시로 500점으로 
+                score.TargetScore = ((player.Round - 1) * 3 + player.Stage) * 100;
 
                 Debug.Log("게임 시작, 초기 점수 설정: " + score.CurrentScore);
+            }
+
+            var endEntities = Context.GetEntitiesWithComponent<EndGameCommand>();
+            if (endEntities.Count > 0)
+            {
+                Debug.Log("게임 종료, 최종 점수: " + score.CurrentScore);
+                score.CurrentScore = 0; // 게임 종료 시 점수 초기화
+                score.TargetScore = 0; // 목표 점수도 초기화
+                return; // 게임 종료 시 더 이상 점수 계산하지 않음
             }
 
             // 줄 클리어 이벤트 처리
@@ -36,7 +47,7 @@ namespace Minomino
             }
         }
 
-        private ScoreComponent GetScoreComponent()
+        private ScoreComponent GetScore()
         {
             var scoreEntities = Context.GetEntitiesWithComponent<ScoreComponent>();
 
@@ -52,6 +63,23 @@ namespace Minomino
             }
 
             return scoreEntities[0].GetComponent<ScoreComponent>();
+        }
+
+        private PlayerComponent GetPlayer()
+        {
+            var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
+            if (playerEntities.Count == 0)
+            {
+                Debug.LogWarning("PlayerComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (playerEntities.Count > 1)
+            {
+                Debug.LogWarning("PlayerComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return playerEntities[0].GetComponent<PlayerComponent>();
         }
 
         /// <summary>
@@ -184,32 +212,6 @@ namespace Minomino
                 case 4: return 8;
                 default: return linesCleared; // 4줄 이상인 경우 선형 증가
             }
-        }
-
-        /// <summary>
-        /// 클리어된 줄 수에 따른 기본 점수 계산 (테트리스 표준 점수) - 더 이상 사용되지 않음
-        /// </summary>
-        [System.Obsolete("새로운 색상 연속 점수 시스템으로 대체됨")]
-        private int CalculateBaseScore(int linesCleared)
-        {
-            switch (linesCleared)
-            {
-                case 1: return BASE_LINE_SCORE * SINGLE_LINE;
-                case 2: return BASE_LINE_SCORE * DOUBLE_LINE;
-                case 3: return BASE_LINE_SCORE * TRIPLE_LINE;
-                case 4: return BASE_LINE_SCORE * TETRIS_LINE;
-                default: return BASE_LINE_SCORE * linesCleared;
-            }
-        }
-
-        /// <summary>
-        /// 줄 클리어 이벤트 처리 및 점수 계산 (향상된 버전) - 더 이상 사용되지 않음
-        /// </summary>
-        [System.Obsolete("새로운 색상 연속 점수 시스템으로 대체됨")]
-        private void ProcessLineClearAdvanced(ScoreComponent score, LineClearCommand lineClearCommand)
-        {
-            // 이 메서드는 더 이상 사용되지 않습니다.
-            // 새로운 ProcessLineClear 메서드를 사용하세요.
         }
 
         /// <summary>
