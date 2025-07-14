@@ -80,7 +80,11 @@ namespace Minomino
                     Type = CommandType.EndGame,
                     PayLoad = null
                 });
+
+                return;
             }
+
+            // 보드를 검증한다. 
         }
 
         private GameStateComponent GetState()
@@ -148,6 +152,23 @@ namespace Minomino
             }
 
             return queueEntities[0].GetComponent<TetriminoQueueComponent>();
+        }
+
+        private BoardComponent GetBoard()
+        {
+            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
+            if (boardEntities.Count == 0)
+            {
+                Debug.LogWarning("BoardComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (boardEntities.Count > 1)
+            {
+                Debug.LogWarning("BoardComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return boardEntities[0].GetComponent<BoardComponent>();
         }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using OVFL.ECS;
-using Unity.VisualScripting.YamlDotNet.Core;
 using UnityEngine;
 
 namespace Minomino
@@ -273,6 +272,7 @@ namespace Minomino
 
         /// <summary>
         /// 회전 처리 - 테트리미노를 시계방향 또는 반시계방향으로 회전
+        /// Wall Kick 기능 포함: 회전이 불가능할 때 위치를 조정하여 회전 시도
         /// </summary>
         private void ProcessRotate(Entity tetriminoEntity, bool clockwise)
         {
@@ -280,7 +280,6 @@ namespace Minomino
             ClearTetriminoFromBoard(tetriminoEntity);
 
             var board = GetBoard();
-
             var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
             var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
 
@@ -300,18 +299,42 @@ namespace Minomino
             // 임시로 회전 적용
             boardTetrimino.Rotation = newRotation;
 
-            // 회전 후 충돌 검사
-            if (CanMoveTo(tetriminoEntity, boardTetrimino.Position))
+            // Wall Kick 시도 - 여러 위치에서 회전 가능성 검사
+            Vector2Int originalPosition = boardTetrimino.Position;
+            Vector2Int[] wallKickOffsets = GetWallKickOffsets(tetriminoComponent.Shape, originalRotation, newRotation, clockwise);
+
+            bool rotationSuccessful = false;
+            Vector2Int finalPosition = originalPosition;
+
+            // 각 Wall Kick 오프셋에 대해 회전 가능성 검사
+            foreach (var offset in wallKickOffsets)
             {
-                // 회전 가능하면 성공
-                boardTetrimino.Rotation = newRotation; // 실제 회전 적용
-                Debug.Log($"Tetrimino 회전 성공: {(clockwise ? "시계방향" : "반시계방향")} - 새 회전: {newRotation}");
+                Vector2Int testPosition = originalPosition + offset;
+
+                if (CanMoveTo(tetriminoEntity, testPosition))
+                {
+                    // 회전 가능한 위치 발견
+                    finalPosition = testPosition;
+                    rotationSuccessful = true;
+                    break;
+                }
+            }
+
+            if (rotationSuccessful)
+            {
+                // 회전 성공 - 새로운 위치와 회전 적용
+                boardTetrimino.Position = finalPosition;
+                boardTetrimino.Rotation = newRotation;
+
+                string kickInfo = finalPosition != originalPosition ?
+                    $" (Wall Kick: {finalPosition - originalPosition})" : "";
+                Debug.Log($"Tetrimino 회전 성공: {(clockwise ? "시계방향" : "반시계방향")} - 새 회전: {newRotation}{kickInfo}");
             }
             else
             {
-                // 회전 불가능하면 원래 회전으로 되돌림
+                // 회전 불가능 - 원래 회전으로 되돌림
                 boardTetrimino.Rotation = originalRotation;
-                Debug.Log($"Tetrimino 회전 실패: {(clockwise ? "시계방향" : "반시계방향")} - 충돌 또는 경계");
+                Debug.Log($"Tetrimino 회전 실패: {(clockwise ? "시계방향" : "반시계방향")} - 모든 Wall Kick 시도 실패");
             }
 
             // 테트리미노 표시
@@ -635,6 +658,245 @@ namespace Minomino
                 Debug.LogError($"FindTetriminoColorByEntityId 오류: {ex.Message}");
                 return TetriminoColor.Red; // 기본값
             }
+        }
+
+        // ========================================
+        // Wall Kick System (Shape-Based Rotation)
+        // ========================================
+
+        /// <summary>
+        /// Shape 기반 Wall Kick 오프셋 배열 생성
+        /// </summary>
+        private Vector2Int[] GetWallKickOffsets(Vector2Int[] shape, int fromRotation, int toRotation, bool clockwise)
+        {
+            // Shape의 특성을 분석하여 적절한 Wall Kick 패턴 결정
+            var shapeAnalysis = AnalyzeShape(shape);
+
+            switch (shapeAnalysis.ShapeType)
+            {
+                case ShapeType.Square:
+                    return GetSquareWallKickOffsets();
+                case ShapeType.Line:
+                    return GetLineWallKickOffsets(fromRotation, toRotation, clockwise);
+                case ShapeType.Complex:
+                    return GetComplexWallKickOffsets(shapeAnalysis, fromRotation, toRotation, clockwise);
+                default:
+                    return GetStandardWallKickOffsets(fromRotation, toRotation, clockwise);
+            }
+        }
+
+        /// <summary>
+        /// Shape 분석 결과를 담는 구조체
+        /// </summary>
+        private struct ShapeAnalysis
+        {
+            public ShapeType ShapeType;
+            public Vector2Int BoundingBox;
+            public Vector2Int Center;
+            public int BlockCount;
+            public bool IsSymmetric;
+        }
+
+        /// <summary>
+        /// Shape 타입 열거형
+        /// </summary>
+        private enum ShapeType
+        {
+            Square,    // 정사각형 (2x2)
+            Line,      // 직선형 (1xN 또는 Nx1)
+            Complex,   // 복잡한 형태
+            Standard   // 일반적인 테트리미노 형태
+        }
+
+        /// <summary>
+        /// Shape을 분석하여 특성을 파악
+        /// </summary>
+        private ShapeAnalysis AnalyzeShape(Vector2Int[] shape)
+        {
+            var analysis = new ShapeAnalysis();
+            analysis.BlockCount = shape.Length;
+
+            // 바운딩 박스 계산
+            int minX = int.MaxValue, maxX = int.MinValue;
+            int minY = int.MaxValue, maxY = int.MinValue;
+
+            foreach (var block in shape)
+            {
+                minX = Mathf.Min(minX, block.x);
+                maxX = Mathf.Max(maxX, block.x);
+                minY = Mathf.Min(minY, block.y);
+                maxY = Mathf.Max(maxY, block.y);
+            }
+
+            analysis.BoundingBox = new Vector2Int(maxX - minX + 1, maxY - minY + 1);
+            analysis.Center = new Vector2Int((minX + maxX) / 2, (minY + maxY) / 2);
+
+            // Shape 타입 결정
+            if (analysis.BoundingBox.x == analysis.BoundingBox.y && analysis.BlockCount == 4)
+            {
+                analysis.ShapeType = ShapeType.Square;
+            }
+            else if (analysis.BoundingBox.x == 1 || analysis.BoundingBox.y == 1)
+            {
+                analysis.ShapeType = ShapeType.Line;
+            }
+            else if (analysis.BlockCount <= 4)
+            {
+                analysis.ShapeType = ShapeType.Standard;
+            }
+            else
+            {
+                analysis.ShapeType = ShapeType.Complex;
+            }
+
+            // 대칭성 검사
+            analysis.IsSymmetric = CheckSymmetry(shape);
+
+            return analysis;
+        }
+
+        /// <summary>
+        /// Shape의 대칭성 검사
+        /// </summary>
+        private bool CheckSymmetry(Vector2Int[] shape)
+        {
+            // 간단한 대칭성 검사 (완전한 구현은 복잡하므로 기본적인 체크만)
+            // 정사각형이나 십자형 등의 대칭적인 형태인지 확인
+            return shape.Length == 4; // 임시로 4개 블록이면 대칭적이라고 가정
+        }
+
+        /// <summary>
+        /// 정사각형 형태의 Wall Kick (회전 불필요)
+        /// </summary>
+        private Vector2Int[] GetSquareWallKickOffsets()
+        {
+            return new Vector2Int[] { Vector2Int.zero };
+        }
+
+        /// <summary>
+        /// 직선 형태의 Wall Kick
+        /// </summary>
+        private Vector2Int[] GetLineWallKickOffsets(int fromRotation, int toRotation, bool clockwise)
+        {
+            // 직선형은 더 넓은 범위의 Wall Kick 필요
+            List<Vector2Int> offsets = new List<Vector2Int>
+            {
+                Vector2Int.zero,        // 원래 위치
+                Vector2Int.left,        // 좌측으로 1칸
+                Vector2Int.right,       // 우측으로 1칸
+                new Vector2Int(-2, 0),  // 좌측으로 2칸
+                new Vector2Int(2, 0),   // 우측으로 2칸
+                Vector2Int.down,        // 아래로 1칸
+                new Vector2Int(0, -2),  // 아래로 2칸
+                new Vector2Int(-1, -1), // 좌측 아래
+                new Vector2Int(1, -1),  // 우측 아래
+            };
+
+            // 수평 ↔ 수직 회전 시 특별한 처리
+            bool isHorizontalToVertical = IsHorizontalToVerticalRotation(fromRotation, toRotation);
+            bool isVerticalToHorizontal = IsVerticalToHorizontalRotation(fromRotation, toRotation);
+
+            if (isHorizontalToVertical)
+            {
+                // 수평에서 수직으로 회전 시 좌우 이동을 더 우선시
+                offsets.Insert(1, new Vector2Int(-1, 0));
+                offsets.Insert(2, new Vector2Int(1, 0));
+            }
+            else if (isVerticalToHorizontal)
+            {
+                // 수직에서 수평으로 회전 시 위아래 이동을 더 우선시
+                offsets.Insert(1, new Vector2Int(0, 1));
+                offsets.Insert(2, new Vector2Int(0, -1));
+            }
+
+            return offsets.ToArray();
+        }
+
+        /// <summary>
+        /// 복잡한 형태의 Wall Kick
+        /// </summary>
+        private Vector2Int[] GetComplexWallKickOffsets(ShapeAnalysis analysis, int fromRotation, int toRotation, bool clockwise)
+        {
+            // 복잡한 형태는 더 많은 Wall Kick 시도
+            List<Vector2Int> offsets = new List<Vector2Int>
+            {
+                Vector2Int.zero,        // 원래 위치
+                Vector2Int.left,        // 좌측으로 1칸
+                Vector2Int.right,       // 우측으로 1칸
+                Vector2Int.down,        // 아래로 1칸
+                new Vector2Int(-2, 0),  // 좌측으로 2칸
+                new Vector2Int(2, 0),   // 우측으로 2칸
+                new Vector2Int(0, -2),  // 아래로 2칸
+                new Vector2Int(-1, -1), // 좌측 아래
+                new Vector2Int(1, -1),  // 우측 아래
+                new Vector2Int(-2, -1), // 좌측 아래 2칸
+                new Vector2Int(2, -1),  // 우측 아래 2칸
+            };
+
+            // 바운딩 박스 크기에 따른 추가 오프셋
+            int maxSize = Mathf.Max(analysis.BoundingBox.x, analysis.BoundingBox.y);
+            if (maxSize > 3)
+            {
+                // 큰 형태일 경우 더 넓은 범위의 Wall Kick
+                offsets.Add(new Vector2Int(-3, 0));
+                offsets.Add(new Vector2Int(3, 0));
+                offsets.Add(new Vector2Int(0, -3));
+            }
+
+            return offsets.ToArray();
+        }
+
+        /// <summary>
+        /// 일반적인 테트리미노 형태의 Wall Kick
+        /// </summary>
+        private Vector2Int[] GetStandardWallKickOffsets(int fromRotation, int toRotation, bool clockwise)
+        {
+            // 기본 우선순위: 원래 위치 → 좌측 → 우측 → 아래 → 좌측 아래 → 우측 아래
+            List<Vector2Int> offsets = new List<Vector2Int>
+            {
+                Vector2Int.zero,        // 원래 위치
+                Vector2Int.left,        // 좌측으로 1칸
+                Vector2Int.right,       // 우측으로 1칸
+                Vector2Int.down,        // 아래로 1칸
+                new Vector2Int(-1, -1), // 좌측 아래
+                new Vector2Int(1, -1),  // 우측 아래
+            };
+
+            // 회전 방향에 따른 추가 오프셋
+            if (clockwise)
+            {
+                // 시계방향 회전 시 우측 우선
+                offsets.Insert(2, new Vector2Int(2, 0));  // 우측으로 2칸
+                offsets.Insert(4, new Vector2Int(-2, 0)); // 좌측으로 2칸
+            }
+            else
+            {
+                // 반시계방향 회전 시 좌측 우선
+                offsets.Insert(2, new Vector2Int(-2, 0)); // 좌측으로 2칸
+                offsets.Insert(4, new Vector2Int(2, 0));  // 우측으로 2칸
+            }
+
+            return offsets.ToArray();
+        }
+
+        /// <summary>
+        /// 수평에서 수직으로 회전하는지 확인
+        /// </summary>
+        private bool IsHorizontalToVerticalRotation(int fromRotation, int toRotation)
+        {
+            // 0도(수평) → 90도(수직) 또는 180도(수평) → 270도(수직)
+            return (fromRotation == 0 && toRotation == 1) ||
+                   (fromRotation == 2 && toRotation == 3);
+        }
+
+        /// <summary>
+        /// 수직에서 수평으로 회전하는지 확인
+        /// </summary>
+        private bool IsVerticalToHorizontalRotation(int fromRotation, int toRotation)
+        {
+            // 90도(수직) → 180도(수평) 또는 270도(수직) → 0도(수평)
+            return (fromRotation == 1 && toRotation == 2) ||
+                   (fromRotation == 3 && toRotation == 0);
         }
     }
 }
