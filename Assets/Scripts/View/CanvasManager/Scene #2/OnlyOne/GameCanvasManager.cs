@@ -47,8 +47,6 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         SceneManager = miniSceneManager;
 
-        TestViewUI.Init(this);
-
         Panel_Game.SetActive(false);
         Canvas_Game.gameObject.SetActive(false);
 
