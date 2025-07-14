@@ -23,7 +23,6 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     [SerializeField] private GameObject Panel_Game;
     [SerializeField] private Button Button_Win;
     [SerializeField] private Button Button_Lose;
-    [SerializeField] private TestViewUI TestViewUI;
 
     [Header("게임 보드 패널")]
     [SerializeField] private GameBoardPanel gameboardPanel;
