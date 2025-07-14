@@ -2751,7 +2751,6 @@ MonoBehaviour:
   Panel_Game: {fileID: 5113373275358047869}
   Button_Win: {fileID: 8982334811159528802}
   Button_Lose: {fileID: 3968055470992398079}
-  TestViewUI: {fileID: 7635281493580680934}
   gameboardPanel: {fileID: 2762310194106276286}
   scoreBoardPanel: {fileID: 6710332618753096468}
   holdTetriminoImage: {fileID: 7460028836240288771}
@@ -9466,53 +9465,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1 &3612664071064009442
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1823500408457639706}
-  - component: {fileID: 7635281493580680934}
-  m_Layer: 0
-  m_Name: TestGameView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1823500408457639706
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3612664071064009442}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -960, y: -465, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2119962417925468301}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7635281493580680934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3612664071064009442}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c877d6c69e21814896020cf7406b79e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameStateText: {fileID: 0}
-  moveRepeatRate: 0.1
-  moveInitialDelay: 0.2
 --- !u!1 &3643674727883126431
 GameObject:
   m_ObjectHideFlags: 0
@@ -12935,7 +12887,6 @@ RectTransform:
   - {fileID: 4703490766635811949}
   - {fileID: 6124868666128009580}
   - {fileID: 2606336418950729744}
-  - {fileID: 1823500408457639706}
   m_Father: {fileID: 4962713663779964335}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
