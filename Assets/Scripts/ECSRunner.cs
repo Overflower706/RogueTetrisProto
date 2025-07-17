@@ -78,6 +78,9 @@ namespace Minomino
 
             var packCanvasManager = FindFirstObjectByType<PackCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(packCanvasManager);
+
+            var ShopPanelManager = FindFirstObjectByType<ShopPanelManager>(FindObjectsInactive.Include);
+            Systems.AddSystem(ShopPanelManager);
         }
     }
 }

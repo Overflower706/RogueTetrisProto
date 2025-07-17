@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Minomino;
 using OVFL.ECS;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,7 +19,9 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     [Header("상점 패널")]
     [SerializeField] private GameObject Panel_Shop;
     [SerializeField] private Button Button_NextRound;
-    [SerializeField] private Button Button_BackToTitle;
+
+    [Header("폴리오미노 패널")]
+    [SerializeField] private ShopPanelManager PanelManager_Shop;
 
     private RectTransform _shopRectTransform;
     private Vector2 _shopOriginalPosition;
@@ -34,10 +37,6 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
         _shopOriginalPosition = _shopRectTransform.anchoredPosition;
 
         Button_NextRound.onClick.AddListener(OnNextRoundButtonClicked);
-        Button_BackToTitle.onClick.AddListener(() =>
-        {
-            // PanelSceneManager.Instance.LoadTitleScene();
-        });
     }
 
     public Tween Show()
@@ -59,6 +58,7 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
             {
                 Canvas_Shop.GetComponent<CanvasGroup>().interactable = true;
                 Button_NextRound.interactable = true; // 버튼 활성화
+                PanelManager_Shop.Show();
             });
     }
 
@@ -73,6 +73,7 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
             .SetEase(Ease.InCubic)
             .OnComplete(() =>
             {
+                PanelManager_Shop.Hide();
                 Panel_Shop.SetActive(false);
                 Canvas_Shop.gameObject.SetActive(false);
             });
@@ -82,7 +83,6 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     {
         _shopRectTransform.anchoredPosition = _shopOriginalPosition;
         Button_NextRound.onClick.RemoveAllListeners();
-        Button_BackToTitle.onClick.RemoveAllListeners();
         Panel_Shop.SetActive(false);
         Canvas_Shop.gameObject.SetActive(false);
     }
