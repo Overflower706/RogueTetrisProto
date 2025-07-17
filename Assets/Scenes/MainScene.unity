@@ -11348,8 +11348,8 @@ MonoBehaviour:
   BoardWidth: 10
   BoardHeight: 20
   HoldSize: 1
-  RoundBonus: 100
-  StageBonus: 1
+  RoundBonus: 1
+  StageBonus: 100
   CurrencyBase: 10
   CurrencyBonusPerDeck: 1
 --- !u!4 &905842235
