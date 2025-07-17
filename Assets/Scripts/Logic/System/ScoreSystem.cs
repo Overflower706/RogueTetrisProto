@@ -17,9 +17,9 @@ namespace Minomino
                 var player = GetPlayer();
 
                 score.CurrentScore = 0;
-                score.TargetScore = ((player.Round - 1) * 3 + player.Stage) * 100;
+                score.TargetScore = (player.Round ^ GlobalSettings.Instance.RoundBonus) * player.Stage * GlobalSettings.Instance.StageBonus;
 
-                Debug.Log("게임 시작, 초기 점수 설정: " + score.CurrentScore);
+                Debug.Log($"게임 시작, 초기 점수 설정: {score.CurrentScore}, 목표 점수: {score.TargetScore}");
             }
 
             var endEntities = Context.GetEntitiesWithComponent<EndGameCommand>();

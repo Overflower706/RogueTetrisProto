@@ -12,11 +12,12 @@ namespace Minomino
             gameEntity.AddComponent<ScoreComponent>();
             gameEntity.AddComponent<BoardComponent>();
 
-            var playerEntiy = Context.CreateEntity();
-            playerEntiy.AddComponent<PlayerComponent>();
+            var playerEntity = Context.CreateEntity();
+            playerEntity.AddComponent<PlayerComponent>();
+            playerEntity.AddComponent<HoldQueueComponent>();
 
-            var commandReuqestEntty = Context.CreateEntity();
-            commandReuqestEntty.AddComponent<CommandRequestComponent>();
+            var commandRequestEntity = Context.CreateEntity();
+            commandRequestEntity.AddComponent<CommandRequestComponent>();
         }
     }
 }

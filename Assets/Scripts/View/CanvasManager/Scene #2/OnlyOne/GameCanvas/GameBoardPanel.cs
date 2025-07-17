@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using OVFL.ECS;
 using Minomino;
 using System.Collections.Generic;
+using TMPro;
 
 public class GameBoardPanel : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class GameBoardPanel : MonoBehaviour
     [Header("부모 오브젝트")]
     [SerializeField] private RectTransform GridParent;
     [SerializeField] private Transform TetriminoParent;
+
+    [Header("디버그용 UI")]
+    [SerializeField] TMP_Text DebugText;
 
 
     private int _width;
@@ -94,6 +98,7 @@ public class GameBoardPanel : MonoBehaviour
 
         // UI 업데이트
         UpdateGhostEffect(board);
+        DebugText.text = BoardLogger.VisualizeBoard(Context, board);
     }
 
     /// <summary>
