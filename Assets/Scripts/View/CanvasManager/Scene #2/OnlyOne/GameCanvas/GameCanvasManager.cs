@@ -30,7 +30,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     [SerializeField] private ScoreBoardPanel scoreBoardPanel;
 
     [Header("미리보기 UI")]
-    [SerializeField] private TetriminoImage holdTetriminoImage;
+    [SerializeField] private TetriminoImage[] holdTetriminoImages = new TetriminoImage[3];
     [SerializeField] private TetriminoImage[] nextTetriminoImages = new TetriminoImage[3];
     [SerializeField] private TextMeshProUGUI restCountText;
 
@@ -151,8 +151,13 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
             gameboardPanel.Clear();
         }
 
-        // 미리보기 이미지들 청소
-        holdTetriminoImage?.ClearDisplay();
+        // 홀드 테트리미노 이미지들 청소
+        for (int i = 0; i < holdTetriminoImages.Length; i++)
+        {
+            holdTetriminoImages[i]?.ClearDisplay();
+        }
+
+        // 다음 테트리미노 이미지들 청소
         for (int i = 0; i < nextTetriminoImages.Length; i++)
         {
             nextTetriminoImages[i]?.ClearDisplay();
@@ -185,12 +190,15 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
 
 
     /// <summary>
-    /// 미리보기 이미지들 초기화 (홀드 + 다음 3개 블록)
+    /// 미리보기 이미지들 초기화 (홀드 3개 + 다음 3개 블록)
     /// </summary>
     private void InitPreviewImages()
     {
-        // 홀드 이미지 초기화
-        holdTetriminoImage?.Init();
+        // 홀드 이미지들 초기화
+        for (int i = 0; i < holdTetriminoImages.Length; i++)
+        {
+            holdTetriminoImages[i]?.Init();
+        }
 
         // 다음 블록 이미지들 초기화
         for (int i = 0; i < nextTetriminoImages.Length; i++)
@@ -213,21 +221,29 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
 
 
     /// <summary>
-    /// 홀드 테트리미노 UI 업데이트
+    /// 홀드 테트리미노들 UI 업데이트 (최대 3개)
     /// </summary>
     private void UpdateHoldUI()
     {
-        if (holdTetriminoImage == null) return;
+        if (holdTetriminoImages == null) return;
 
-        var holdTetriminoEntity = GetHoldTetriminoEntity();
-        if (holdTetriminoEntity != null)
+        var holdTetriminos = GetHoldTetriminos();
+
+        for (int i = 0; i < holdTetriminoImages.Length; i++)
         {
-            var tetriminoComponent = holdTetriminoEntity.GetComponent<TetriminoComponent>();
-            holdTetriminoImage.UpdateImage(tetriminoComponent);
-        }
-        else
-        {
-            holdTetriminoImage.ClearDisplay();
+            if (holdTetriminoImages[i] == null) continue;
+
+            // i번째 홀드 테트리미노가 존재하는지 확인
+            if (i < holdTetriminos.Length && holdTetriminos[i] != null)
+            {
+                // 테트리미노가 있으면 표시
+                holdTetriminoImages[i].UpdateImage(holdTetriminos[i]);
+            }
+            else
+            {
+                // 테트리미노가 없으면 해당 번째 홀드 UI를 클리어
+                holdTetriminoImages[i].ClearDisplay();
+            }
         }
     }
 
@@ -304,21 +320,48 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     }
 
     /// <summary>
-    /// 홀드된 테트리미노를 가져오는 헬퍼 메서드
+    /// 홀드된 테트리미노들을 가져오는 헬퍼 메서드 (최대 3개)
     /// </summary>
-    private Entity GetHoldTetriminoEntity()
+    private TetriminoComponent[] GetHoldTetriminos()
     {
-        var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
-        foreach (var entity in tetriminoEntities)
+        var holdQueueEntities = Context.GetEntitiesWithComponent<HoldQueueComponent>();
+        if (holdQueueEntities == null || holdQueueEntities.Count == 0)
         {
-            var boardTetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-            if (boardTetriminoComponent.State == BoardTetriminoState.Hold)
-            {
-                return entity;
-            }
+            // 홀드 큐가 없으면 빈 배열 반환 (모든 홀드 UI가 클리어됨)
+            return new TetriminoComponent[0];
         }
 
-        return null;
+        if (holdQueueEntities.Count > 1)
+        {
+            Debug.LogWarning($"HoldQueueComponent가 {holdQueueEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
+        }
+
+        var holdQueueComponent = holdQueueEntities[0].GetComponent<HoldQueueComponent>();
+        if (holdQueueComponent?.HoldQueue == null)
+        {
+            // 홀드 큐 컴포넌트가 null이면 빈 배열 반환
+            return new TetriminoComponent[0];
+        }
+
+        // 홀드 큐에서 앞에서부터 최대 3개까지 가져오기 (큐를 수정하지 않고 미리보기만)
+        var holdQueueArray = holdQueueComponent.HoldQueue.ToArray();
+        var maxCount = Mathf.Min(3, holdQueueArray.Length);
+
+        if (maxCount == 0)
+        {
+            // 홀드 큐가 비어있으면 빈 배열 반환 (모든 홀드 UI가 클리어됨)
+            return new TetriminoComponent[0];
+        }
+
+        var holdTetriminos = new TetriminoComponent[maxCount];
+
+        for (int i = 0; i < maxCount; i++)
+        {
+            var entity = holdQueueArray[i];
+            holdTetriminos[i] = entity?.GetComponent<TetriminoComponent>();
+        }
+
+        return holdTetriminos;
     }
 
     private void UpdateRestCountText()
