@@ -63,10 +63,34 @@ namespace Minomino
                     }
                     else
                     {
-                        var entity = context.GetEntities()[entityId];
-                        var tetriminoComponent = entity.GetComponent<TetriminoComponent>();
-                        TetriminoColor color = tetriminoComponent.Color;
-                        sb.Append(GetColorBlock(color));
+                        try
+                        {
+                            // Entity 찾기 (ID로 직접 검색)
+                            Entity entity = FindEntityById(context, entityId);
+                            // entity ID와 이 Entity가 Context.GetEntities()에서의 index와 일치하는지 확인
+                            if (entity == null)
+                            {
+                                Debug.LogWarning($"Entity ID {entityId}를 찾을 수 없습니다. 위치: ({x}, {y})");
+                                sb.Append("?"); // 오류 표시
+                                continue;
+                            }
+
+                            var tetriminoComponent = entity.GetComponent<TetriminoComponent>();
+                            if (tetriminoComponent == null)
+                            {
+                                Debug.LogWarning($"Entity {entityId}에 TetriminoComponent가 없습니다. 위치: ({x}, {y})");
+                                sb.Append("E"); // 에러 블록 표시
+                                continue;
+                            }
+
+                            TetriminoColor color = tetriminoComponent.Color;
+                            sb.Append(GetColorBlock(color));
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Debug.LogError($"Entity {entityId} 처리 중 오류 발생 (위치: {x}, {y}): {ex.Message}");
+                            sb.Append("X"); // 예외 표시
+                        }
                     }
                 }
                 sb.AppendLine("│");
@@ -105,68 +129,31 @@ namespace Minomino
         }
 
 
-        // /// <summary>
-        // /// 현재 테트리미노가 떨어질 최종 위치를 계산
-        // /// </summary>
-        // /// <param name="board">게임 보드</param>
-        // /// <param name="tetrimino">현재 테트리미노</param>
-        // /// <returns>떨어질 위치의 테트리미노 블록들</returns>
-        // private static Vector2Int[] CalculateGhostPiecePositions(TetrisBoard board, Tetrimino tetrimino)
-        // {
-        //     if (board == null || tetrimino == null) return null;
+        /// <summary>
+        /// Entity ID로 Entity를 안전하게 찾기
+        /// </summary>
+        private static Entity FindEntityById(Context context, int entityId)
+        {
+            try
+            {
+                // GetEntities()로 직접 인덱스 접근 대신 안전한 검색
+                var allEntities = context.GetEntities();
 
-        //     // 현재 테트리미노의 회전된 로컬 위치들을 계산
-        //     Vector2Int[] rotatedShape = new Vector2Int[tetrimino.shape.Length];
-        //     for (int i = 0; i < tetrimino.shape.Length; i++)
-        //     {
-        //         rotatedShape[i] = RotatePoint(tetrimino.shape[i], tetrimino.rotation);
-        //     }
+                foreach (var entity in allEntities)
+                {
+                    if (entity != null && entity.ID == entityId)
+                    {
+                        return entity;
+                    }
+                }
 
-        //     // 현재 위치에서 아래로 떨어뜨려 봄
-        //     Vector2Int testPosition = tetrimino.position;
-
-        //     // 아래로 계속 떨어뜨려서 충돌할 때까지 반복
-        //     while (true)
-        //     {
-        //         testPosition.y--;
-
-        //         // 이 위치에서 충돌하는지 확인
-        //         bool collision = false;
-        //         foreach (var localPos in rotatedShape)
-        //         {
-        //             Vector2Int worldPos = testPosition + localPos;
-
-        //             // 보드 경계 확인
-        //             if (worldPos.y < 0 || worldPos.x < 0 || worldPos.x >= TetrisBoard.WIDTH)
-        //             {
-        //                 collision = true;
-        //                 break;
-        //             }
-
-        //             // 다른 블록과 충돌 확인
-        //             if (worldPos.y < TetrisBoard.HEIGHT && board.grid[worldPos.x, worldPos.y] != 0)
-        //             {
-        //                 collision = true;
-        //                 break;
-        //             }
-        //         }
-
-        //         // 충돌했다면 이전 위치가 최종 위치
-        //         if (collision)
-        //         {
-        //             testPosition.y++; // 한 칸 위로 되돌림
-        //             break;
-        //         }
-        //     }
-
-        //     // 최종 위치에서의 블록 위치들 계산
-        //     Vector2Int[] ghostPositions = new Vector2Int[rotatedShape.Length];
-        //     for (int i = 0; i < rotatedShape.Length; i++)
-        //     {
-        //         ghostPositions[i] = testPosition + rotatedShape[i];
-        //     }
-
-        //     return ghostPositions;
-        // }
+                return null; // 찾지 못함
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"FindEntityById({entityId}) 오류: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
