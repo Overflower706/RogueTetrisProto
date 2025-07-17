@@ -101,6 +101,13 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
         // GameState 변화 감시
         MonitorGameState();
 
+        var state = GetState();
+
+        if (state.CurrentState != GameState.Playing)
+        {
+            return;
+        }
+
         if (gameboardPanel.IsInit)
         {
             // 게임 보드 상태 업데이트
@@ -374,5 +381,22 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
                     break;
             }
         }
+    }
+
+    private GameStateComponent GetState()
+    {
+        var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+        if (stateEntities.Count == 0)
+        {
+            Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
+            return null;
+        }
+        else if (stateEntities.Count > 1)
+        {
+            Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+            return null;
+        }
+
+        return stateEntities[0].GetComponent<GameStateComponent>();
     }
 }
