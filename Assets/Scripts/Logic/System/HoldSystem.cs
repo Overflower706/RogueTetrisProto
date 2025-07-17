@@ -56,11 +56,22 @@ namespace Minomino
 
             if (holdTetriminoComponent == null)
             {
-                currentTetriminoComponent.State = BoardTetriminoState.Hold;
+                var tetriminoQueue = GetTetriminoQueue();
+                if (tetriminoQueue.TetriminoQueue.Count == 0)
+                {
+                    Debug.Log("유일한 테트리미노이므로 Hold를 하지 않습니다.");
+                    return;
+                }
+                else
+                {
+                    currentTetriminoComponent.State = BoardTetriminoState.Hold;
+                }
             }
             else
             {
                 holdTetriminoComponent.State = BoardTetriminoState.Current;
+                holdTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                holdTetriminoComponent.Rotation = 0; // 초기 회전 상태
                 currentTetriminoComponent.State = BoardTetriminoState.Hold;
             }
         }
@@ -80,6 +91,23 @@ namespace Minomino
             }
 
             return stateEntities[0].GetComponent<GameStateComponent>();
+        }
+
+        private TetriminoQueueComponent GetTetriminoQueue()
+        {
+            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+            if (queueEntities.Count == 0)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (queueEntities.Count > 1)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
         }
     }
 }

@@ -84,7 +84,7 @@ namespace Minomino
             return null;
         }
 
-        private BoardTetriminoComponent GetHoldTetriminoComponent()
+        private Entity GetHoldTetriminoEntity()
         {
             var holdEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
 
@@ -93,7 +93,7 @@ namespace Minomino
                 var tetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
                 if (tetriminoComponent.State == BoardTetriminoState.Hold)
                 {
-                    return tetriminoComponent;
+                    return entity;
                 }
             }
 
@@ -132,13 +132,16 @@ namespace Minomino
             }
             else // TetriminoQueue가 비었다면, Hold로부터 꺼내온다.
             {
-                var holdTetrimino = GetHoldTetriminoComponent();
+                var holdTetrimino = GetHoldTetriminoEntity();
                 if (holdTetrimino != null)
                 {
+                    var holdTetriminoComponent = holdTetrimino.GetComponent<BoardTetriminoComponent>();
                     // Hold 상태의 Tetrimino를 Current로 변경
-                    holdTetrimino.State = BoardTetriminoState.Current;
-                    holdTetrimino.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-                    holdTetrimino.Rotation = 0; // 초기 회전 상태
+                    holdTetriminoComponent.State = BoardTetriminoState.Current;
+                    holdTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                    holdTetriminoComponent.Rotation = 0; // 초기 회전 상태
+
+                    Debug.Log($"Hold에서 Current Tetrimino로 변경: Type: {holdTetrimino.GetComponent<TetriminoComponent>().Type}, Position: {holdTetriminoComponent.Position}");
                 }
                 else // 그런데 Hold조차 비었다면, 로그만 남기고 종료
                 {

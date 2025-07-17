@@ -7,13 +7,6 @@ namespace Minomino
     {
         public Context Context { get; set; }
 
-        // 점수 계산 상수
-        private const int BASE_LINE_SCORE = 100;
-        private const int SINGLE_LINE = 1;
-        private const int DOUBLE_LINE = 2;
-        private const int TRIPLE_LINE = 3;
-        private const int TETRIS_LINE = 4;
-
         public void Tick()
         {
             var score = GetScore();
@@ -208,8 +201,8 @@ namespace Minomino
             {
                 case 1: return 1;
                 case 2: return 2;
-                case 3: return 4;
-                case 4: return 8;
+                case 3: return 3;
+                case 4: return 4;
                 default: return linesCleared; // 4줄 이상인 경우 선형 증가
             }
         }

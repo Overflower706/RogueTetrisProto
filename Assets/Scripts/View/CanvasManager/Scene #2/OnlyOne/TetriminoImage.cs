@@ -1,9 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
-using OVFL.ECS;
 using Minomino;
-using TMPro;
-using System.Collections.Generic;
 
 public class TetriminoImage : MonoBehaviour
 {
@@ -54,16 +50,16 @@ public class TetriminoImage : MonoBehaviour
     {
         if (!_isInitialized) Init();
         ClearDisplay();
-        
-        if (tetrimino == null || tetrimino.Shape == null || _images == null) 
+
+        if (tetrimino == null || tetrimino.Shape == null || _images == null)
         {
             Debug.LogWarning("TetriminoImage.UpdateImage: tetrimino, tetrimino.Shape 또는 _images가 null입니다.");
             return;
         }
-        
+
         Vector2Int centerOffset = new Vector2Int(2, 2);
         Color color = GetTetriminoColorStatic(tetrimino.Color);
-        
+
         foreach (var shapePos in tetrimino.Shape)
         {
             Vector2Int gridPos = centerOffset + shapePos;
