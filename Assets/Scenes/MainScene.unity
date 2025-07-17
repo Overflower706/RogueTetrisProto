@@ -1626,10 +1626,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13680767f39a01447aa1c0905cc7b933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoardWidth: 15
-  BoardHeight: 22
+  BoardWidth: 10
+  BoardHeight: 20
   HoldSize: 3
-  RoundBonus: 10
+  RoundBonus: 1
   StageBonus: 100
   CurrencyBase: 100
   CurrencyBonusPerDeck: 1
