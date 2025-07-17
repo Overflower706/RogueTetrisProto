@@ -61,7 +61,7 @@ namespace Minomino
             {
                 // 게임 시작 로직
                 // SevenBag 시스템을 사용하여 Tetrimino Entity 큐 생성
-                Queue<Entity> tetriminoQueue = GenerateSevenBagQueue();
+                Queue<Entity> tetriminoQueue = GenerateRandomQueue();
 
                 // TetriminoQueueComponent가 있는 엔티티 찾기 또는 생성
                 var queueComponent = GetTetriminoQueue();
