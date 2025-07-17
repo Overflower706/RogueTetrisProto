@@ -1,3 +1,4 @@
+using System;
 using OVFL.ECS;
 using UnityEngine;
 
@@ -16,9 +17,11 @@ namespace Minomino
             {
                 var player = GetPlayer();
 
-                score.CurrentScore = 0;
-                score.TargetScore = (player.Round ^ GlobalSettings.Instance.RoundBonus) * player.Stage * GlobalSettings.Instance.StageBonus;
+                Debug.Log($"게임 시작, 플레이어 정보: 라운드 {player.Round}, 스테이지 {player.Stage}");
+                Debug.Log($"플레이어의 라운드 보너스: {GlobalSettings.Instance.RoundBonus}, 스테이지 보너스: {GlobalSettings.Instance.StageBonus}");
 
+                score.CurrentScore = 0;
+                score.TargetScore = (int)(Math.Pow(player.Round, GlobalSettings.Instance.RoundBonus) * player.Stage * GlobalSettings.Instance.StageBonus);
                 Debug.Log($"게임 시작, 초기 점수 설정: {score.CurrentScore}, 목표 점수: {score.TargetScore}");
             }
 

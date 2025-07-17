@@ -13,6 +13,8 @@ namespace Minomino
             player.Stage = 1;
             player.Round = 1;
             player.Currency = 0;
+
+            Debug.Log($"플레이어 설정 완료: 스테이지 {player.Stage}, 라운드 {player.Round}, 통화 {player.Currency}");
         }
 
         public void Tick()
