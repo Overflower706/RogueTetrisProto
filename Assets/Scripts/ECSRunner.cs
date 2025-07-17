@@ -1,10 +1,9 @@
 using UnityEngine;
 using OVFL.ECS;
-using Minomino;
 
-namespace Minos
+namespace Minomino
 {
-    public class ECSManager : MonoBehaviour
+    public class ECSRunner : MonoBehaviour
     {
         public Context Context;
         public Systems Systems;
@@ -39,8 +38,8 @@ namespace Minos
             Systems.AddSystem<DataSystem>();
             Systems.AddSystem<CommandSystem>();
 
-            Systems.AddSystem<GameStateSystem>();
             Systems.AddSystem<PlayerSystem>();
+            Systems.AddSystem<GameStateSystem>();
             Systems.AddSystem<ScoreSystem>();
 
             Systems.AddSystem<TetriminoSystem>();

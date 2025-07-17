@@ -30,12 +30,15 @@ namespace Minomino
                         player.Stage = 1;
                         player.Round++;
                     }
+                    player.Currency += GlobalSettings.Instance.CurrencyBase + GetTetriminoQueue().TetriminoQueue.Count * GlobalSettings.Instance.CurrencyBonusPerDeck;
+                    Debug.Log($"게임 승리! 현재 스테이지: {player.Stage}, 라운드: {player.Round}, 통화: {player.Currency}");
                 }
                 else if (state.CurrentState == GameState.GameOver)
                 {
                     // 게임 오버 상태에서 플레이어가 게임을 종료할 때의 로직
                     player.Round = 1;
                     player.Stage = 1;
+                    player.Currency = 0;
                 }
                 else
                 {
@@ -76,6 +79,23 @@ namespace Minomino
             }
 
             return stateEntities[0].GetComponent<GameStateComponent>();
+        }
+
+        private TetriminoQueueComponent GetTetriminoQueue()
+        {
+            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+            if (queueEntities.Count == 0)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (queueEntities.Count > 1)
+            {
+                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
         }
     }
 }

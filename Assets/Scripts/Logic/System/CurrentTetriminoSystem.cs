@@ -31,6 +31,42 @@ namespace Minomino
             }
         }
 
+        private void GenerateTetrimino()
+        {
+            var queueEntity = GetTetriminoQueue();
+
+            if (queueEntity.TetriminoQueue.Count > 0)
+            {
+                var nextTetrimino = queueEntity.TetriminoQueue.Dequeue();
+                var boardTetriminoComponent = nextTetrimino.AddComponent<BoardTetriminoComponent>();
+                boardTetriminoComponent.State = BoardTetriminoState.Current;
+                boardTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                boardTetriminoComponent.Rotation = 0; // 초기 회전 상태
+
+                Debug.Log($"새로운 Current Tetrimino 생성: Type: {nextTetrimino.GetComponent<TetriminoComponent>().Type}, Position: {boardTetriminoComponent.Position}");
+            }
+            else // TetriminoQueue가 비었다면, Hold로부터 꺼내온다.
+            {
+                var holdQueue = GetHoldQueue();
+                if (holdQueue.HoldQueue.Count > 0)
+                {
+                    var holdTetrimino = holdQueue.HoldQueue.Dequeue();
+                    var holdTetriminoComponent = holdTetrimino.GetComponent<BoardTetriminoComponent>();
+                    // Hold 상태의 Tetrimino를 Current로 변경
+                    holdTetriminoComponent.State = BoardTetriminoState.Current;
+                    holdTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                    holdTetriminoComponent.Rotation = 0; // 초기 회전 상태
+
+                    Debug.Log($"Hold에서 Current Tetrimino로 변경: Type: {holdTetrimino.GetComponent<TetriminoComponent>().Type}, Position: {holdTetriminoComponent.Position}");
+                }
+                else // 그런데 Hold조차 비었다면, 로그만 남기고 종료
+                {
+                    Debug.LogWarning("Queue도 비었으며 Hold Tetrimino 또한 비어 있습니다. 새로운 Tetrimino를 생성할 수 없습니다.");
+                    return;
+                }
+            }
+        }
+
         private GameStateComponent GetState()
         {
             var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
@@ -84,7 +120,7 @@ namespace Minomino
             return null;
         }
 
-        private BoardTetriminoComponent GetHoldTetriminoComponent()
+        private Entity GetHoldTetriminoEntity()
         {
             var holdEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
 
@@ -93,7 +129,7 @@ namespace Minomino
                 var tetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
                 if (tetriminoComponent.State == BoardTetriminoState.Hold)
                 {
-                    return tetriminoComponent;
+                    return entity;
                 }
             }
 
@@ -116,36 +152,20 @@ namespace Minomino
             return queueEntities[0].GetComponent<TetriminoQueueComponent>();
         }
 
-        private void GenerateTetrimino()
+        private HoldQueueComponent GetHoldQueue()
         {
-            var queueEntity = GetTetriminoQueue();
-
-            if (queueEntity.TetriminoQueue.Count > 0)
+            var holdEntities = Context.GetEntitiesWithComponent<HoldQueueComponent>();
+            if (holdEntities.Count == 0)
             {
-                var nextTetrimino = queueEntity.TetriminoQueue.Dequeue();
-                var boardTetriminoComponent = nextTetrimino.AddComponent<BoardTetriminoComponent>();
-                boardTetriminoComponent.State = BoardTetriminoState.Current;
-                boardTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-                boardTetriminoComponent.Rotation = 0; // 초기 회전 상태
-
-                Debug.Log($"새로운 Current Tetrimino 생성: Type: {nextTetrimino.GetComponent<TetriminoComponent>().Type}, Position: {boardTetriminoComponent.Position}");
+                Debug.LogWarning("HoldQueueComponent가 있는 엔티티가 없습니다.");
+                return null; // HoldQueue가 없으면 null 반환
             }
-            else // TetriminoQueue가 비었다면, Hold로부터 꺼내온다.
+            else if (holdEntities.Count > 1)
             {
-                var holdTetrimino = GetHoldTetriminoComponent();
-                if (holdTetrimino != null)
-                {
-                    // Hold 상태의 Tetrimino를 Current로 변경
-                    holdTetrimino.State = BoardTetriminoState.Current;
-                    holdTetrimino.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-                    holdTetrimino.Rotation = 0; // 초기 회전 상태
-                }
-                else // 그런데 Hold조차 비었다면, 로그만 남기고 종료
-                {
-                    Debug.LogWarning("Queue도 비었으며 Hold Tetrimino 또한 비어 있습니다. 새로운 Tetrimino를 생성할 수 없습니다.");
-                    return;
-                }
+                Debug.LogWarning("HoldQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null; // 여러 엔티티가 있으면 경고 후 null 반환
             }
+            return holdEntities[0].GetComponent<HoldQueueComponent>();
         }
     }
 }

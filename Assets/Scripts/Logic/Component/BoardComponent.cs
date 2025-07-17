@@ -4,8 +4,8 @@ namespace Minomino
 {
     public class BoardComponent : IComponent
     {
-        public const int WIDTH = 10;
-        public const int HEIGHT = 20;
+        public static int WIDTH => GlobalSettings.Instance.BoardWidth;
+        public static int HEIGHT => GlobalSettings.Instance.BoardHeight;
 
         public int[,] Board; // 각 셀에 해당하는 테트리미노 Entity ID (0=빈공간)
 
