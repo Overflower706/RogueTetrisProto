@@ -465,35 +465,35 @@ namespace Minomino
             CheckAndHandleGameOver(tetriminoEntity);
 
             // 줄 완성 검증 및 제거
-            var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines();
-            if (clearedLines > 0)
-            {
-                Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
+            // var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines();
+            // if (clearedLines > 0)
+            // {
+            //     Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
 
-                // ScoreSystem에 줄 클리어 이벤트 전달
-                var scoreCommandRequest = GetCommandRequestComponent();
-                if (scoreCommandRequest != null)
-                {
-                    scoreCommandRequest.Requests.Enqueue(new CommandRequest
-                    {
-                        Type = CommandType.LineClear,
-                        PayLoad = (clearedLines, tetriminoEntity.ID, completedLinesColors)
-                    });
-                    Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {tetriminoEntity.ID}");
-                }
-            }
+            //     // ScoreSystem에 줄 클리어 이벤트 전달
+            //     var scoreCommandRequest = GetCommandRequestComponent();
+            //     if (scoreCommandRequest != null)
+            //     {
+            //         scoreCommandRequest.Requests.Enqueue(new CommandRequest
+            //         {
+            //             Type = CommandType.LineClear,
+            //             PayLoad = (clearedLines, tetriminoEntity.ID, completedLinesColors)
+            //         });
+            //         Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {tetriminoEntity.ID}");
+            //     }
+            // }
 
             // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
-            var commandRequest = GetCommandRequestComponent();
-            if (commandRequest != null)
-            {
-                commandRequest.Requests.Enqueue(new CommandRequest
-                {
-                    Type = CommandType.GenerateTetrimino,
-                    PayLoad = null
-                });
-                Debug.Log("새로운 테트리미노 생성 요청됨");
-            }
+            // var commandRequest = GetCommandRequestComponent();
+            // if (commandRequest != null)
+            // {
+            //     commandRequest.Requests.Enqueue(new CommandRequest
+            //     {
+            //         Type = CommandType.GenerateTetrimino,
+            //         PayLoad = null
+            //     });
+            //     Debug.Log("새로운 테트리미노 생성 요청됨");
+            // }
         }
 
         /// <summary>
