@@ -93,7 +93,149 @@ namespace Minomino
 
         private int ProcessBake(int[] row)
         {
-            return 0;
+            TetriminoColor[] colors = new TetriminoColor[row.Length];
+
+            // Entity ID를 색상으로 변환
+            for (int i = 0; i < row.Length; i++)
+            {
+                if (row[i] == 0) // 빈 칸
+                {
+                    colors[i] = TetriminoColor.None;
+                }
+                else
+                {
+                    var entity = GetEntityByID(row[i]);
+                    if (entity != null)
+                    {
+                        var component = entity.GetComponent<TetriminoComponent>();
+                        colors[i] = component.Color;
+                    }
+                    else
+                    {
+                        colors[i] = TetriminoColor.None;
+                    }
+                }
+            }
+
+            Debug.Log($"=== 베이킹 점수 계산 시작 ===");
+            string colorPattern = string.Join("-", System.Array.ConvertAll(colors, GetIngredientName));
+            Debug.Log($"재료 패턴: {colorPattern}");
+
+            int totalScore = CalculateRecipeScore(colors);
+
+            Debug.Log($"최종 베이킹 점수: {totalScore}점");
+            Debug.Log($"=== 베이킹 점수 계산 완료 ===");
+
+            return totalScore;
+        }
+
+        /// <summary>
+        /// 레시피 기반 점수 계산 (높은 점수 레시피부터 우선 처리)
+        /// </summary>
+        private int CalculateRecipeScore(TetriminoColor[] colors)
+        {
+            // 재료 개수 카운트
+            int dough = 0;    // 반죽 (Red)
+            int yeast = 0;    // 이스트 (Green)
+            int syrup = 0;    // 시럽 (Blue)
+
+            foreach (var color in colors)
+            {
+                switch (color)
+                {
+                    case TetriminoColor.Red: dough++; break;
+                    case TetriminoColor.Green: yeast++; break;
+                    case TetriminoColor.Blue: syrup++; break;
+                }
+            }
+
+            Debug.Log($"재료 보유량: 반죽 {dough}개, 이스트 {yeast}개, 시럽 {syrup}개");
+
+            int totalScore = 0;
+            string recipeLog = "";
+
+            // 1. 초코 소라빵 (반죽 + 이스트 + 시럽) = 100점 (최우선)
+            int chocoSorabread = System.Math.Min(System.Math.Min(dough, yeast), syrup);
+            if (chocoSorabread > 0)
+            {
+                totalScore += chocoSorabread * 100;
+                dough -= chocoSorabread;
+                yeast -= chocoSorabread;
+                syrup -= chocoSorabread;
+                recipeLog += $"초코 소라빵 {chocoSorabread}개 = {chocoSorabread * 100}점, ";
+                Debug.Log($"초코 소라빵 {chocoSorabread}개 제작 (+{chocoSorabread * 100}점)");
+            }
+
+            // 2. 식빵 (반죽 + 이스트) = 50점
+            int bread = System.Math.Min(dough, yeast);
+            if (bread > 0)
+            {
+                totalScore += bread * 50;
+                dough -= bread;
+                yeast -= bread;
+                recipeLog += $"식빵 {bread}개 = {bread * 50}점, ";
+                Debug.Log($"식빵 {bread}개 제작 (+{bread * 50}점)");
+            }
+
+            // 3. 아이싱 쿠키 (반죽 + 시럽) = 50점
+            int icingCookie = System.Math.Min(dough, syrup);
+            if (icingCookie > 0)
+            {
+                totalScore += icingCookie * 50;
+                dough -= icingCookie;
+                syrup -= icingCookie;
+                recipeLog += $"아이싱 쿠키 {icingCookie}개 = {icingCookie * 50}점, ";
+                Debug.Log($"아이싱 쿠키 {icingCookie}개 제작 (+{icingCookie * 50}점)");
+            }
+
+            // 4. 쿠키 (반죽) = 10점 (최후)
+            if (dough > 0)
+            {
+                totalScore += dough * 10;
+                recipeLog += $"쿠키 {dough}개 = {dough * 10}점, ";
+                Debug.Log($"쿠키 {dough}개 제작 (+{dough * 10}점)");
+            }
+
+            // 남은 재료 로그
+            if (yeast > 0 || syrup > 0)
+            {
+                Debug.Log($"사용되지 않은 재료: 이스트 {yeast}개, 시럽 {syrup}개");
+            }
+
+            if (!string.IsNullOrEmpty(recipeLog))
+            {
+                recipeLog = recipeLog.TrimEnd(' ', ',');
+                Debug.Log($"레시피 결과: {recipeLog}");
+            }
+
+            return totalScore;
+        }
+
+        /// <summary>
+        /// 색상을 재료 이름으로 변환
+        /// </summary>
+        private string GetIngredientName(TetriminoColor color)
+        {
+            switch (color)
+            {
+                case TetriminoColor.Red: return "반죽";
+                case TetriminoColor.Green: return "이스트";
+                case TetriminoColor.Blue: return "시럽";
+                default: return "없음";
+            }
+        }
+
+        private Entity GetEntityByID(int entityID)
+        {
+            var entities = Context.GetEntitiesWithComponent<ScoreComponent>();
+            foreach (var entity in entities)
+            {
+                if (entity.ID == entityID)
+                {
+                    return entity;
+                }
+            }
+            return null;
         }
 
         /// <summary>
