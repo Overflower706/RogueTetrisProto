@@ -123,9 +123,11 @@ namespace Minomino
                 case CommandType.LineClear:
                     var lineClearCommand = new LineClearCommand();
                     // PayLoad에서 줄 클리어 정보 추출
-                    if (request.PayLoad is (int cleardLine))
+                    if (request.PayLoad is (int linesCleared, int tetriminoEntityId, TetriminoColor[][] completedLinesColors))
                     {
-                        lineClearCommand.Index = cleardLine;
+                        lineClearCommand.LinesCleared = linesCleared;
+                        lineClearCommand.TetriminoEntityId = tetriminoEntityId;
+                        lineClearCommand.CompletedLinesColors = completedLinesColors;
                     }
                     entity.AddComponent(lineClearCommand);
                     entity.AddComponent<CommandMarkerComponent>();
