@@ -12318,6 +12318,10 @@ MonoBehaviour:
   CurrencyBonusPerDeck: 1
   BaseBakeCount: 4
   BaseTrashCount: 3
+  CookieScore: 5
+  BreadScore: 20
+  IcingCookieScore: 20
+  ChocoSoraBreadScore: 45
 --- !u!4 &905842235
 Transform:
   m_ObjectHideFlags: 0
