@@ -83,23 +83,6 @@ namespace Minomino
 
                 return;
             }
-
-            var player = GetPlayer();
-            if (player.BakeCount <= 0)
-            {
-                Debug.LogWarning("베이킹 횟수가 떨어졌지만, 점수를 넘지 못했습니다. 게임을 종료합니다.");
-                state.CurrentState = GameState.GameOver;
-
-                // 게임 종료 명령 생성
-                var commandComponent = GetCommandRequest();
-                commandComponent.Requests.Enqueue(new CommandRequest
-                {
-                    Type = CommandType.EndGame,
-                    PayLoad = null
-                });
-
-                return;
-            }
         }
 
         private GameStateComponent GetState()

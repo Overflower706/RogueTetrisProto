@@ -43,6 +43,41 @@ namespace Minomino
                 score.CurrentScore += scoreForRow;
                 Debug.Log($"베이크된 줄 {string.Join(", ", bakeComponent.BakedRow)}에 대한 점수: {scoreForRow}, 현재 점수: {score.CurrentScore}");
                 bakeEntity.RemoveComponent<BakedComponent>(); // 베이크 후 컴포넌트 제거
+
+                var state = GetState();
+                var player = GetPlayer();
+
+                if (score.CurrentScore >= score.TargetScore)
+                {
+                    Debug.Log("목표 점수 도달! 게임 승리 상태로 전환");
+                    state.CurrentState = GameState.Victory;
+
+                    // 게임 종료 명령 생성
+                    var commandComponent = GetCommandRequest();
+                    commandComponent.Requests.Enqueue(new CommandRequest
+                    {
+                        Type = CommandType.EndGame,
+                        PayLoad = null
+                    });
+
+                    return;
+                }
+
+                if (player.BakeCount <= 0)
+                {
+                    Debug.LogWarning("베이킹 횟수가 떨어졌지만, 점수를 넘지 못했습니다. 게임을 종료합니다.");
+                    state.CurrentState = GameState.GameOver;
+
+                    // 게임 종료 명령 생성
+                    var commandComponent = GetCommandRequest();
+                    commandComponent.Requests.Enqueue(new CommandRequest
+                    {
+                        Type = CommandType.EndGame,
+                        PayLoad = null
+                    });
+
+                    return;
+                }
             }
 
             #region 줄 클리어 이벤트. 주석 처리 안해도 되지만 일단은
@@ -54,6 +89,40 @@ namespace Minomino
             //     ProcessLineClear(score, lineClearCommand);
             // }
             #endregion
+        }
+
+        private GameStateComponent GetState()
+        {
+            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
+            if (stateEntities.Count == 0)
+            {
+                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (stateEntities.Count > 1)
+            {
+                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return stateEntities[0].GetComponent<GameStateComponent>();
+        }
+
+        private CommandRequestComponent GetCommandRequest()
+        {
+            var commandEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
+            if (commandEntities.Count == 0)
+            {
+                Debug.LogWarning("CommandRequestComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (commandEntities.Count > 1)
+            {
+                Debug.LogWarning("CommandRequestComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return commandEntities[0].GetComponent<CommandRequestComponent>();
         }
 
         private ScoreComponent GetScore()
