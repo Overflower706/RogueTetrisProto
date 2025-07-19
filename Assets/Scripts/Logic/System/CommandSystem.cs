@@ -120,14 +120,36 @@ namespace Minomino
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
 
-                case CommandType.Bake:
+                case CommandType.LineClear:
                     var lineClearCommand = new LineClearCommand();
                     // PayLoad에서 줄 클리어 정보 추출
-                    if (request.PayLoad is (int lineIndex))
+                    if (request.PayLoad is (int cleardLine))
                     {
-                        lineClearCommand.Index = lineIndex;
+                        lineClearCommand.Index = cleardLine;
                     }
                     entity.AddComponent(lineClearCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
+                case CommandType.Bake:
+                    var bakeCommand = new BakeCommand();
+                    // PayLoad에서 줄 클리어 정보 추출
+                    if (request.PayLoad is (int bakeIndex))
+                    {
+                        bakeCommand.Index = bakeIndex;
+                    }
+                    entity.AddComponent(bakeCommand);
+                    entity.AddComponent<CommandMarkerComponent>();
+                    break;
+
+                case CommandType.Trash:
+                    var trashCommand = new TrashCommand();
+                    // PayLoad에서 줄 클리어 정보 추출
+                    if (request.PayLoad is (int trashIndex))
+                    {
+                        trashCommand.Index = trashIndex;
+                    }
+                    entity.AddComponent(trashCommand);
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
 
