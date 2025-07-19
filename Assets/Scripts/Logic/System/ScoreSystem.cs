@@ -227,14 +227,17 @@ namespace Minomino
 
         private Entity GetEntityByID(int entityID)
         {
-            var entities = Context.GetEntitiesWithComponent<ScoreComponent>();
-            foreach (var entity in entities)
+            // 모든 Entity에서 ID로 검색
+            var allEntities = Context.GetEntities();
+            foreach (var entity in allEntities)
             {
                 if (entity.ID == entityID)
                 {
                     return entity;
                 }
             }
+
+            Debug.LogWarning($"Entity ID {entityID}를 찾을 수 없습니다.");
             return null;
         }
 
