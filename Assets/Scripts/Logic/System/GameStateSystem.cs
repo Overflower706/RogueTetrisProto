@@ -84,7 +84,22 @@ namespace Minomino
                 return;
             }
 
-            // 보드를 검증한다. 
+            var player = GetPlayer();
+            if (player.BakeCount <= 0)
+            {
+                Debug.LogWarning("베이킹 횟수가 떨어졌지만, 점수를 넘지 못했습니다. 게임을 종료합니다.");
+                state.CurrentState = GameState.GameOver;
+
+                // 게임 종료 명령 생성
+                var commandComponent = GetCommandRequest();
+                commandComponent.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.EndGame,
+                    PayLoad = null
+                });
+
+                return;
+            }
         }
 
         private GameStateComponent GetState()
@@ -169,6 +184,23 @@ namespace Minomino
             }
 
             return boardEntities[0].GetComponent<BoardComponent>();
+        }
+
+        private PlayerComponent GetPlayer()
+        {
+            var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
+            if (playerEntities.Count == 0)
+            {
+                Debug.LogWarning("PlayerComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (playerEntities.Count > 1)
+            {
+                Debug.LogWarning("PlayerComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return playerEntities[0].GetComponent<PlayerComponent>();
         }
     }
 }

@@ -7,5 +7,7 @@ namespace Minomino
         public int Stage;
         public int Round;
         public int Currency;
+        public int BakeCount;
+        public int TrashCount;
     }
 }

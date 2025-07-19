@@ -12180,6 +12180,8 @@ MonoBehaviour:
   StageBonus: 100
   CurrencyBase: 10
   CurrencyBonusPerDeck: 1
+  BaseBakeCount: 2
+  BaseTrashCount: 2
 --- !u!4 &905842235
 Transform:
   m_ObjectHideFlags: 0

@@ -9,5 +9,7 @@ namespace Minomino
         public int StageBonus = 100;
         public int CurrencyBase = 100;
         public int CurrencyBonusPerDeck = 1;
+        public int BaseBakeCount = 3;
+        public int BaseTrashCount = 3;
     }
 }

@@ -106,7 +106,7 @@ namespace Minomino
                 var bakeCommand = bakeEntities[0].GetComponent<BakeCommand>();
                 var index = bakeCommand.Index;
 
-                ProcessBake(index);
+                ProcessBake(currentEntity, index);
             }
 
             var trashEntities = Context.GetEntitiesWithComponent<TrashCommand>();
@@ -115,7 +115,7 @@ namespace Minomino
                 var trashCommand = trashEntities[0].GetComponent<TrashCommand>();
                 var index = trashCommand.Index;
 
-                ProcessTrashLine(index);
+                ProcessTrashLine(currentEntity, index);
             }
         }
 
@@ -429,8 +429,20 @@ namespace Minomino
             FixTetrimino(tetriminoEntity);
         }
 
-        private void ProcessBake(int index)
+        private void ProcessBake(Entity tetriminoEntity, int index)
         {
+            var player = GetPlayer();
+
+            if (player.BakeCount <= 0)
+            {
+                Debug.LogWarning($"베이킹 횟수가 부족합니다. 현재 베이킹 횟수: {player.BakeCount}");
+                return; // 베이킹 횟수가 부족하면 처리 중단
+            }
+
+            player.BakeCount--;
+
+            ClearTetriminoFromBoard(tetriminoEntity);
+
             var board = GetBoard();
             int[] bakedRow = new int[BoardComponent.WIDTH];
 
@@ -453,8 +465,20 @@ namespace Minomino
             Debug.Log($"굽기: {index}줄 삭제 및 드롭 완료");
         }
 
-        private void ProcessTrashLine(int index)
+        private void ProcessTrashLine(Entity tetriminoEntity, int index)
         {
+            var player = GetPlayer();
+
+            if (player.TrashCount <= 0)
+            {
+                Debug.LogWarning($"폐기 횟수가 부족합니다. 현재 폐기 횟수: {player.TrashCount}");
+                return; // 폐기 횟수가 부족하면 처리 중단
+            }
+
+            player.TrashCount--;
+
+            ClearTetriminoFromBoard(tetriminoEntity);
+
             var board = GetBoard();
 
             // 1. 지정된 줄을 0으로 클리어
@@ -676,6 +700,24 @@ namespace Minomino
             }
 
             Debug.Log($"줄 드롭 완료: {clearedLines.Count}줄 제거됨, {remainingLines.Count}줄 남음");
+        }
+
+        private PlayerComponent GetPlayer()
+        {
+            var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
+
+            if (playerEntities.Count == 0)
+            {
+                Debug.LogWarning("PlayerComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (playerEntities.Count > 1)
+            {
+                Debug.LogWarning("PlayerComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return playerEntities[0].GetComponent<PlayerComponent>();
         }
 
         private CommandRequestComponent GetCommandRequestComponent()

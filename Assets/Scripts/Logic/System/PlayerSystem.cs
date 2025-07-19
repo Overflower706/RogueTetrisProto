@@ -19,6 +19,14 @@ namespace Minomino
 
         public void Tick()
         {
+            var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
+            if (startEntities.Count > 0)
+            {
+                var player = GetPlayer();
+                player.BakeCount = GlobalSettings.Instance.BaseBakeCount;
+                player.TrashCount = GlobalSettings.Instance.BaseTrashCount;
+            }
+
             var endEntities = Context.GetEntitiesWithComponent<EndGameCommand>();
             if (endEntities.Count > 0)
             {
