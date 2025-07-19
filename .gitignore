@@ -106,3 +106,9 @@ InitTestScene*.unity*
 # Ignore the embedded git repository in the package folder
 /[Pp]ackages/com.ovfl.ecs/.git/
 /[Pp]ackages/com.ovfl.ecs/.gitignore
+
+# Unity Build Profiles (로컬 환경 설정)
+/[Aa]ssets/[Ss]ettings/[Bb]uild [Pp]rofiles/
+/[Aa]ssets/[Ss]ettings/[Bb]uild [Pp]rofiles.meta
+*.buildprofile
+*.buildprofile.meta
