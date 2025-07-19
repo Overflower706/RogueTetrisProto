@@ -83,31 +83,31 @@ namespace Minomino
         /// </summary>
         private void ProcessLineClear(ScoreComponent score, LineClearCommand lineClearCommand)
         {
-            // if (lineClearCommand.LinesCleared <= 0 || lineClearCommand.CompletedLinesColors == null) return;
+            if (lineClearCommand.LinesCleared <= 0 || lineClearCommand.CompletedLinesColors == null) return;
 
-            // Debug.Log($"=== 줄 클리어 점수 계산 시작 ===");
-            // Debug.Log($"완성된 줄 수: {lineClearCommand.LinesCleared}개");
+            Debug.Log($"=== 줄 클리어 점수 계산 시작 ===");
+            Debug.Log($"완성된 줄 수: {lineClearCommand.LinesCleared}개");
 
-            // // 1. 각 줄의 색상 연속 점수 계산
-            // int totalColorScore = 0;
-            // for (int lineIndex = 0; lineIndex < lineClearCommand.CompletedLinesColors.Length; lineIndex++)
-            // {
-            //     int lineScore = CalculateLineColorScore(lineClearCommand.CompletedLinesColors[lineIndex], lineIndex);
-            //     totalColorScore += lineScore;
-            // }
+            // 1. 각 줄의 색상 연속 점수 계산
+            int totalColorScore = 0;
+            for (int lineIndex = 0; lineIndex < lineClearCommand.CompletedLinesColors.Length; lineIndex++)
+            {
+                int lineScore = CalculateLineColorScore(lineClearCommand.CompletedLinesColors[lineIndex], lineIndex);
+                totalColorScore += lineScore;
+            }
 
-            // // 2. 줄 배수 계산 (1줄→1배, 2줄→2배, 3줄→4배, 4줄→8배)
-            // int lineMultiplier = GetLineMultiplier(lineClearCommand.LinesCleared);
+            // 2. 줄 배수 계산 (1줄→1배, 2줄→2배, 3줄→4배, 4줄→8배)
+            int lineMultiplier = GetLineMultiplier(lineClearCommand.LinesCleared);
 
-            // // 3. 최종 점수 계산
-            // int finalScore = totalColorScore * lineMultiplier;
-            // score.CurrentScore += finalScore;
+            // 3. 최종 점수 계산
+            int finalScore = totalColorScore * lineMultiplier;
+            score.CurrentScore += finalScore;
 
-            // Debug.Log($"색상 연속 총합: {totalColorScore}점");
-            // Debug.Log($"줄 배수: {lineMultiplier}배 ({lineClearCommand.LinesCleared}줄 완성)");
-            // Debug.Log($"최종 점수: {totalColorScore} × {lineMultiplier} = {finalScore}점");
-            // Debug.Log($"총 누적 점수: {score.CurrentScore}점");
-            // Debug.Log($"=== 줄 클리어 점수 계산 완료 ===");
+            Debug.Log($"색상 연속 총합: {totalColorScore}점");
+            Debug.Log($"줄 배수: {lineMultiplier}배 ({lineClearCommand.LinesCleared}줄 완성)");
+            Debug.Log($"최종 점수: {totalColorScore} × {lineMultiplier} = {finalScore}점");
+            Debug.Log($"총 누적 점수: {score.CurrentScore}점");
+            Debug.Log($"=== 줄 클리어 점수 계산 완료 ===");
         }
 
         /// <summary>
