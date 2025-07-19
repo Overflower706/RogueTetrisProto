@@ -17,9 +17,15 @@ public class GameBoardPanel : MonoBehaviour
     [Header("테트리미노 프리팹")]
     [SerializeField] private GameObject TetriminoPrefab;
 
+    [Header("테트리미노 이미지")]
+    [SerializeField] private Sprite[] tetriminoSprites = new Sprite[4]; // 4종류 이미지 (Red, Green, Blue, Yellow)
+
     [Header("부모 오브젝트")]
     [SerializeField] private RectTransform GridParent;
     [SerializeField] private Transform TetriminoParent;
+
+    [Header("게임 라인")]
+    [SerializeField] private GameLine[] gameLines;
 
     [Header("디버그용 UI")]
     [SerializeField] TMP_Text DebugText;
@@ -39,6 +45,7 @@ public class GameBoardPanel : MonoBehaviour
         Context = context;
         _isInit = true;
         InitGrid();
+        InitLines();
     }
 
     private void InitGrid()
@@ -63,7 +70,28 @@ public class GameBoardPanel : MonoBehaviour
         }
     }
 
-    /// <summary>
+    private void InitLines()
+    {
+        if (gameLines == null || gameLines.Length == 0)
+        {
+            Debug.LogWarning("GameBoardPanel: gameLines 배열이 null이거나 비어있습니다.");
+            return;
+        }
+
+        // 모든 GameLine 초기화
+        for (int i = 0; i < gameLines.Length; i++)
+        {
+            if (gameLines[i] != null)
+            {
+                gameLines[i].Init(Context);
+                Debug.Log($"GameLine[{i}] 초기화 완료");
+            }
+            else
+            {
+                Debug.LogWarning($"GameLine[{i}]이 null입니다.");
+            }
+        }
+    }    /// <summary>
     /// 보드 상태를 받아 시각 UI를 갱신 (배치/삭제/라인 이동 시 호출)
     /// </summary>
     public void SetBoard(BoardComponent board)
@@ -122,16 +150,21 @@ public class GameBoardPanel : MonoBehaviour
         }
     }
 
-    // tetriminoId 1~4에 맞는 색상 반환
-    private Color GetTetriminoColor(TetriminoColor tetriminoColor)
+    // tetriminoColor에 맞는 스프라이트 반환
+    private Sprite GetTetriminoSprite(TetriminoColor tetriminoColor)
     {
         switch (tetriminoColor)
         {
-            case TetriminoColor.Red: return Color.red;
-            case TetriminoColor.Green: return Color.green;
-            case TetriminoColor.Blue: return Color.blue;
-            case TetriminoColor.Yellow: return Color.yellow;
-            default: return Color.white;
+            case TetriminoColor.Red: 
+                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
+            case TetriminoColor.Green: 
+                return tetriminoSprites.Length > 1 ? tetriminoSprites[1] : null;
+            case TetriminoColor.Blue: 
+                return tetriminoSprites.Length > 2 ? tetriminoSprites[2] : null;
+            case TetriminoColor.Yellow: 
+                return tetriminoSprites.Length > 3 ? tetriminoSprites[3] : null;
+            default: 
+                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
         }
     }
 
@@ -253,15 +286,23 @@ public class GameBoardPanel : MonoBehaviour
     {
         GameObject tetriminoObj = GetOrCreateTetriminoObject(pos);
         var image = tetriminoObj.GetComponent<Image>();
-
-        // 색상 설정
-        Color color = GetTetriminoColorById(tetriminoId, currentTetrimino, currentEntityId);
-        image.color = color;
-
+        
+        // 이미지 설정
+        Sprite sprite = GetTetriminoSpriteById(tetriminoId, currentTetrimino, currentEntityId);
+        if (sprite != null)
+        {
+            image.sprite = sprite;
+            image.color = Color.white; // 기본 색상으로 설정
+        }
+        else
+        {
+            // 스프라이트가 없으면 기본 색상 사용
+            image.sprite = null;
+            image.color = Color.white;
+        }
+        
         tetriminoObj.SetActive(true);
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// 테트리미노 오브젝트를 가져오거나 생성하는 헬퍼 메서드
     /// </summary>
     private GameObject GetOrCreateTetriminoObject(Vector2Int pos)
@@ -308,21 +349,21 @@ public class GameBoardPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// 테트리미노 ID로 색상을 가져오는 헬퍼 메서드
+    /// 테트리미노 ID로 스프라이트를 가져오는 헬퍼 메서드
     /// </summary>
-    private Color GetTetriminoColorById(int tetriminoId, TetriminoComponent currentTetrimino, int currentEntityId)
+    private Sprite GetTetriminoSpriteById(int tetriminoId, TetriminoComponent currentTetrimino, int currentEntityId)
     {
         // 현재 테트리미노인 경우
         if (currentTetrimino != null && tetriminoId == currentEntityId)
         {
-            return GetTetriminoColor(currentTetrimino.Color);
+            return GetTetriminoSprite(currentTetrimino.Color);
         }
 
         // 배치된 블록인 경우
         var placedTetrimino = FindEntityById(tetriminoId);
         return placedTetrimino != null
-            ? GetTetriminoColor(placedTetrimino.Color)
-            : Color.white;
+            ? GetTetriminoSprite(placedTetrimino.Color)
+            : (tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null);
     }
 
     /// <summary>
@@ -357,6 +398,18 @@ public class GameBoardPanel : MonoBehaviour
     {
         _isInit = false;
         Context = null;
+
+        // GameLine들 Context 해제
+        if (gameLines != null)
+        {
+            for (int i = 0; i < gameLines.Length; i++)
+            {
+                if (gameLines[i] != null)
+                {
+                    gameLines[i].Context = null;
+                }
+            }
+        }
 
         // 기존 테트리미노 오브젝트들 모두 제거
         foreach (var kvp in _tetriminoObjects)

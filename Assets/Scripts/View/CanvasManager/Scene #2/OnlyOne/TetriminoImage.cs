@@ -6,6 +6,9 @@ public class TetriminoImage : MonoBehaviour
     [Header("테트리미노 미리보기 그리드 부모 오브젝트")]
     [SerializeField] private Transform gridParent;
 
+    [Header("테트리미노 이미지")]
+    [SerializeField] private Sprite[] tetriminoSprites = new Sprite[4]; // 4종류 이미지 (Red, Green, Blue, Yellow)
+
     private GameObject[,] _anchors;
     private GameObject[,] _images;
     private const int GRID_SIZE = 5;
@@ -58,7 +61,7 @@ public class TetriminoImage : MonoBehaviour
         }
 
         Vector2Int centerOffset = new Vector2Int(2, 2);
-        Color color = GetTetriminoColorStatic(tetrimino.Color);
+        Sprite sprite = GetTetriminoSpriteStatic(tetrimino.Color);
 
         foreach (var shapePos in tetrimino.Shape)
         {
@@ -70,7 +73,20 @@ public class TetriminoImage : MonoBehaviour
                 {
                     go.SetActive(true);
                     var img = go.GetComponent<UnityEngine.UI.Image>();
-                    if (img != null) img.color = color;
+                    if (img != null) 
+                    {
+                        if (sprite != null)
+                        {
+                            img.sprite = sprite;
+                            img.color = Color.white; // 기본 색상으로 설정
+                        }
+                        else
+                        {
+                            // 스프라이트가 없으면 기본 색상 사용
+                            img.sprite = null;
+                            img.color = Color.white;
+                        }
+                    }
                 }
             }
         }
@@ -88,17 +104,22 @@ public class TetriminoImage : MonoBehaviour
     }
 
     /// <summary>
-    /// 테트리미노 색상 enum을 UnityEngine.Color로 변환
+    /// 테트리미노 색상 enum을 Sprite로 변환
     /// </summary>
-    public static Color GetTetriminoColorStatic(TetriminoColor tetriminoColor)
+    public Sprite GetTetriminoSpriteStatic(TetriminoColor tetriminoColor)
     {
         switch (tetriminoColor)
         {
-            case TetriminoColor.Red: return Color.red;
-            case TetriminoColor.Green: return Color.green;
-            case TetriminoColor.Blue: return Color.blue;
-            case TetriminoColor.Yellow: return Color.yellow;
-            default: return Color.white;
+            case TetriminoColor.Red: 
+                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
+            case TetriminoColor.Green: 
+                return tetriminoSprites.Length > 1 ? tetriminoSprites[1] : null;
+            case TetriminoColor.Blue: 
+                return tetriminoSprites.Length > 2 ? tetriminoSprites[2] : null;
+            case TetriminoColor.Yellow: 
+                return tetriminoSprites.Length > 3 ? tetriminoSprites[3] : null;
+            default: 
+                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
         }
     }
 
