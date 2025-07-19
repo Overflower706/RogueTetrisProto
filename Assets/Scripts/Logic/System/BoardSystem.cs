@@ -496,6 +496,8 @@ namespace Minomino
             // }
         }
 
+        // Legacy
+
         /// <summary>
         /// 완성된 줄 검증 및 제거
         /// </summary>

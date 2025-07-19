@@ -120,14 +120,12 @@ namespace Minomino
                     entity.AddComponent<CommandMarkerComponent>();
                     break;
 
-                case CommandType.LineClear:
+                case CommandType.Bake:
                     var lineClearCommand = new LineClearCommand();
                     // PayLoad에서 줄 클리어 정보 추출
-                    if (request.PayLoad is (int linesCleared, int tetriminoEntityId, TetriminoColor[][] completedLinesColors))
+                    if (request.PayLoad is (int lineIndex))
                     {
-                        lineClearCommand.LinesCleared = linesCleared;
-                        lineClearCommand.TetriminoEntityId = tetriminoEntityId;
-                        lineClearCommand.CompletedLinesColors = completedLinesColors;
+                        lineClearCommand.Index = lineIndex;
                     }
                     entity.AddComponent(lineClearCommand);
                     entity.AddComponent<CommandMarkerComponent>();
