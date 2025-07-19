@@ -99,6 +99,24 @@ namespace Minomino
             {
                 ClearTetriminoFromBoard(currentEntity);
             }
+
+            var bakeEntities = Context.GetEntitiesWithComponent<BakeCommand>();
+            if (bakeEntities.Count > 0)
+            {
+                var bakeCommand = bakeEntities[0].GetComponent<BakeCommand>();
+                var index = bakeCommand.Index;
+
+                ProcessBake(index);
+            }
+
+            var trashEntities = Context.GetEntitiesWithComponent<TrashCommand>();
+            if (trashEntities.Count > 0)
+            {
+                var trashCommand = trashEntities[0].GetComponent<TrashCommand>();
+                var index = trashCommand.Index;
+
+                ProcessTrashLine(index);
+            }
         }
 
         private BoardComponent GetBoard()
@@ -409,6 +427,47 @@ namespace Minomino
             // HardDrop 후에는 즉시 테트리미노를 고정하고 새로운 테트리미노 
             MarkTetriminoToBoard(tetriminoEntity);
             FixTetrimino(tetriminoEntity);
+        }
+
+        private void ProcessBake(int index)
+        {
+            var board = GetBoard();
+            int[] bakedRow = new int[BoardComponent.WIDTH];
+
+            // 1. 지정된 줄을 0으로 클리어
+            for (int x = 0; x < BoardComponent.WIDTH; x++)
+            {
+                bakedRow[x] = board.Board[x, index];
+                board.Board[x, index] = 0;
+            }
+
+            Context.CreateEntity().AddComponent(new BakedComponent
+            {
+                BakedRow = bakedRow
+            });
+
+            // 2. 기존 DropLinesDown 메서드를 활용하여 위의 블록들을 아래로 드롭
+            var clearedLines = new List<int> { index };
+            DropLinesDown(board, clearedLines);
+
+            Debug.Log($"굽기: {index}줄 삭제 및 드롭 완료");
+        }
+
+        private void ProcessTrashLine(int index)
+        {
+            var board = GetBoard();
+
+            // 1. 지정된 줄을 0으로 클리어
+            for (int x = 0; x < BoardComponent.WIDTH; x++)
+            {
+                board.Board[x, index] = 0;
+            }
+
+            // 2. 기존 DropLinesDown 메서드를 활용하여 위의 블록들을 아래로 드롭
+            var clearedLines = new List<int> { index };
+            DropLinesDown(board, clearedLines);
+
+            Debug.Log($"폐기: {index}줄 삭제 및 드롭 완료");
         }
 
         /// <summary>

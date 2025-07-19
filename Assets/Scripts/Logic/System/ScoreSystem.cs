@@ -34,13 +34,26 @@ namespace Minomino
                 return; // 게임 종료 시 더 이상 점수 계산하지 않음
             }
 
-            // 줄 클리어 이벤트 처리
-            var lineClearEntities = Context.GetEntitiesWithComponent<LineClearCommand>();
-            foreach (var entity in lineClearEntities)
+            var bakedRowEntities = Context.GetEntitiesWithComponent<BakedComponent>();
+            if (bakedRowEntities.Count > 0)
             {
-                var lineClearCommand = entity.GetComponent<LineClearCommand>();
-                ProcessLineClear(score, lineClearCommand);
+                var bakeEntity = bakedRowEntities[0];
+                var bakeComponent = bakeEntity.GetComponent<BakedComponent>();
+                int scoreForRow = ProcessBake(bakeComponent.BakedRow);
+                score.CurrentScore += scoreForRow;
+                Debug.Log($"베이크된 줄 {string.Join(", ", bakeComponent.BakedRow)}에 대한 점수: {scoreForRow}, 현재 점수: {score.CurrentScore}");
+                bakeEntity.RemoveComponent<BakedComponent>(); // 베이크 후 컴포넌트 제거
             }
+
+            #region 줄 클리어 이벤트. 주석 처리 안해도 되지만 일단은
+            // 줄 클리어 이벤트 처리
+            // var lineClearEntities = Context.GetEntitiesWithComponent<LineClearCommand>();
+            // foreach (var entity in lineClearEntities)
+            // {
+            //     var lineClearCommand = entity.GetComponent<LineClearCommand>();
+            //     ProcessLineClear(score, lineClearCommand);
+            // }
+            #endregion
         }
 
         private ScoreComponent GetScore()
@@ -76,6 +89,11 @@ namespace Minomino
             }
 
             return playerEntities[0].GetComponent<PlayerComponent>();
+        }
+
+        private int ProcessBake(int[] row)
+        {
+            return 0;
         }
 
         /// <summary>
@@ -208,15 +226,6 @@ namespace Minomino
                 case 4: return 4;
                 default: return linesCleared; // 4줄 이상인 경우 선형 증가
             }
-        }
-
-        /// <summary>
-        /// ScoreMultiplierComponent 가져오기 (선택적)
-        /// </summary>
-        private ScoreMultiplierComponent GetScoreMultiplierComponent()
-        {
-            var multiplierEntities = Context.GetEntitiesWithComponent<ScoreMultiplierComponent>();
-            return multiplierEntities.Count > 0 ? multiplierEntities[0].GetComponent<ScoreMultiplierComponent>() : null;
         }
     }
 }
