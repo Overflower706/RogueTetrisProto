@@ -158,7 +158,7 @@ namespace Minomino
             int chocoSorabread = System.Math.Min(System.Math.Min(dough, yeast), syrup);
             if (chocoSorabread > 0)
             {
-                totalScore += chocoSorabread * 100;
+                totalScore += chocoSorabread * GlobalSettings.Instance.ChocoSoraBreadScore;
                 dough -= chocoSorabread;
                 yeast -= chocoSorabread;
                 syrup -= chocoSorabread;
@@ -167,10 +167,10 @@ namespace Minomino
             }
 
             // 2. 식빵 (반죽 + 이스트) = 50점
-            int bread = System.Math.Min(dough, yeast);
+            int bread = Math.Min(dough, yeast);
             if (bread > 0)
             {
-                totalScore += bread * 50;
+                totalScore += bread * GlobalSettings.Instance.BreadScore;
                 dough -= bread;
                 yeast -= bread;
                 recipeLog += $"식빵 {bread}개 = {bread * 50}점, ";
@@ -178,10 +178,10 @@ namespace Minomino
             }
 
             // 3. 아이싱 쿠키 (반죽 + 시럽) = 50점
-            int icingCookie = System.Math.Min(dough, syrup);
+            int icingCookie = Math.Min(dough, syrup);
             if (icingCookie > 0)
             {
-                totalScore += icingCookie * 50;
+                totalScore += icingCookie * GlobalSettings.Instance.IcingCookieScore;
                 dough -= icingCookie;
                 syrup -= icingCookie;
                 recipeLog += $"아이싱 쿠키 {icingCookie}개 = {icingCookie * 50}점, ";
@@ -191,7 +191,7 @@ namespace Minomino
             // 4. 쿠키 (반죽) = 10점 (최후)
             if (dough > 0)
             {
-                totalScore += dough * 10;
+                totalScore += dough * GlobalSettings.Instance.CookieScore;
                 recipeLog += $"쿠키 {dough}개 = {dough * 10}점, ";
                 Debug.Log($"쿠키 {dough}개 제작 (+{dough * 10}점)");
             }
