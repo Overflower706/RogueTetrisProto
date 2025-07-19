@@ -32,7 +32,10 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     [Header("미리보기 UI")]
     [SerializeField] private TetriminoImage[] holdTetriminoImages = new TetriminoImage[3];
     [SerializeField] private TetriminoImage[] nextTetriminoImages = new TetriminoImage[3];
+    
     [SerializeField] private TextMeshProUGUI restCountText;
+    [SerializeField] private TextMeshProUGUI BakeCountText;
+    [SerializeField] private TextMeshProUGUI TrashCountText;
 
     // 게임 상태 감시용
     private GameState _lastGameState = GameState.None;
@@ -217,6 +220,8 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
         UpdateHoldUI();
         UpdateNextTetriminoUI();
         UpdateRestCountText();
+        UpdateBakeCountText();
+        UpdateTrashCountText();
     }
 
 
@@ -388,6 +393,58 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
         // 큐에 남은 테트리미노 개수 가져오기
         int remainingCount = queueComponent.TetriminoQueue.Count;
         restCountText.text = $"{remainingCount}";
+    }
+
+    private void UpdateBakeCountText()
+    {
+        var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
+        if (playerEntities == null || playerEntities.Count == 0)
+        {
+            BakeCountText.text = "-----";
+            return;
+        }
+
+        if (playerEntities.Count > 1)
+        {
+            Debug.LogWarning($"PlayerComponent가 {playerEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
+        }
+
+        var playerComponent = playerEntities[0].GetComponent<PlayerComponent>();
+        if (playerComponent == null)
+        {
+            BakeCountText.text = "+++++";
+            return;
+        }
+
+        // 플레이어의 Bake 개수 가져오기
+        int bakeCount = playerComponent.BakeCount;
+        BakeCountText.text = $"{bakeCount}";
+    }
+
+    private void UpdateTrashCountText()
+    {
+        var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
+        if (playerEntities == null || playerEntities.Count == 0)
+        {
+            TrashCountText.text = "-----";
+            return;
+        }
+
+        if (playerEntities.Count > 1)
+        {
+            Debug.LogWarning($"PlayerComponent가 {playerEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
+        }
+
+        var playerComponent = playerEntities[0].GetComponent<PlayerComponent>();
+        if (playerComponent == null)
+        {
+            TrashCountText.text = "+++++";
+            return;
+        }
+
+        // 플레이어의 Trash 개수 가져오기
+        int trashCount = playerComponent.TrashCount;
+        TrashCountText.text = $"{trashCount}";
     }
 
     /// <summary>
