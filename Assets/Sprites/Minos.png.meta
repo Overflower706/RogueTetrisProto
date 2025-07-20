@@ -322,7 +322,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Minos_0: -8738808999595854974
+      Minos_1: 230453193148059873
+      Minos_2: 2675836854704054677
+      Minos_3: 3667795298676726750
+      Minos_4: -6685101342295513176
+      Minos_5: -881574208294414941
+      Minos_6: 7465062294144104994
+      Minos_7: 2220586306974586619
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
