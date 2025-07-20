@@ -3573,9 +3573,9 @@ MonoBehaviour:
   IcingCookieScore: 20
   ChocoSoraBreadScore: 45
   tetriminoSprites:
-  - {fileID: -8738808999595854974, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: 2220586306974586619, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
-  - {fileID: 2220586306974586619, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
+  - {fileID: 7465062294144104994, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
+  - {fileID: 3667795298676726750, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: 6578132775963850410, guid: 79e18df0ff1b9ac45a7743d46d3644f4, type: 3}
 --- !u!4 &905842235
 Transform:
