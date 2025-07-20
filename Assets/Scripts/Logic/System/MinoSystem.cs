@@ -9,6 +9,28 @@ namespace Minomino
 
         public void Tick()
         {
+            var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
+            if (startEntities.Count > 0)
+            {
+                var minoEntities = Context.GetEntitiesWithComponent<MinoComponent>();
+                foreach (var mino in minoEntities)
+                {
+                    var minoComponent = mino.GetComponent<MinoComponent>();
+                    minoComponent.State = MinoState.Empty; // 초기 상태를 Empty로 설정
+                }
+            }
+
+            var endEntities = Context.GetEntitiesWithComponent<EndGameCommand>();
+            if (endEntities.Count > 0)
+            {
+                var minoEntities = Context.GetEntitiesWithComponent<MinoComponent>();
+                foreach (var mino in minoEntities)
+                {
+                    var minoComponent = mino.GetComponent<MinoComponent>();
+                    minoComponent.State = MinoState.Empty; // 초기 상태를 Empty로 설정
+                }
+            }
+
             var completedLineEntities = Context.GetEntitiesWithComponent<CompletedLineComponent>();
             if (completedLineEntities.Count > 0)
             {
