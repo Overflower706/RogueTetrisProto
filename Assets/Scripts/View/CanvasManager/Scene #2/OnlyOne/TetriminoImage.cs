@@ -6,9 +6,6 @@ public class TetriminoImage : MonoBehaviour
     [Header("테트리미노 미리보기 그리드 부모 오브젝트")]
     [SerializeField] private Transform gridParent;
 
-    [Header("테트리미노 이미지")]
-    [SerializeField] private Sprite[] tetriminoSprites = new Sprite[4]; // 4종류 이미지 (Red, Green, Blue, Yellow)
-
     private GameObject[,] _anchors;
     private GameObject[,] _images;
     private const int GRID_SIZE = 5;
@@ -108,18 +105,19 @@ public class TetriminoImage : MonoBehaviour
     /// </summary>
     public Sprite GetTetriminoSpriteStatic(TetriminoColor tetriminoColor)
     {
+        var sprites = GlobalSettings.Instance.tetriminoSprites;
         switch (tetriminoColor)
         {
             case TetriminoColor.Red: 
-                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
+                return sprites.Length > 0 ? sprites[0] : null;
             case TetriminoColor.Green: 
-                return tetriminoSprites.Length > 1 ? tetriminoSprites[1] : null;
+                return sprites.Length > 1 ? sprites[1] : null;
             case TetriminoColor.Blue: 
-                return tetriminoSprites.Length > 2 ? tetriminoSprites[2] : null;
+                return sprites.Length > 2 ? sprites[2] : null;
             case TetriminoColor.Yellow: 
-                return tetriminoSprites.Length > 3 ? tetriminoSprites[3] : null;
+                return sprites.Length > 3 ? sprites[3] : null;
             default: 
-                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
+                return sprites.Length > 0 ? sprites[0] : null;
         }
     }
 
