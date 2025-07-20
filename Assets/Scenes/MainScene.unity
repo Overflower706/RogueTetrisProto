@@ -3559,11 +3559,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13680767f39a01447aa1c0905cc7b933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoardWidth: 8
+  BoardWidth: 6
   BoardHeight: 10
   HoldSize: 1
   RoundBonus: 1
-  StageBonus: 100
+  StageBonus: 10
   CurrencyBase: 10
   CurrencyBonusPerDeck: 1
   BaseBakeCount: 4
@@ -9332,6 +9332,10 @@ PrefabInstance:
     - target: {fileID: 8501252589040803508, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
       propertyPath: m_Type
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8593058892759255503, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
+      propertyPath: m_ConstraintCount
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8619904797245195956, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
       propertyPath: m_Type
