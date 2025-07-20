@@ -38,7 +38,8 @@ namespace Minomino
             if (completedLineComponentEntities.Count > 0)
             {
                 var board = GetBoard();
-                var completedLineComponent = completedLineComponentEntities[0].GetComponent<CompletedLineComponent>();
+                var completedLineEntity = completedLineComponentEntities[0];
+                var completedLineComponent = completedLineEntity.GetComponent<CompletedLineComponent>();
 
                 foreach (var line in completedLineComponent.CompletedLine)
                 {
@@ -59,6 +60,8 @@ namespace Minomino
                         }
                     }
                 }
+
+                Context.DestroyEntity(completedLineEntity);
             }
 
             #region 줄 클리어 이벤트. 주석 처리 안해도 되지만 일단은
