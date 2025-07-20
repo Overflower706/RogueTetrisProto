@@ -72,7 +72,7 @@ namespace Minomino
             if (startEntities.Count > 0)
             {
                 // 게임 시작 로직
-                Queue<Entity> tetriminoQueue = GenerateSevenBagQueue();
+                Queue<Entity> tetriminoQueue = GenerateRandomQueue();
 
                 // TetriminoQueueComponent가 있는 엔티티 찾기 또는 생성
                 var queueComponent = GetTetriminoQueue();
