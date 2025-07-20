@@ -78,11 +78,10 @@ namespace Minomino
 
         private Entity FindEntityByID(int id)
         {
-            var entities = Context.GetEntitiesWithComponent<MinoComponent>();
+            var entities = Context.GetEntities();
             foreach (var entity in entities)
             {
-                var minoComponent = entity.GetComponent<MinoComponent>();
-                if (minoComponent.ParentID == id)
+                if (entity.ID == id)
                 {
                     return entity;
                 }
