@@ -265,9 +265,8 @@ public class GameBoardPanel : MonoBehaviour
     {
         GameObject tetriminoObj = GetOrCreateTetriminoObject(pos);
         var image = tetriminoObj.GetComponent<Image>();
-        
         // 이미지 설정
-        Sprite sprite = GetTetriminoSpriteById(tetriminoId, currentTetrimino, currentEntityId);
+        Sprite sprite = GetMinoSpriteById(tetriminoId);
         if (sprite != null)
         {
             image.sprite = sprite;
@@ -279,7 +278,6 @@ public class GameBoardPanel : MonoBehaviour
             image.sprite = null;
             image.color = Color.white;
         }
-        
         tetriminoObj.SetActive(true);
     }    /// <summary>
     /// 테트리미노 오브젝트를 가져오거나 생성하는 헬퍼 메서드
@@ -328,20 +326,29 @@ public class GameBoardPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// 테트리미노 ID로 스프라이트를 가져오는 헬퍼 메서드
+    /// 미노 ID로 스프라이트를 가져오는 헬퍼 메서드
     /// </summary>
-    private Sprite GetTetriminoSpriteById(int tetriminoId, TetriminoComponent currentTetrimino, int currentEntityId)
+    private Sprite GetMinoSpriteById(int minoId)
     {
-        // 시스템 구조 변경: minoComponent의 State 값에 따라 Sprite 반환
-        var entity = FindEntityById(tetriminoId);
+        var entity = FindEntityById(minoId);
         var sprites = GlobalSettings.Instance.tetriminoSprites;
-        if (entity == null || sprites == null || sprites.Length == 0)
+        if (entity == null)
+        {
+            Debug.LogWarning($"[GetMinoSpriteById] minoId({minoId})에 해당하는 엔티티를 찾을 수 없습니다.");
             return null;
+        }
+        if (sprites == null || sprites.Length == 0)
+        {
+            Debug.LogWarning("[GetMinoSpriteById] GlobalSettings.Instance.tetriminoSprites에 스프라이트가 없습니다.");
+            return null;
+        }
 
-        // minoComponent(State) 기준으로 스프라이트 선택
         var minoComponent = entity.GetComponent<MinoComponent>();
         if (minoComponent == null)
+        {
+            Debug.LogWarning($"[GetMinoSpriteById] entityId({entity.ID})에 MinoComponent가 없습니다.");
             return sprites[0];
+        }
 
         int spriteIndex = Mathf.Clamp((int)minoComponent.State, 0, sprites.Length - 1);
         return sprites[spriteIndex];
