@@ -8,6 +8,7 @@ namespace Minomino
         public TetriminoType Type;      // 테트리미노 종류 (I, O, T, S, Z, J, L)
         public TetriminoColor Color;          // 1~4 색상 값
         public Vector2Int[] Shape;      // 테트리미노 형태
+        public int[] Minos; // 해당 테트리미노에 속하는 미노들의 Entity ID 배열
     }
 
     public enum TetriminoType

@@ -75,13 +75,14 @@ namespace Minomino
                                 continue;
                             }
 
-                            var tetriminoComponent = entity.GetComponent<TetriminoComponent>();
-                            if (tetriminoComponent == null)
+                            var minoComponent = entity.GetComponent<MinoComponent>();
+                            if (minoComponent == null)
                             {
-                                Debug.LogWarning($"Entity {entityId}에 TetriminoComponent가 없습니다. 위치: ({x}, {y})");
+                                Debug.LogWarning($"Entity {entityId}에 MinoComponent가 없습니다. 위치: ({x}, {y})");
                                 sb.Append("E"); // 에러 블록 표시
                                 continue;
                             }
+                            var tetriminoComponent = FindEntityById(context, minoComponent.ParentID).GetComponent<TetriminoComponent>();
 
                             TetriminoColor color = tetriminoComponent.Color;
                             sb.Append(GetColorBlock(color));

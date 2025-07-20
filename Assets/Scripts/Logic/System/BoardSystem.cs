@@ -178,10 +178,14 @@ namespace Minomino
         /// </summary>
         private bool CanMoveTo(Entity tetrimino, Vector2Int newPosition)
         {
+            var tetriminoComponent = tetrimino.GetComponent<TetriminoComponent>();
             var worldPositions = GetTetriminoWorldPositions(tetrimino, newPosition);
 
-            foreach (var position in worldPositions)
+            for (int i = 0; i < worldPositions.Length && i < tetriminoComponent.Minos.Length; i++)
             {
+                var position = worldPositions[i];
+                var minoEntityId = tetriminoComponent.Minos[i];
+
                 // 보드 경계 체크
                 if (!IsValidPosition(position))
                 {
@@ -191,15 +195,31 @@ namespace Minomino
                 var board = GetBoard();
 
                 // 고정된 블록과 충돌 체크 (0이 아닌 다른 Entity ID가 있으면 충돌)
-                // 단, 현재 테트리미노 자신의 ID는 제외 (이동 중이므로)
-
-                if (board.Board[position.x, position.y] > 0 && board.Board[position.x, position.y] != tetrimino.ID)
+                // 단, 현재 테트리미노의 미노 ID들은 제외 (이동 중이므로)
+                int currentCellId = board.Board[position.x, position.y];
+                if (currentCellId > 0 && !IsCurrentTetriminoMino(tetrimino, currentCellId))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 주어진 Entity ID가 현재 테트리미노의 미노인지 확인
+        /// </summary>
+        private bool IsCurrentTetriminoMino(Entity tetrimino, int entityId)
+        {
+            var tetriminoComponent = tetrimino.GetComponent<TetriminoComponent>();
+            foreach (int minoId in tetriminoComponent.Minos)
+            {
+                if (minoId == entityId)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -495,7 +515,7 @@ namespace Minomino
         }
 
         /// <summary>
-        /// Board에 테트리미노 표시 (Entity ID로 저장)
+        /// Board에 테트리미노 표시 (개별 미노 Entity ID로 저장)
         /// </summary>
         private void MarkTetriminoToBoard(Entity tetriminoEntity)
         {
@@ -507,11 +527,15 @@ namespace Minomino
             // Shape과 Rotation 기반으로 실제 블록 위치들 계산
             var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
 
-            foreach (var position in blockPositions)
+            // Shape 순서대로 Minos와 매칭하여 개별 미노 Entity ID 할당
+            for (int i = 0; i < blockPositions.Length && i < tetriminoComponent.Minos.Length; i++)
             {
-                if (IsValidPosition(position))
+                var position = blockPositions[i];
+                var minoEntityId = tetriminoComponent.Minos[i];
+
+                if (IsValidPosition(position) && minoEntityId > 0)
                 {
-                    board.Board[position.x, position.y] = tetriminoEntity.ID; // Entity ID로 테트리미노 표시
+                    board.Board[position.x, position.y] = minoEntityId; // 개별 미노 Entity ID로 테트리미노 표시
                 }
             }
         }
@@ -526,11 +550,19 @@ namespace Minomino
             // Shape과 Rotation 기반으로 실제 블록 위치들 계산
             var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
 
-            foreach (var position in blockPositions)
+            // Shape 순서대로 Minos와 매칭하여 해당 미노만 제거
+            for (int i = 0; i < blockPositions.Length && i < tetriminoComponent.Minos.Length; i++)
             {
-                if (IsValidPosition(position))
+                var position = blockPositions[i];
+                var minoEntityId = tetriminoComponent.Minos[i];
+
+                if (IsValidPosition(position) && minoEntityId > 0)
                 {
-                    board.Board[position.x, position.y] = 0; // 빈 칸으로 설정
+                    // 해당 위치에 있는 Entity ID가 현재 미노 ID와 일치하면 제거
+                    if (board.Board[position.x, position.y] == minoEntityId)
+                    {
+                        board.Board[position.x, position.y] = 0; // 빈 칸으로 설정
+                    }
                 }
             }
         }
@@ -545,7 +577,8 @@ namespace Minomino
             Debug.Log("Board System : 테트리스 고정할게~");
 
             // 게임 오버 감지 (테트리미노 고정 직후)
-            CheckAndHandleGameOver(tetriminoEntity);
+            if (IsGameOver(tetriminoEntity)) return;
+            CheckCompletedLines();
 
             // 줄 완성 검증 및 제거
             // var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines();
@@ -579,7 +612,25 @@ namespace Minomino
             // }
         }
 
-        // Legacy
+        private void CheckCompletedLines()
+        {
+            var completedLines = new List<int>();
+
+            for (int y = 0; y < BoardComponent.HEIGHT; y++)
+            {
+                if (IsLineCompleted(y))
+                {
+                    completedLines.Add(y);
+                }
+            }
+
+            if (completedLines.Count > 0)
+            {
+                // MinoSystem 측에서 수정할 수 있도록 Component 발행
+                var completedLineComponent = Context.CreateEntity().AddComponent<CompletedLineComponent>();
+                completedLineComponent.CompletedLine = completedLines;
+            }
+        }
 
         /// <summary>
         /// 완성된 줄 검증 및 제거
@@ -594,7 +645,7 @@ namespace Minomino
             // 아래부터 위로 검사하여 완성된 줄 찾기
             for (int y = 0; y < BoardComponent.HEIGHT; y++)
             {
-                if (IsLineCompleted(board, y))
+                if (IsLineCompleted(y))
                 {
                     completedLines.Add(y);
 
@@ -631,8 +682,10 @@ namespace Minomino
         /// <summary>
         /// 특정 줄이 완성되었는지 검사
         /// </summary>
-        private bool IsLineCompleted(BoardComponent board, int lineY)
+        private bool IsLineCompleted(int lineY)
         {
+            var board = GetBoard();
+
             for (int x = 0; x < BoardComponent.WIDTH; x++)
             {
                 if (board.Board[x, lineY] == 0) // 빈 칸이 있으면 완성되지 않음
@@ -771,21 +824,15 @@ namespace Minomino
         /// <summary>
         /// 게임 오버 상태 감지 및 처리
         /// </summary>
-        private void CheckAndHandleGameOver(Entity tetriminoEntity)
+        private bool IsGameOver(Entity tetriminoEntity)
         {
-            var gameStateComponent = GetState();
-            if (gameStateComponent == null || gameStateComponent.CurrentState != GameState.Playing)
-            {
-                return;
-            }
-
             // 하이브리드 게임 오버 감지
             // 1. 높이 기반 감지 (버퍼 존 포함)
             if (IsGameOverByHeight())
             {
                 Debug.Log("게임 오버: 높이 기반 감지 (버퍼 존 초과)");
                 TriggerGameOver();
-                return;
+                return true;
             }
 
             // 2. 스폰 위치 충돌 감지
@@ -793,8 +840,10 @@ namespace Minomino
             {
                 Debug.Log("게임 오버: 스폰 위치 충돌 감지");
                 TriggerGameOver();
-                return;
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>

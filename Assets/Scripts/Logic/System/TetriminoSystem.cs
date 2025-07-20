@@ -10,20 +10,15 @@ namespace Minomino
 
         public void Setup()
         {
-            // TetriminoSystem은 게임 시작 시 Tetrimino Entity들을 생성합니다.
-            // 만일 Player 데이터가 있다면 해당 데이터를 기준으로 Entity에 Component를 추가합니다만,
-            // 지금은 Player 데이터가 없으므로, 기본 Tetrimino Entity들을 생성합니다.
-            // 기본 Tetrmino Entity들은 3가지 색, 7가지 타입의 조합으로 총 21가지 TetriminoComponent를 생성합니다.
-
             // 7가지 타입
             TetriminoType[] types = {
                 TetriminoType.I, TetriminoType.O, TetriminoType.T,
                 TetriminoType.S, TetriminoType.Z, TetriminoType.J, TetriminoType.L
             };
 
-            // 3가지 색상
+            // 2가지 색상
             TetriminoColor[] colors = {
-                TetriminoColor.Red, TetriminoColor.Green, TetriminoColor.Blue
+                TetriminoColor.Red, TetriminoColor.Green
             };
 
             int createdCount = 0;
@@ -39,8 +34,25 @@ namespace Minomino
                     // TetriminoComponent 추가
                     var tetriminoComponent = tetriminoEntity.AddComponent<TetriminoComponent>();
                     tetriminoComponent.Type = type;
-                    tetriminoComponent.Color = color;
+                    tetriminoComponent.Color = color; // 지금은 안 쓰긴 합니다.
                     tetriminoComponent.Shape = GetShapeForType(type);
+
+                    // MinoComponent 추가
+                    for (int i = 0; i < tetriminoComponent.Shape.Length; i++)
+                    {
+                        var minoEntity = Context.CreateEntity();
+                        var minoComponent = minoEntity.AddComponent<MinoComponent>();
+                        minoComponent.ParentID = tetriminoEntity.ID;
+                        minoComponent.State = MinoState.Empty;
+
+                        // Tetrimino에 속하는 미노 ID 추가
+                        if (tetriminoComponent.Minos == null)
+                        {
+                            tetriminoComponent.Minos = new int[tetriminoComponent.Shape.Length];
+                        }
+                        tetriminoComponent.Minos[i] = minoEntity.ID;
+                        Debug.Log($"미노 Entity 생성 - Parent ID: {minoComponent.ParentID}, Mino State: {minoComponent.State}, Entity ID: {minoEntity.ID}");
+                    }
 
                     createdCount++;
 
@@ -51,7 +63,7 @@ namespace Minomino
             var queueEntity = Context.CreateEntity()
                                         .AddComponent<TetriminoQueueComponent>();
 
-            Debug.Log($"기본 테트리미노 Entity 생성 완료 - 총 {createdCount}개 (7타입 × 3색상)");
+            Debug.Log($"기본 테트리미노 Entity 생성 완료 - 총 {createdCount}개 (7타입 × 2색상)");
         }
 
         public void Tick()
@@ -60,8 +72,7 @@ namespace Minomino
             if (startEntities.Count > 0)
             {
                 // 게임 시작 로직
-                // SevenBag 시스템을 사용하여 Tetrimino Entity 큐 생성
-                Queue<Entity> tetriminoQueue = GenerateRandomQueue();
+                Queue<Entity> tetriminoQueue = GenerateSevenBagQueue();
 
                 // TetriminoQueueComponent가 있는 엔티티 찾기 또는 생성
                 var queueComponent = GetTetriminoQueue();
@@ -182,12 +193,12 @@ namespace Minomino
             TetriminoType[] types = { TetriminoType.I, TetriminoType.O, TetriminoType.T,
                                     TetriminoType.S, TetriminoType.Z, TetriminoType.J, TetriminoType.L };
 
-            // 3가지 색상별로 7-bag 생성
-            List<Entity>[] colorBags = new List<Entity>[3];
-            TetriminoColor[] colors = { TetriminoColor.Red, TetriminoColor.Green, TetriminoColor.Blue };
+            // 2가지 색상별로 7-bag 생성
+            List<Entity>[] colorBags = new List<Entity>[2];
+            TetriminoColor[] colors = { TetriminoColor.Red, TetriminoColor.Green };
 
             // 각 색상별로 7타입이 들어있는 백 생성
-            for (int colorIndex = 0; colorIndex < 3; colorIndex++)
+            for (int colorIndex = 0; colorIndex < 2; colorIndex++)
             {
                 colorBags[colorIndex] = new List<Entity>();
                 TetriminoColor color = colors[colorIndex];
@@ -212,8 +223,8 @@ namespace Minomino
                 }
             }
 
-            // 1번 색상부터 3번 색상까지 순회하면서 같은 타입끼리 색상 교환
-            for (int bagIndex = 0; bagIndex < 3; bagIndex++)
+            // 1번 색상부터 2번 색상까지 순회하면서 같은 타입끼리 색상 교환
+            for (int bagIndex = 0; bagIndex < 2; bagIndex++)
             {
                 for (int typeIndex = 0; typeIndex < colorBags[bagIndex].Count; typeIndex++)
                 {
@@ -225,7 +236,7 @@ namespace Minomino
                     int randomBagIndex;
                     do
                     {
-                        randomBagIndex = Random.Range(0, 3);
+                        randomBagIndex = Random.Range(0, 2);
                     } while (randomBagIndex == bagIndex);
 
                     // 해당 백에서 같은 타입 찾기
@@ -247,7 +258,7 @@ namespace Minomino
             }
 
             // 모든 백의 Entity들을 순서대로 큐에 추가
-            for (int bagIndex = 0; bagIndex < 3; bagIndex++)
+            for (int bagIndex = 0; bagIndex < 2; bagIndex++)
             {
                 foreach (var entity in colorBags[bagIndex])
                 {
@@ -255,7 +266,7 @@ namespace Minomino
                 }
             }
 
-            Debug.Log($"색상별 7-bag 시스템 Tetrimino Entity 큐 생성 완료: 3백, 총 {queue.Count}개 Entity (색상간 무작위 교환 적용)");
+            Debug.Log($"색상별 7-bag 시스템 Tetrimino Entity 큐 생성 완료: 2백, 총 {queue.Count}개 Entity (색상간 무작위 교환 적용)");
             return queue;
         }
 
