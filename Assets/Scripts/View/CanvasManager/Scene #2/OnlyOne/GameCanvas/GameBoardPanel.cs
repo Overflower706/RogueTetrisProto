@@ -17,9 +17,6 @@ public class GameBoardPanel : MonoBehaviour
     [Header("테트리미노 프리팹")]
     [SerializeField] private GameObject TetriminoPrefab;
 
-    [Header("테트리미노 이미지")]
-    [SerializeField] private Sprite[] tetriminoSprites = new Sprite[4]; // 4종류 이미지 (Red, Green, Blue, Yellow)
-
     [Header("부모 오브젝트")]
     [SerializeField] private RectTransform GridParent;
     [SerializeField] private Transform TetriminoParent;
@@ -149,25 +146,7 @@ public class GameBoardPanel : MonoBehaviour
             }
         }
     }
-
-    // tetriminoColor에 맞는 스프라이트 반환
-    private Sprite GetTetriminoSprite(TetriminoColor tetriminoColor)
-    {
-        switch (tetriminoColor)
-        {
-            case TetriminoColor.Red: 
-                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
-            case TetriminoColor.Green: 
-                return tetriminoSprites.Length > 1 ? tetriminoSprites[1] : null;
-            case TetriminoColor.Blue: 
-                return tetriminoSprites.Length > 2 ? tetriminoSprites[2] : null;
-            case TetriminoColor.Yellow: 
-                return tetriminoSprites.Length > 3 ? tetriminoSprites[3] : null;
-            default: 
-                return tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null;
-        }
-    }
-
+    
     /// <summary>
     /// 현재 활성화된 있는 테트리미노가 하드롭 했을 때의 예상 위치(월드 좌표 배열)를 반환
     /// </summary>
@@ -353,30 +332,32 @@ public class GameBoardPanel : MonoBehaviour
     /// </summary>
     private Sprite GetTetriminoSpriteById(int tetriminoId, TetriminoComponent currentTetrimino, int currentEntityId)
     {
-        // 현재 테트리미노인 경우
-        if (currentTetrimino != null && tetriminoId == currentEntityId)
-        {
-            return GetTetriminoSprite(currentTetrimino.Color);
-        }
+        // 시스템 구조 변경: minoComponent의 State 값에 따라 Sprite 반환
+        var entity = FindEntityById(tetriminoId);
+        var sprites = GlobalSettings.Instance.tetriminoSprites;
+        if (entity == null || sprites == null || sprites.Length == 0)
+            return null;
 
-        // 배치된 블록인 경우
-        var placedTetrimino = FindEntityById(tetriminoId);
-        return placedTetrimino != null
-            ? GetTetriminoSprite(placedTetrimino.Color)
-            : (tetriminoSprites.Length > 0 ? tetriminoSprites[0] : null);
+        // minoComponent(State) 기준으로 스프라이트 선택
+        var minoComponent = entity.GetComponent<MinoComponent>();
+        if (minoComponent == null)
+            return sprites[0];
+
+        int spriteIndex = Mathf.Clamp((int)minoComponent.State, 0, sprites.Length - 1);
+        return sprites[spriteIndex];
     }
 
     /// <summary>
     /// ID로 엔티티를 찾는 헬퍼 메서드
     /// </summary>
-    private TetriminoComponent FindEntityById(int entityId)
+private Entity FindEntityById(int entityId)
     {
         var entities = Context.GetEntities();
         foreach (var entity in entities)
         {
             if (entity.ID == entityId)
             {
-                return entity.GetComponent<TetriminoComponent>();
+                return entity;
             }
         }
         return null;

@@ -28,5 +28,8 @@ namespace Minomino
         public int BreadScore = 50;
         public int IcingCookieScore = 50;
         public int ChocoSoraBreadScore = 100;
+
+        [Header("UI Sprite")]
+        public Sprite[] tetriminoSprites;
     }
 }
