@@ -34,49 +34,30 @@ namespace Minomino
                 return; // 게임 종료 시 더 이상 점수 계산하지 않음
             }
 
-            var bakedRowEntities = Context.GetEntitiesWithComponent<BakedComponent>();
-            if (bakedRowEntities.Count > 0)
+            var completedLineComponentEntities = Context.GetEntitiesWithComponent<CompletedLineComponent>();
+            if (completedLineComponentEntities.Count > 0)
             {
-                var bakeEntity = bakedRowEntities[0];
-                var bakeComponent = bakeEntity.GetComponent<BakedComponent>();
-                int scoreForRow = ProcessBake(bakeComponent.BakedRow);
-                score.CurrentScore += scoreForRow;
-                Debug.Log($"베이크된 줄 {string.Join(", ", bakeComponent.BakedRow)}에 대한 점수: {scoreForRow}, 현재 점수: {score.CurrentScore}");
-                bakeEntity.RemoveComponent<BakedComponent>(); // 베이크 후 컴포넌트 제거
+                var board = GetBoard();
+                var completedLineComponent = completedLineComponentEntities[0].GetComponent<CompletedLineComponent>();
 
-                var state = GetState();
-                var player = GetPlayer();
-
-                if (score.CurrentScore >= score.TargetScore)
+                foreach (var line in completedLineComponent.CompletedLine)
                 {
-                    Debug.Log("목표 점수 도달! 게임 승리 상태로 전환");
-                    state.CurrentState = GameState.Victory;
-
-                    // 게임 종료 명령 생성
-                    var commandComponent = GetCommandRequest();
-                    commandComponent.Requests.Enqueue(new CommandRequest
+                    for (int x = 0; x < BoardComponent.WIDTH; x++)
                     {
-                        Type = CommandType.EndGame,
-                        PayLoad = null
-                    });
+                        int entityID = board.Board[x, line];
+                        if (entityID != 0)
+                        {
+                            var minoEntity = FindEntityByID(entityID);
+                            var minoComponent = minoEntity.GetComponent<MinoComponent>();
 
-                    return;
-                }
-
-                if (player.BakeCount <= 0)
-                {
-                    Debug.LogWarning("베이킹 횟수가 떨어졌지만, 점수를 넘지 못했습니다. 게임을 종료합니다.");
-                    state.CurrentState = GameState.GameOver;
-
-                    // 게임 종료 명령 생성
-                    var commandComponent = GetCommandRequest();
-                    commandComponent.Requests.Enqueue(new CommandRequest
-                    {
-                        Type = CommandType.EndGame,
-                        PayLoad = null
-                    });
-
-                    return;
+                            if (minoComponent.State == MinoState.Living)
+                            {
+                                score.CurrentScore += 1;
+                                Debug.Log($"{line}번째 줄에서 Mino ID {entityID}의 상태를 Living으로 변경하고 점수에 1점 추가했습니다. 현재 점수: {score.CurrentScore}");
+                            }
+                            Debug.Log($"높이 {line}의 Mino ID {entityID}의 상태를 Living으로 변경했습니다.");
+                        }
+                    }
                 }
             }
 
@@ -106,6 +87,23 @@ namespace Minomino
             }
 
             return stateEntities[0].GetComponent<GameStateComponent>();
+        }
+
+        private BoardComponent GetBoard()
+        {
+            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
+            if (boardEntities.Count == 0)
+            {
+                Debug.LogWarning("BoardComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (boardEntities.Count > 1)
+            {
+                Debug.LogWarning("BoardComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return boardEntities[0].GetComponent<BoardComponent>();
         }
 
         private CommandRequestComponent GetCommandRequest()
@@ -158,6 +156,19 @@ namespace Minomino
             }
 
             return playerEntities[0].GetComponent<PlayerComponent>();
+        }
+
+        private Entity FindEntityByID(int id)
+        {
+            var entities = Context.GetEntities();
+            foreach (var entity in entities)
+            {
+                if (entity.ID == id)
+                {
+                    return entity;
+                }
+            }
+            return null;
         }
 
         private int ProcessBake(int[] row)

@@ -32,6 +32,7 @@ namespace Minomino
                 var commandEntity = Context.CreateEntity();
 
                 // 명령 타입에 따라 적절한 컴포넌트 추가
+                commandEntity.AddComponent<CommandMarkerComponent>();
                 AddCommandComponent(request, commandEntity);
             }
         }
@@ -54,70 +55,60 @@ namespace Minomino
                     var startCommand = new StartGameCommand();
                     startCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(startCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.EndGame:
                     var endCommand = new EndGameCommand();
                     endCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(endCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.MoveLeft:
                     var moveLeftCommand = new MoveLeftCommand();
                     moveLeftCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(moveLeftCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.MoveRight:
                     var moveRightCommand = new MoveRightCommand();
                     moveRightCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(moveRightCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.SoftDrop:
                     var softDropCommand = new SoftDropCommand();
                     softDropCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(softDropCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.HardDrop:
                     var hardDropCommand = new HardDropCommand();
                     hardDropCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(hardDropCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.RotateClockwise:
                     var rotateClockwiseCommand = new RotateClockwiseCommand();
                     rotateClockwiseCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(rotateClockwiseCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.RotateCounterClockwise:
                     var rotateCounterClockwiseCommand = new RotateCounterClockwiseCommand();
                     rotateCounterClockwiseCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(rotateCounterClockwiseCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.Hold:
                     var holdCommand = new HoldTetriminoCommand();
                     holdCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(holdCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.GenerateTetrimino:
                     var generateCommand = new GenerateTetriminoCommand();
                     generateCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(generateCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.LineClear:
@@ -130,7 +121,6 @@ namespace Minomino
                         lineClearCommand.CompletedLinesColors = completedLinesColors;
                     }
                     entity.AddComponent(lineClearCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.Bake:
@@ -141,7 +131,6 @@ namespace Minomino
                         bakeCommand.Index = bakeIndex;
                     }
                     entity.AddComponent(bakeCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 case CommandType.Trash:
@@ -152,7 +141,6 @@ namespace Minomino
                         trashCommand.Index = trashIndex;
                     }
                     entity.AddComponent(trashCommand);
-                    entity.AddComponent<CommandMarkerComponent>();
                     break;
 
                 // 향후 다른 명령 타입들 추가

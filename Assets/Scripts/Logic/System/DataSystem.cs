@@ -18,6 +18,9 @@ namespace Minomino
 
             var commandRequestEntity = Context.CreateEntity();
             commandRequestEntity.AddComponent<CommandRequestComponent>();
+
+            var notifyQueueEntity = Context.CreateEntity();
+            notifyQueueEntity.AddComponent<NotifyQueueComponent>();
         }
     }
 }

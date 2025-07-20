@@ -13,6 +13,7 @@ namespace Minomino
             if (completedLineEntities.Count > 0)
             {
                 var board = GetBoard();
+                var notifyQueue = GetNotifyQueue();
                 // board에서 해당 height에 해당하는 모든 int 값을 가져온다.
                 // 해당 int 값은 Mino Entity의 ID이다.
                 var completedLineComponent = completedLineEntities[0].GetComponent<CompletedLineComponent>();
@@ -29,6 +30,11 @@ namespace Minomino
                             minoComponent.State = MinoState.Living;
 
                             // 이제 notify 보내기만 하면된다.
+                            notifyQueue.Notifies.Enqueue(new Notify
+                            {
+                                Type = NotifyType.MinoStateChanged,
+                                PayLoad = minoEntity.ID
+                            });
                             Debug.Log($"높이 {line}의 Mino ID {entityID}의 상태를 Living으로 변경했습니다.");
                         }
                     }
@@ -51,6 +57,23 @@ namespace Minomino
             }
 
             return boardEntities[0].GetComponent<BoardComponent>();
+        }
+
+        private NotifyQueueComponent GetNotifyQueue()
+        {
+            var notifyQueueEntities = Context.GetEntitiesWithComponent<NotifyQueueComponent>();
+            if (notifyQueueEntities.Count == 0)
+            {
+                Debug.LogWarning("NotifyQueueComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (notifyQueueEntities.Count > 1)
+            {
+                Debug.LogWarning("NotifyQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return notifyQueueEntities[0].GetComponent<NotifyQueueComponent>();
         }
 
         private Entity FindEntityByID(int id)

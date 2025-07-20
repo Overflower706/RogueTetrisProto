@@ -40,7 +40,6 @@ namespace Minomino
 
             Systems.AddSystem<PlayerSystem>();
             Systems.AddSystem<GameStateSystem>();
-            Systems.AddSystem<ScoreSystem>();
 
             Systems.AddSystem<TetriminoSystem>();
 
@@ -48,8 +47,11 @@ namespace Minomino
 
             Systems.AddSystem<BoardSystem>(); // Board측에서 Hold에 대해 지우고나서 HoldSystem이 BoardTetriminoState를 바꿔야함
             Systems.AddSystem<HoldSystem>();
+            Systems.AddSystem<MinoSystem>();
 
+            Systems.AddSystem<ScoreSystem>();
 
+            Systems.AddSystem<NotifySystem>();
             Systems.AddSystem<ExampleInputSystem>();
 
             // View 관련
