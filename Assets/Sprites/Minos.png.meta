@@ -150,10 +150,10 @@ TextureImporter:
       name: Minos_0
       rect:
         serializedVersion: 2
-        x: 107
+        x: 108
         y: 1036
-        width: 372
-        height: 372
+        width: 370
+        height: 371
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -172,10 +172,10 @@ TextureImporter:
       name: Minos_1
       rect:
         serializedVersion: 2
-        x: 519
-        y: 1040
+        x: 516
+        y: 1035
         width: 372
-        height: 372
+        height: 371
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -194,10 +194,10 @@ TextureImporter:
       name: Minos_2
       rect:
         serializedVersion: 2
-        x: 920
-        y: 1041
-        width: 372
-        height: 372
+        x: 937
+        y: 1072
+        width: 370
+        height: 370
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -216,10 +216,10 @@ TextureImporter:
       name: Minos_3
       rect:
         serializedVersion: 2
-        x: 1335
-        y: 1041
-        width: 372
-        height: 372
+        x: 1332
+        y: 1069
+        width: 370
+        height: 371
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -238,10 +238,10 @@ TextureImporter:
       name: Minos_4
       rect:
         serializedVersion: 2
-        x: 107
-        y: 637
+        x: 102
+        y: 617
         width: 372
-        height: 372
+        height: 371
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -260,10 +260,10 @@ TextureImporter:
       name: Minos_5
       rect:
         serializedVersion: 2
-        x: 520
-        y: 639
-        width: 372
-        height: 372
+        x: 517
+        y: 614
+        width: 371
+        height: 371
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -282,10 +282,10 @@ TextureImporter:
       name: Minos_6
       rect:
         serializedVersion: 2
-        x: 924
-        y: 637
+        x: 933
+        y: 633
         width: 372
-        height: 372
+        height: 371
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -304,10 +304,10 @@ TextureImporter:
       name: Minos_7
       rect:
         serializedVersion: 2
-        x: 1342
-        y: 634
-        width: 372
-        height: 372
+        x: 1343
+        y: 635
+        width: 370
+        height: 370
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -326,7 +326,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 19dcde26e3598f0439fa957abd4e7229
     internalID: 0
     vertices: []
     indices: 
@@ -334,7 +334,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Minos_0: -8738808999595854974
       Minos_1: 230453193148059873
