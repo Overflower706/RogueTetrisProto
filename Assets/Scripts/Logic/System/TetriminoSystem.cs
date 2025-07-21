@@ -37,22 +37,8 @@ namespace Minomino
                     tetriminoComponent.Color = color; // 지금은 안 쓰긴 합니다.
                     tetriminoComponent.Shape = GetShapeForType(type);
 
-                    // MinoComponent 추가
-                    for (int i = 0; i < tetriminoComponent.Shape.Length; i++)
-                    {
-                        var minoEntity = Context.CreateEntity();
-                        var minoComponent = minoEntity.AddComponent<MinoComponent>();
-                        minoComponent.ParentID = tetriminoEntity.ID;
-                        minoComponent.State = MinoState.Empty;
-
-                        // Tetrimino에 속하는 미노 ID 추가
-                        if (tetriminoComponent.Minos == null)
-                        {
-                            tetriminoComponent.Minos = new int[tetriminoComponent.Shape.Length];
-                        }
-                        tetriminoComponent.Minos[i] = minoEntity.ID;
-                        Debug.Log($"미노 Entity 생성 - Parent ID: {minoComponent.ParentID}, Mino State: {minoComponent.State}, Entity ID: {minoEntity.ID}");
-                    }
+                    // 미노 Entity들 생성 및 연결
+                    CreateMinoEntities(tetriminoEntity, tetriminoComponent);
 
                     createdCount++;
 
@@ -72,7 +58,7 @@ namespace Minomino
             if (startEntities.Count > 0)
             {
                 // 게임 시작 로직
-                Queue<Entity> tetriminoQueue = GenerateRandomQueue();
+                Queue<Entity> tetriminoQueue = GenerateSevenBagQueue();
 
                 // TetriminoQueueComponent가 있는 엔티티 찾기 또는 생성
                 var queueComponent = GetTetriminoQueue();
@@ -100,9 +86,43 @@ namespace Minomino
                 Debug.Log("게임 종료: Tetrimino 큐를 비우고 모든 BoardTetriminoComponent를 제거했습니다.");
             }
 
-            var state = GetState();
-            if (state.CurrentState != GameState.Playing) return;
+            var createTetriminoEntities = Context.GetEntitiesWithComponent<GenerateTetriminoCommand>();
+            if (createTetriminoEntities.Count > 0)
+            {
+                var commandRequests = createTetriminoEntities[0].GetComponent<GenerateTetriminoCommand>();
+                if (commandRequests.PayLoad is TetriminoComponent tetriminoComponent)
+                {
+                    var tetriminoEntity = Context.CreateEntity();
+                    tetriminoEntity.AddComponent(tetriminoComponent);
+                    CreateMinoEntities(tetriminoEntity, tetriminoComponent);
+                }
+            }
         }
+
+        /// <summary>
+        /// 테트리미노에 속하는 미노 Entity들을 생성하고 연결
+        /// </summary>
+        /// <param name="tetriminoEntity">부모 테트리미노 Entity</param>
+        /// <param name="tetriminoComponent">테트리미노 컴포넌트</param>
+        private void CreateMinoEntities(Entity tetriminoEntity, TetriminoComponent tetriminoComponent)
+        {
+            // Minos 배열 초기화
+            tetriminoComponent.Minos = new int[tetriminoComponent.Shape.Length];
+
+            // Shape 길이만큼 미노 Entity 생성
+            for (int i = 0; i < tetriminoComponent.Shape.Length; i++)
+            {
+                var minoEntity = Context.CreateEntity();
+                var minoComponent = minoEntity.AddComponent<MinoComponent>();
+                minoComponent.ParentID = tetriminoEntity.ID;
+                minoComponent.State = MinoState.Empty;
+
+                // Tetrimino에 속하는 미노 ID 추가
+                tetriminoComponent.Minos[i] = minoEntity.ID;
+                Debug.Log($"미노 Entity 생성 - Parent ID: {minoComponent.ParentID}, Mino State: {minoComponent.State}, Entity ID: {minoEntity.ID}");
+            }
+        }
+
 
         private GameStateComponent GetState()
         {

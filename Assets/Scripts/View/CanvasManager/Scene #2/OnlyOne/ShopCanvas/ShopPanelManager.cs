@@ -33,8 +33,16 @@ namespace Minomino
 
             RefreshCurrency();
 
+            var commandRequests = GetCommandRequests();
+
             Button_Blueprint_1.onClick.AddListener(() =>
             {
+                commandRequests.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.GenerateTetrimino,
+                    PayLoad = tetrimino_1
+                });
+
                 Context.CreateEntity()
                 .AddComponent(tetrimino_1);
                 Button_Blueprint_1.interactable = false;
@@ -50,8 +58,11 @@ namespace Minomino
             });
             Button_Blueprint_2.onClick.AddListener(() =>
             {
-                Context.CreateEntity()
-                .AddComponent(tetrimino_2);
+                commandRequests.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.GenerateTetrimino,
+                    PayLoad = tetrimino_2
+                });
                 Button_Blueprint_2.interactable = false;
 
                 var player = GetPlayer();
@@ -64,8 +75,11 @@ namespace Minomino
             });
             Button_Blueprint_3.onClick.AddListener(() =>
             {
-                Context.CreateEntity()
-                .AddComponent(tetrimino_3);
+                commandRequests.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.GenerateTetrimino,
+                    PayLoad = tetrimino_3
+                });
                 Button_Blueprint_3.interactable = false;
 
                 var player = GetPlayer();
@@ -91,6 +105,22 @@ namespace Minomino
             BlueprintView_3.Clear();
         }
 
+        private CommandRequestComponent GetCommandRequests()
+        {
+            var commandRequestEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
+            if (commandRequestEntities.Count == 0)
+            {
+                Debug.LogWarning("CommandRequestsComponent가 있는 엔티티가 없습니다.");
+                return null;
+            }
+            else if (commandRequestEntities.Count > 1)
+            {
+                Debug.LogWarning("CommandRequestsComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
+                return null;
+            }
+
+            return commandRequestEntities[0].GetComponent<CommandRequestComponent>();
+        }
         private void RefreshCurrency()
         {
             var player = GetPlayer();

@@ -3560,7 +3560,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BoardWidth: 6
-  BoardHeight: 10
+  BoardHeight: 11
   HoldSize: 1
   RoundBonus: 1
   StageBonus: 10
@@ -3574,8 +3574,8 @@ MonoBehaviour:
   ChocoSoraBreadScore: 45
   tetriminoSprites:
   - {fileID: 2220586306974586619, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
-  - {fileID: -8738808999595854974, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
-  - {fileID: 2220586306974586619, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
+  - {fileID: 2632398311536810851, guid: aea427a2117a42d42a814f3fb9e79028, type: 3}
+  - {fileID: -1969903928382244192, guid: e67e31ea9429e6140871a79a81e4ec59, type: 3}
   - {fileID: 6578132775963850410, guid: 79e18df0ff1b9ac45a7743d46d3644f4, type: 3}
 --- !u!4 &905842235
 Transform:
@@ -9332,6 +9332,14 @@ PrefabInstance:
     - target: {fileID: 8501252589040803508, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
       propertyPath: m_Type
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8593058892759255503, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
+      propertyPath: m_CellSize.x
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 8593058892759255503, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
+      propertyPath: m_CellSize.y
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 8593058892759255503, guid: 95ec9d10d4a5dbf4b8cc542157f81a1c, type: 3}
       propertyPath: m_ConstraintCount

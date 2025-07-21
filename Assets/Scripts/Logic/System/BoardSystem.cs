@@ -528,6 +528,16 @@ namespace Minomino
             var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
 
             // Shape 순서대로 Minos와 매칭하여 개별 미노 Entity ID 할당
+            if (blockPositions.Length == 0)
+            {
+                Debug.LogWarning("테트리미노의 블록 위치가 비어 있습니다. 테트리미노가 올바르게 설정되었는지 확인하세요.");
+                return; // 블록 위치가 비어 있으면 처리 중단
+            }
+            if (tetriminoComponent.Minos == null)
+            {
+                Debug.LogWarning("테트리미노의 Minos가 null입니다. 테트리미노가 올바르게 설정되었는지 확인하세요.");
+                return; // Minos가 null이면 처리 중단
+            }
             for (int i = 0; i < blockPositions.Length && i < tetriminoComponent.Minos.Length; i++)
             {
                 var position = blockPositions[i];
