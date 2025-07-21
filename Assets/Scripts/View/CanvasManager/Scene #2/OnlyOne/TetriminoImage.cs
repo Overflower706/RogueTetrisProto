@@ -1,27 +1,28 @@
 using UnityEngine;
 using Minomino;
+using OVFL.ECS;
 
 public class TetriminoImage : MonoBehaviour
 {
     [Header("테트리미노 미리보기 그리드 부모 오브젝트")]
     [SerializeField] private Transform gridParent;
 
+    public Context Context { get; set; }
+
     private GameObject[,] _anchors;
     private GameObject[,] _images;
     private const int GRID_SIZE = 5;
     private bool _isInitialized = false;
 
-    private void Awake()
-    {
-        Init();
-    }
 
     /// <summary>
     /// 5x5 그리드 초기화 (중복 방지)
     /// </summary>
-    public void Init()
+    public void Init(Context context)
     {
         if (_isInitialized) return;
+
+        Context = context;
         _anchors = new GameObject[GRID_SIZE, GRID_SIZE];
         _images = new GameObject[GRID_SIZE, GRID_SIZE];
 
@@ -44,24 +45,32 @@ public class TetriminoImage : MonoBehaviour
     }
 
     /// <summary>
-    /// 테트리미노 컴포넌트로부터 shape와 color를 받아 미리보기 이미지를 갱신
+    /// 테트리미노 컴포넌트로부터 mino ID들을 받아 MinoComponent의 state에 맞는 스프라이트로 미리보기 이미지를 갱신
     /// </summary>
     public void UpdateImage(TetriminoComponent tetrimino)
     {
-        if (!_isInitialized) Init();
+        if (!_isInitialized) return;
         ClearDisplay();
 
-        if (tetrimino == null || tetrimino.Shape == null || _images == null)
+        if (tetrimino == null || tetrimino.Shape == null || _images == null || Context == null)
         {
-            Debug.LogWarning("TetriminoImage.UpdateImage: tetrimino, tetrimino.Shape 또는 _images가 null입니다.");
+            Debug.LogWarning("TetriminoImage.UpdateImage: tetrimino, tetrimino.Shape, _images 또는 Context가 null입니다.");
+            return;
+        }
+
+        if (tetrimino.Minos == null || tetrimino.Minos.Length == 0)
+        {
+            Debug.LogWarning("TetriminoImage.UpdateImage: tetrimino.Minos가 null이거나 비어있습니다.");
             return;
         }
 
         Vector2Int centerOffset = new Vector2Int(2, 2);
-        Sprite sprite = GetTetriminoSpriteStatic(tetrimino.Color);
 
-        foreach (var shapePos in tetrimino.Shape)
+        for (int i = 0; i < tetrimino.Shape.Length && i < tetrimino.Minos.Length; i++)
         {
+            Vector2Int shapePos = tetrimino.Shape[i];
+            int minoID = tetrimino.Minos[i];
+            
             Vector2Int gridPos = centerOffset + shapePos;
             if (IsValidGridPosition(gridPos))
             {
@@ -72,6 +81,7 @@ public class TetriminoImage : MonoBehaviour
                     var img = go.GetComponent<UnityEngine.UI.Image>();
                     if (img != null) 
                     {
+                        Sprite sprite = GetMinoSpriteFromID(minoID);
                         if (sprite != null)
                         {
                             img.sprite = sprite;
@@ -79,7 +89,7 @@ public class TetriminoImage : MonoBehaviour
                         }
                         else
                         {
-                            // 스프라이트가 없으면 기본 색상 사용
+                            // 스프라이트가 없으면 기본 처리
                             img.sprite = null;
                             img.color = Color.white;
                         }
@@ -101,7 +111,7 @@ public class TetriminoImage : MonoBehaviour
     }
 
     /// <summary>
-    /// 테트리미노 색상 enum을 Sprite로 변환
+    /// 테트리미노 색상 enum을 Sprite로 변환 (레거시 메서드)
     /// </summary>
     public Sprite GetTetriminoSpriteStatic(TetriminoColor tetriminoColor)
     {
@@ -117,6 +127,47 @@ public class TetriminoImage : MonoBehaviour
             case TetriminoColor.Yellow: 
                 return sprites.Length > 3 ? sprites[3] : null;
             default: 
+                return sprites.Length > 0 ? sprites[0] : null;
+        }
+    }
+
+    /// <summary>
+    /// Mino ID로부터 MinoComponent를 찾아 state에 맞는 스프라이트를 반환
+    /// </summary>
+    private Sprite GetMinoSpriteFromID(int minoID)
+    {
+        if (Context == null) return null;
+
+        // Context에서 해당 ID의 엔티티를 찾기
+        var entities = Context.GetEntities();
+        if (entities == null || minoID >= entities.Count || minoID < 0) return null;
+
+        var entity = entities[minoID];
+        if (entity == null) return null;
+
+        var minoComponent = entity.GetComponent<MinoComponent>();
+        if (minoComponent == null) return null;
+
+        // MinoComponent의 state에 맞는 스프라이트 반환
+        return GetSpriteByMinoState(minoComponent.State);
+    }
+
+    /// <summary>
+    /// MinoComponent의 state에 맞는 스프라이트를 GlobalSettings에서 가져오기
+    /// </summary>
+    private Sprite GetSpriteByMinoState(MinoState state)
+    {
+        var sprites = GlobalSettings.Instance.tetriminoSprites;
+        if (sprites == null || sprites.Length == 0) return null;
+
+        switch (state)
+        {
+            case MinoState.Living:
+                return sprites.Length > 0 ? sprites[0] : null;
+            case MinoState.Empty:
+                return sprites.Length > 1 ? sprites[1] : null;
+            case MinoState.None:
+            default:
                 return sprites.Length > 0 ? sprites[0] : null;
         }
     }

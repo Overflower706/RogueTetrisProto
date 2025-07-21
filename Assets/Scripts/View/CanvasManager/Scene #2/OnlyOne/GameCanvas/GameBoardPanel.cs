@@ -21,8 +21,7 @@ public class GameBoardPanel : MonoBehaviour
     [SerializeField] private RectTransform GridParent;
     [SerializeField] private Transform TetriminoParent;
 
-    [Header("게임 라인")]
-    [SerializeField] private GameLine[] gameLines;
+
 
     [Header("디버그용 UI")]
     [SerializeField] TMP_Text DebugText;
@@ -42,7 +41,6 @@ public class GameBoardPanel : MonoBehaviour
         Context = context;
         _isInit = true;
         InitGrid();
-        InitLines();
     }
 
     private void InitGrid()
@@ -67,28 +65,8 @@ public class GameBoardPanel : MonoBehaviour
         }
     }
 
-    private void InitLines()
-    {
-        if (gameLines == null || gameLines.Length == 0)
-        {
-            Debug.LogWarning("GameBoardPanel: gameLines 배열이 null이거나 비어있습니다.");
-            return;
-        }
 
-        // 모든 GameLine 초기화
-        for (int i = 0; i < gameLines.Length; i++)
-        {
-            if (gameLines[i] != null)
-            {
-                gameLines[i].Init(Context);
-                Debug.Log($"GameLine[{i}] 초기화 완료");
-            }
-            else
-            {
-                Debug.LogWarning($"GameLine[{i}]이 null입니다.");
-            }
-        }
-    }    /// <summary>
+    /// <summary>
     /// 보드 상태를 받아 시각 UI를 갱신 (배치/삭제/라인 이동 시 호출)
     /// </summary>
     public void SetBoard(BoardComponent board)
@@ -357,7 +335,7 @@ public class GameBoardPanel : MonoBehaviour
     /// <summary>
     /// ID로 엔티티를 찾는 헬퍼 메서드
     /// </summary>
-private Entity FindEntityById(int entityId)
+    private Entity FindEntityById(int entityId)
     {
         var entities = Context.GetEntities();
         foreach (var entity in entities)
@@ -386,18 +364,6 @@ private Entity FindEntityById(int entityId)
     {
         _isInit = false;
         Context = null;
-
-        // GameLine들 Context 해제
-        if (gameLines != null)
-        {
-            for (int i = 0; i < gameLines.Length; i++)
-            {
-                if (gameLines[i] != null)
-                {
-                    gameLines[i].Context = null;
-                }
-            }
-        }
 
         // 기존 테트리미노 오브젝트들 모두 제거
         foreach (var kvp in _tetriminoObjects)

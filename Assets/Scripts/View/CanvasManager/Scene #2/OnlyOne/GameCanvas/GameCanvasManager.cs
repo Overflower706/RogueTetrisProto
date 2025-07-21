@@ -200,13 +200,13 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
         // 홀드 이미지들 초기화
         for (int i = 0; i < holdTetriminoImages.Length; i++)
         {
-            holdTetriminoImages[i]?.Init();
+            holdTetriminoImages[i]?.Init(Context);
         }
 
         // 다음 블록 이미지들 초기화
         for (int i = 0; i < nextTetriminoImages.Length; i++)
         {
-            nextTetriminoImages[i]?.Init();
+            nextTetriminoImages[i]?.Init(Context);
         }
     }
 
