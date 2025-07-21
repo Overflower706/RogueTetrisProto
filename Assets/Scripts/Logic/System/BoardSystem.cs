@@ -99,24 +99,6 @@ namespace Minomino
             {
                 ClearTetriminoFromBoard(currentEntity);
             }
-
-            var bakeEntities = Context.GetEntitiesWithComponent<BakeCommand>();
-            if (bakeEntities.Count > 0)
-            {
-                var bakeCommand = bakeEntities[0].GetComponent<BakeCommand>();
-                var index = bakeCommand.Index;
-
-                ProcessBake(currentEntity, index);
-            }
-
-            var trashEntities = Context.GetEntitiesWithComponent<TrashCommand>();
-            if (trashEntities.Count > 0)
-            {
-                var trashCommand = trashEntities[0].GetComponent<TrashCommand>();
-                var index = trashCommand.Index;
-
-                ProcessTrashLine(currentEntity, index);
-            }
         }
 
         private BoardComponent GetBoard()
@@ -447,71 +429,6 @@ namespace Minomino
             // HardDrop 후에는 즉시 테트리미노를 고정하고 새로운 테트리미노 
             MarkTetriminoToBoard(tetriminoEntity);
             FixTetrimino(tetriminoEntity);
-        }
-
-        private void ProcessBake(Entity tetriminoEntity, int index)
-        {
-            var player = GetPlayer();
-
-            if (player.BakeCount <= 0)
-            {
-                Debug.LogWarning($"베이킹 횟수가 부족합니다. 현재 베이킹 횟수: {player.BakeCount}");
-                return; // 베이킹 횟수가 부족하면 처리 중단
-            }
-
-            player.BakeCount--;
-
-            ClearTetriminoFromBoard(tetriminoEntity);
-
-            var board = GetBoard();
-            int[] bakedRow = new int[BoardComponent.WIDTH];
-
-            // 1. 지정된 줄을 0으로 클리어
-            for (int x = 0; x < BoardComponent.WIDTH; x++)
-            {
-                bakedRow[x] = board.Board[x, index];
-                board.Board[x, index] = 0;
-            }
-
-            Context.CreateEntity().AddComponent(new BakedComponent
-            {
-                BakedRow = bakedRow
-            });
-
-            // 2. 기존 DropLinesDown 메서드를 활용하여 위의 블록들을 아래로 드롭
-            var clearedLines = new List<int> { index };
-            DropLinesDown(board, clearedLines);
-
-            Debug.Log($"굽기: {index}줄 삭제 및 드롭 완료");
-        }
-
-        private void ProcessTrashLine(Entity tetriminoEntity, int index)
-        {
-            var player = GetPlayer();
-
-            if (player.TrashCount <= 0)
-            {
-                Debug.LogWarning($"폐기 횟수가 부족합니다. 현재 폐기 횟수: {player.TrashCount}");
-                return; // 폐기 횟수가 부족하면 처리 중단
-            }
-
-            player.TrashCount--;
-
-            ClearTetriminoFromBoard(tetriminoEntity);
-
-            var board = GetBoard();
-
-            // 1. 지정된 줄을 0으로 클리어
-            for (int x = 0; x < BoardComponent.WIDTH; x++)
-            {
-                board.Board[x, index] = 0;
-            }
-
-            // 2. 기존 DropLinesDown 메서드를 활용하여 위의 블록들을 아래로 드롭
-            var clearedLines = new List<int> { index };
-            DropLinesDown(board, clearedLines);
-
-            Debug.Log($"폐기: {index}줄 삭제 및 드롭 완료");
         }
 
         /// <summary>

@@ -28,7 +28,5 @@ namespace Minomino
         Hold = 9,                   // 홀드 (방향키 위)
         GenerateTetrimino = 10, // 테트리미노 생성
         LineClear = 11,
-        Bake = 12, // 줄 클리어 이벤트
-        Trash = 13,
     }
 }

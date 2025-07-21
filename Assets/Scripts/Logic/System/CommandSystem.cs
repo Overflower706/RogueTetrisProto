@@ -123,26 +123,6 @@ namespace Minomino
                     entity.AddComponent(lineClearCommand);
                     break;
 
-                case CommandType.Bake:
-                    var bakeCommand = new BakeCommand();
-                    // PayLoad에서 줄 클리어 정보 추출
-                    if (request.PayLoad is (int bakeIndex))
-                    {
-                        bakeCommand.Index = bakeIndex;
-                    }
-                    entity.AddComponent(bakeCommand);
-                    break;
-
-                case CommandType.Trash:
-                    var trashCommand = new TrashCommand();
-                    // PayLoad에서 줄 클리어 정보 추출
-                    if (request.PayLoad is (int trashIndex))
-                    {
-                        trashCommand.Index = trashIndex;
-                    }
-                    entity.AddComponent(trashCommand);
-                    break;
-
                 // 향후 다른 명령 타입들 추가
                 default:
                     Debug.LogWarning($"알 수 없는 명령 타입: {request.Type}");
