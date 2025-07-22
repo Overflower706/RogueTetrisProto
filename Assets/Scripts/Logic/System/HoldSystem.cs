@@ -13,20 +13,20 @@ namespace Minomino
             var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (startEntities.Count > 0)
             {
-                var holdQueue = GetHoldQueue();
+                var holdQueue = Context.GetHoldQueue();
                 holdQueue.HoldQueue = new Queue<Entity>();
             }
 
             var endEntities = Context.GetEntitiesWithComponent<EndGameCommand>();
             if (endEntities.Count > 0)
             {
-                var holdQueue = GetHoldQueue();
+                var holdQueue = Context.GetHoldQueue();
                 holdQueue.HoldQueue.Clear();
                 Debug.Log("게임 종료: HoldQueue를 초기화했습니다.");
                 return;
             }
 
-            var state = GetState();
+            var state = Context.GetGameState();
 
             if (state.CurrentState != GameState.Playing)
             {
@@ -49,8 +49,8 @@ namespace Minomino
             // 만일 HoldQueue.Count도 0이고, TetriminoQueue.Count도 0이라면,
             // 유일한 Tetrimino이므로 Hold를 하지 않고, 그냥 Return
 
-            var tetriminoQueue = GetTetriminoQueue();
-            var holdQueue = GetHoldQueue();
+            var tetriminoQueue = Context.GetTetriminoQueue();
+            var holdQueue = Context.GetHoldQueue();
             if (tetriminoQueue.TetriminoQueue.Count == 0 && holdQueue.HoldQueue.Count == 0)
             {
                 Debug.Log("유일한 테트리미노이므로 Hold를 하지 않습니다.");
@@ -104,103 +104,6 @@ namespace Minomino
                 Debug.LogError("HoldQueue의 크기가 설정 값보다 큽니다. HoldQueue.Count: " + holdQueue.HoldQueue.Count);
                 return;
             }
-
-            // var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
-            // BoardTetriminoComponent holdTetriminoComponent = null;
-
-            // foreach (var entity in tetriminoEntities)
-            // {
-            //     var tetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-            //     if (tetriminoComponent.State == BoardTetriminoState.Hold)
-            //     {
-            //         holdTetriminoComponent = tetriminoComponent;
-            //         break;
-            //     }
-            // }
-
-            // BoardTetriminoComponent currentTetriminoComponent = null;
-
-            // foreach (var entity in tetriminoEntities)
-            // {
-            //     var TetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-            //     if (TetriminoComponent.State == BoardTetriminoState.Current)
-            //     {
-            //         currentTetriminoComponent = TetriminoComponent;
-            //         break;
-            //     }
-            // }
-
-            // if (holdTetriminoComponent == null)
-            // {
-            //     var tetriminoQueue = GetTetriminoQueue();
-            //     if (tetriminoQueue.TetriminoQueue.Count == 0)
-            //     {
-            //         Debug.Log("유일한 테트리미노이므로 Hold를 하지 않습니다.");
-            //         return;
-            //     }
-            //     else
-            //     {
-            //         currentTetriminoComponent.State = BoardTetriminoState.Hold;
-            //     }
-            // }
-            // else
-            // {
-            //     holdTetriminoComponent.State = BoardTetriminoState.Current;
-            //     holdTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-            //     holdTetriminoComponent.Rotation = 0; // 초기 회전 상태
-            //     currentTetriminoComponent.State = BoardTetriminoState.Hold;
-            // }
-        }
-
-        private GameStateComponent GetState()
-        {
-            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
-            if (stateEntities.Count == 0)
-            {
-                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (stateEntities.Count > 1)
-            {
-                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return stateEntities[0].GetComponent<GameStateComponent>();
-        }
-
-        private TetriminoQueueComponent GetTetriminoQueue()
-        {
-            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
-            if (queueEntities.Count == 0)
-            {
-                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (queueEntities.Count > 1)
-            {
-                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
-        }
-
-        private HoldQueueComponent GetHoldQueue()
-        {
-            var holdQueueEntities = Context.GetEntitiesWithComponent<HoldQueueComponent>();
-            if (holdQueueEntities.Count == 0)
-            {
-                Debug.LogWarning("HoldQueueComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (holdQueueEntities.Count > 1)
-            {
-                Debug.LogWarning("HoldQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return holdQueueEntities[0].GetComponent<HoldQueueComponent>();
         }
     }
 }

@@ -35,8 +35,8 @@ namespace Minomino
             var completedLineEntities = Context.GetEntitiesWithComponent<CompletedLineComponent>();
             if (completedLineEntities.Count > 0)
             {
-                var board = GetBoard();
-                var notifyQueue = GetNotifyQueue();
+                var board = Context.GetBoard();
+                var notifyQueue = Context.GetNotifyQueue();
                 // board에서 해당 height에 해당하는 모든 int 값을 가져온다.
                 // 해당 int 값은 Mino Entity의 ID이다.
                 var completedLineComponent = completedLineEntities[0].GetComponent<CompletedLineComponent>();
@@ -48,7 +48,7 @@ namespace Minomino
                         int entityID = board.Board[x, line];
                         if (entityID != 0)
                         {
-                            var minoEntity = FindEntityByID(entityID);
+                            var minoEntity = Context.FindEntityByID(entityID);
                             var minoComponent = minoEntity.GetComponent<MinoComponent>();
                             minoComponent.State = MinoState.Living;
 
@@ -63,53 +63,6 @@ namespace Minomino
                     }
                 }
             }
-        }
-
-        private BoardComponent GetBoard()
-        {
-            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
-            if (boardEntities.Count == 0)
-            {
-                Debug.LogWarning("BoardComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (boardEntities.Count > 1)
-            {
-                Debug.LogWarning("BoardComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return boardEntities[0].GetComponent<BoardComponent>();
-        }
-
-        private NotifyQueueComponent GetNotifyQueue()
-        {
-            var notifyQueueEntities = Context.GetEntitiesWithComponent<NotifyQueueComponent>();
-            if (notifyQueueEntities.Count == 0)
-            {
-                Debug.LogWarning("NotifyQueueComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (notifyQueueEntities.Count > 1)
-            {
-                Debug.LogWarning("NotifyQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return notifyQueueEntities[0].GetComponent<NotifyQueueComponent>();
-        }
-
-        private Entity FindEntityByID(int id)
-        {
-            var entities = Context.GetEntities();
-            foreach (var entity in entities)
-            {
-                if (entity.ID == id)
-                {
-                    return entity;
-                }
-            }
-            return null;
         }
     }
 }

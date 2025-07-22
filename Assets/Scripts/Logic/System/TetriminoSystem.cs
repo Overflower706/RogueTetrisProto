@@ -61,7 +61,7 @@ namespace Minomino
                 Queue<Entity> tetriminoQueue = GenerateSevenBagQueue();
 
                 // TetriminoQueueComponent가 있는 엔티티 찾기 또는 생성
-                var queueComponent = GetTetriminoQueue();
+                var queueComponent = Context.GetTetriminoQueue();
                 queueComponent.TetriminoQueue = tetriminoQueue;
 
                 Debug.Log($"Tetrimino 생성 완료: {queueComponent.TetriminoQueue.Count}개 대기 중");
@@ -71,7 +71,7 @@ namespace Minomino
             if (endEntities.Count > 0)
             {
                 // 게임 종료 로직
-                var queueEntity = GetTetriminoQueue();
+                var queueEntity = Context.GetTetriminoQueue();
                 queueEntity.TetriminoQueue.Clear();
 
                 var tetriminoEntities = Context.GetEntitiesWithComponent<TetriminoComponent>();
@@ -121,39 +121,6 @@ namespace Minomino
                 tetriminoComponent.Minos[i] = minoEntity.ID;
                 Debug.Log($"미노 Entity 생성 - Parent ID: {minoComponent.ParentID}, Mino State: {minoComponent.State}, Entity ID: {minoEntity.ID}");
             }
-        }
-
-
-        private GameStateComponent GetState()
-        {
-            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
-            if (stateEntities.Count == 0)
-            {
-                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
-                return null; // 상태가 없으면 null 반환
-            }
-            else if (stateEntities.Count > 1)
-            {
-                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null; // 여러 엔티티가 있으면 경고 후 null 반환
-            }
-            return stateEntities[0].GetComponent<GameStateComponent>();
-        }
-
-        private TetriminoQueueComponent GetTetriminoQueue()
-        {
-            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
-            if (queueEntities.Count == 0)
-            {
-                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
-                return null; // 큐가 없으면 null 반환
-            }
-            else if (queueEntities.Count > 1)
-            {
-                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null; // 여러 엔티티가 있으면 경고 후 null 반환
-            }
-            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
         }
 
         /// <summary>

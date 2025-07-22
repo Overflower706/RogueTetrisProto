@@ -10,12 +10,12 @@ namespace Minomino
 
         public void Tick()
         {
-            var score = GetScore();
+            var score = Context.GetScore();
 
             var startEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (startEntities.Count > 0)
             {
-                var player = GetPlayer();
+                var player = Context.GetPlayer();
 
                 Debug.Log($"게임 시작, 플레이어 정보: 라운드 {player.Round}, 스테이지 {player.Stage}");
                 Debug.Log($"플레이어의 라운드 보너스: {GlobalSettings.Instance.RoundBonus}, 스테이지 보너스: {GlobalSettings.Instance.StageBonus}");
@@ -37,7 +37,7 @@ namespace Minomino
             var completedLineComponentEntities = Context.GetEntitiesWithComponent<CompletedLineComponent>();
             if (completedLineComponentEntities.Count > 0)
             {
-                var board = GetBoard();
+                var board = Context.GetBoard();
                 var completedLineEntity = completedLineComponentEntities[0];
                 var completedLineComponent = completedLineEntity.GetComponent<CompletedLineComponent>();
 
@@ -48,7 +48,7 @@ namespace Minomino
                         int entityID = board.Board[x, line];
                         if (entityID != 0)
                         {
-                            var minoEntity = FindEntityByID(entityID);
+                            var minoEntity = Context.FindEntityByID(entityID);
                             var minoComponent = minoEntity.GetComponent<MinoComponent>();
 
                             if (minoComponent.State == MinoState.Living)
@@ -73,143 +73,6 @@ namespace Minomino
             //     ProcessLineClear(score, lineClearCommand);
             // }
             #endregion
-        }
-
-        private GameStateComponent GetState()
-        {
-            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
-            if (stateEntities.Count == 0)
-            {
-                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (stateEntities.Count > 1)
-            {
-                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return stateEntities[0].GetComponent<GameStateComponent>();
-        }
-
-        private BoardComponent GetBoard()
-        {
-            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
-            if (boardEntities.Count == 0)
-            {
-                Debug.LogWarning("BoardComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (boardEntities.Count > 1)
-            {
-                Debug.LogWarning("BoardComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return boardEntities[0].GetComponent<BoardComponent>();
-        }
-
-        private CommandRequestComponent GetCommandRequest()
-        {
-            var commandEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
-            if (commandEntities.Count == 0)
-            {
-                Debug.LogWarning("CommandRequestComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (commandEntities.Count > 1)
-            {
-                Debug.LogWarning("CommandRequestComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return commandEntities[0].GetComponent<CommandRequestComponent>();
-        }
-
-        private ScoreComponent GetScore()
-        {
-            var scoreEntities = Context.GetEntitiesWithComponent<ScoreComponent>();
-
-            if (scoreEntities.Count == 0)
-            {
-                Debug.LogWarning("ScoreComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (scoreEntities.Count > 1)
-            {
-                Debug.LogWarning("ScoreComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return scoreEntities[0].GetComponent<ScoreComponent>();
-        }
-
-        private PlayerComponent GetPlayer()
-        {
-            var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
-            if (playerEntities.Count == 0)
-            {
-                Debug.LogWarning("PlayerComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (playerEntities.Count > 1)
-            {
-                Debug.LogWarning("PlayerComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return playerEntities[0].GetComponent<PlayerComponent>();
-        }
-
-        private Entity FindEntityByID(int id)
-        {
-            var entities = Context.GetEntities();
-            foreach (var entity in entities)
-            {
-                if (entity.ID == id)
-                {
-                    return entity;
-                }
-            }
-            return null;
-        }
-
-        private int ProcessBake(int[] row)
-        {
-            TetriminoColor[] colors = new TetriminoColor[row.Length];
-
-            // Entity ID를 색상으로 변환
-            for (int i = 0; i < row.Length; i++)
-            {
-                if (row[i] == 0) // 빈 칸
-                {
-                    colors[i] = TetriminoColor.None;
-                }
-                else
-                {
-                    var entity = GetEntityByID(row[i]);
-                    if (entity != null)
-                    {
-                        var component = entity.GetComponent<TetriminoComponent>();
-                        colors[i] = component.Color;
-                    }
-                    else
-                    {
-                        colors[i] = TetriminoColor.None;
-                    }
-                }
-            }
-
-            Debug.Log($"=== 베이킹 점수 계산 시작 ===");
-            string colorPattern = string.Join("-", System.Array.ConvertAll(colors, GetIngredientName));
-            Debug.Log($"재료 패턴: {colorPattern}");
-
-            int totalScore = CalculateRecipeScore(colors);
-
-            Debug.Log($"최종 베이킹 점수: {totalScore}점");
-            Debug.Log($"=== 베이킹 점수 계산 완료 ===");
-
-            return totalScore;
         }
 
         /// <summary>

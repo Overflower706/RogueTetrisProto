@@ -19,7 +19,7 @@ namespace Minomino
 
         public void Cleanup()
         {
-            var state = GetState();
+            var state = Context.GetGameState();
 
             if (state.CurrentState != GameState.Playing) return;
 
@@ -33,7 +33,7 @@ namespace Minomino
 
         private void GenerateTetrimino()
         {
-            var queueEntity = GetTetriminoQueue();
+            var queueEntity = Context.GetTetriminoQueue();
 
             if (queueEntity.TetriminoQueue.Count > 0)
             {
@@ -47,7 +47,7 @@ namespace Minomino
             }
             else // TetriminoQueue가 비었다면, Hold로부터 꺼내온다.
             {
-                var holdQueue = GetHoldQueue();
+                var holdQueue = Context.GetHoldQueue();
                 if (holdQueue.HoldQueue.Count > 0)
                 {
                     var holdTetrimino = holdQueue.HoldQueue.Dequeue();
@@ -67,44 +67,6 @@ namespace Minomino
             }
         }
 
-        private GameStateComponent GetState()
-        {
-            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
-
-            if (stateEntities.Count == 0)
-            {
-                Debug.LogWarning("게임 상태 컴포넌트가 없습니다.");
-                return null;
-            }
-
-            if (stateEntities.Count > 1)
-            {
-                Debug.LogWarning("게임 상태 컴포넌트가 여러 개 있습니다.");
-                return null;
-            }
-
-            return stateEntities[0].GetComponent<GameStateComponent>();
-        }
-
-        private BoardComponent GetBoard()
-        {
-            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
-
-            if (boardEntities.Count == 0)
-            {
-                Debug.LogWarning("보드 컴포넌트가 없습니다.");
-                return null;
-            }
-
-            if (boardEntities.Count > 1)
-            {
-                Debug.LogWarning("보드 컴포넌트가 여러 개 있습니다.");
-                return null;
-            }
-
-            return boardEntities[0].GetComponent<BoardComponent>();
-        }
-
         private BoardTetriminoComponent GetCurrentTetrimino()
         {
             var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
@@ -118,54 +80,6 @@ namespace Minomino
                 }
             }
             return null;
-        }
-
-        private Entity GetHoldTetriminoEntity()
-        {
-            var holdEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
-
-            foreach (var entity in holdEntities)
-            {
-                var tetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-                if (tetriminoComponent.State == BoardTetriminoState.Hold)
-                {
-                    return entity;
-                }
-            }
-
-            return null;
-        }
-
-        private TetriminoQueueComponent GetTetriminoQueue()
-        {
-            var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
-            if (queueEntities.Count == 0)
-            {
-                Debug.LogWarning("TetriminoQueueComponent가 있는 엔티티가 없습니다.");
-                return null; // 큐가 없으면 null 반환
-            }
-            else if (queueEntities.Count > 1)
-            {
-                Debug.LogWarning("TetriminoQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null; // 여러 엔티티가 있으면 경고 후 null 반환
-            }
-            return queueEntities[0].GetComponent<TetriminoQueueComponent>();
-        }
-
-        private HoldQueueComponent GetHoldQueue()
-        {
-            var holdEntities = Context.GetEntitiesWithComponent<HoldQueueComponent>();
-            if (holdEntities.Count == 0)
-            {
-                Debug.LogWarning("HoldQueueComponent가 있는 엔티티가 없습니다.");
-                return null; // HoldQueue가 없으면 null 반환
-            }
-            else if (holdEntities.Count > 1)
-            {
-                Debug.LogWarning("HoldQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null; // 여러 엔티티가 있으면 경고 후 null 반환
-            }
-            return holdEntities[0].GetComponent<HoldQueueComponent>();
         }
     }
 }

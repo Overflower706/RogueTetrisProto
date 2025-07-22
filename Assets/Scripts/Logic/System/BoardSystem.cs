@@ -14,7 +14,7 @@ namespace Minomino
             if (startEntities.Count > 0)
             {
                 // 초기 보드 설정 로직
-                var board = GetBoard();
+                var board = Context.GetBoard();
                 board.Board = new int[BoardComponent.WIDTH, BoardComponent.HEIGHT];
                 for (int x = 0; x < BoardComponent.WIDTH; x++)
                 {
@@ -32,7 +32,7 @@ namespace Minomino
             {
                 // 게임 종료 로직
                 Debug.Log("게임 종료, 보드 초기화");
-                var board = GetBoard();
+                var board = Context.GetBoard();
                 board.Board = new int[BoardComponent.WIDTH, BoardComponent.HEIGHT];
                 for (int x = 0; x < BoardComponent.WIDTH; x++)
                 {
@@ -45,7 +45,7 @@ namespace Minomino
                 return; // 게임이 종료되면 더 이상 처리하지 않음
             }
 
-            var state = GetState();
+            var state = Context.GetGameState();
             if (state.CurrentState != GameState.Playing) return;
 
             var currentEntity = GetCurrentTetriminoEntity();
@@ -101,42 +101,6 @@ namespace Minomino
             }
         }
 
-        private BoardComponent GetBoard()
-        {
-            var boardEntities = Context.GetEntitiesWithComponent<BoardComponent>();
-
-            if (boardEntities.Count == 0)
-            {
-                Debug.LogWarning("BoardComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (boardEntities.Count > 1)
-            {
-                Debug.LogWarning("BoardComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return boardEntities[0].GetComponent<BoardComponent>();
-        }
-
-        private GameStateComponent GetState()
-        {
-            var stateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
-
-            if (stateEntities.Count == 0)
-            {
-                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (stateEntities.Count > 1)
-            {
-                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return stateEntities[0].GetComponent<GameStateComponent>();
-        }
-
         /// <summary>
         /// CurrentTetriminoComponent를 가진 엔티티 찾기
         /// </summary>
@@ -174,7 +138,7 @@ namespace Minomino
                     return false;
                 }
 
-                var board = GetBoard();
+                var board = Context.GetBoard();
 
                 // 고정된 블록과 충돌 체크 (0이 아닌 다른 Entity ID가 있으면 충돌)
                 // 단, 현재 테트리미노의 미노 ID들은 제외 (이동 중이므로)
@@ -254,7 +218,7 @@ namespace Minomino
         {
             ClearTetriminoFromBoard(tetriminoEntity);
 
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
             var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
@@ -299,7 +263,7 @@ namespace Minomino
             // 현재 위치에서 테트리미노 제거
             ClearTetriminoFromBoard(tetriminoEntity);
 
-            var board = GetBoard();
+            var board = Context.GetBoard();
             var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
             var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
 
@@ -399,7 +363,7 @@ namespace Minomino
         {
             ClearTetriminoFromBoard(tetriminoEntity);
 
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
             var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
@@ -436,7 +400,7 @@ namespace Minomino
         /// </summary>
         private void MarkTetriminoToBoard(Entity tetriminoEntity)
         {
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
             var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
@@ -469,7 +433,7 @@ namespace Minomino
 
         private void ClearTetriminoFromBoard(Entity tetriminoEntity)
         {
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
             var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
@@ -506,37 +470,6 @@ namespace Minomino
             // 게임 오버 감지 (테트리미노 고정 직후)
             if (IsGameOver(tetriminoEntity)) return;
             CheckCompletedLines();
-
-            // 줄 완성 검증 및 제거
-            // var (clearedLines, completedLinesColors) = CheckAndClearCompletedLines();
-            // if (clearedLines > 0)
-            // {
-            //     Debug.Log($"완성된 줄 {clearedLines}개 제거됨");
-
-            //     // ScoreSystem에 줄 클리어 이벤트 전달
-            //     var scoreCommandRequest = GetCommandRequestComponent();
-            //     if (scoreCommandRequest != null)
-            //     {
-            //         scoreCommandRequest.Requests.Enqueue(new CommandRequest
-            //         {
-            //             Type = CommandType.LineClear,
-            //             PayLoad = (clearedLines, tetriminoEntity.ID, completedLinesColors)
-            //         });
-            //         Debug.Log($"줄 클리어 이벤트 전송: {clearedLines}줄, 테트리미노 ID: {tetriminoEntity.ID}");
-            //     }
-            // }
-
-            // GenerateTetriminoCommand를 통해 새로운 테트리미노 생성 요청
-            // var commandRequest = GetCommandRequestComponent();
-            // if (commandRequest != null)
-            // {
-            //     commandRequest.Requests.Enqueue(new CommandRequest
-            //     {
-            //         Type = CommandType.GenerateTetrimino,
-            //         PayLoad = null
-            //     });
-            //     Debug.Log("새로운 테트리미노 생성 요청됨");
-            // }
         }
 
         private void CheckCompletedLines()
@@ -565,7 +498,7 @@ namespace Minomino
         /// </summary>
         private bool IsLineCompleted(int lineY)
         {
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             for (int x = 0; x < BoardComponent.WIDTH; x++)
             {
@@ -723,7 +656,7 @@ namespace Minomino
         /// </summary>
         private bool IsGameOverByHeight()
         {
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             // 상위 2줄(18, 19줄)에 블록이 있는지 확인 (버퍼 존)
             for (int y = BoardComponent.HEIGHT - 2; y < BoardComponent.HEIGHT; y++)
@@ -744,7 +677,7 @@ namespace Minomino
         /// </summary>
         private bool IsGameOverBySpawnCollision()
         {
-            var board = GetBoard();
+            var board = Context.GetBoard();
 
             // 일반적인 테트리미노 스폰 위치 (중앙 상단)
             Vector2Int spawnPosition = new Vector2Int(BoardComponent.WIDTH / 2, BoardComponent.HEIGHT - 1);
@@ -774,7 +707,7 @@ namespace Minomino
         /// </summary>
         private void TriggerGameOver()
         {
-            var gameStateComponent = GetState();
+            var gameStateComponent = Context.GetGameState();
             if (gameStateComponent != null)
             {
                 gameStateComponent.CurrentState = GameState.GameOver;

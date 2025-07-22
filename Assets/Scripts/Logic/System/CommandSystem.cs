@@ -9,19 +9,7 @@ namespace Minomino
 
         public void Tick()
         {
-            var queueEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
-            if (queueEntities.Count == 0)
-            {
-                Debug.LogWarning("CommandQueueComponent가 있는 엔티티가 없습니다.");
-                return; // 명령 큐가 없으면 아무것도 하지 않음
-            }
-            else if (queueEntities.Count > 1)
-            {
-                Debug.LogWarning("CommandQueueComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return; // 여러 엔티티가 있으면 경고 후 종료
-            }
-
-            var commandQueue = queueEntities[0].GetComponent<CommandRequestComponent>();
+            var commandQueue = Context.GetCommandRequest();
 
             // 한 틱당 하나의 명령만 처리 (순서 보장)
             if (commandQueue.Requests.Count > 0)
