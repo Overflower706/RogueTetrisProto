@@ -40,7 +40,7 @@ namespace Minomino
                         player.Stage = 1;
                         player.Round++;
                     }
-                    player.Currency += GlobalSettings.Instance.CurrencyBase + Context.GetTetriminoQueue().TetriminoQueue.Count * GlobalSettings.Instance.CurrencyBonusPerDeck;
+                    player.Currency += GlobalSettings.Instance.CurrencyBase + Context.GetTetrominoQueue().TetrominoQueue.Count * GlobalSettings.Instance.CurrencyBonusPerDeck;
                     Debug.Log($"게임 승리! 현재 스테이지: {player.Stage}, 라운드: {player.Round}, 통화: {player.Currency}");
                 }
                 else if (state.CurrentState == GameState.GameOver)

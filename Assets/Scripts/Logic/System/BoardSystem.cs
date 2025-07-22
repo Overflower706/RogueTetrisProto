@@ -106,11 +106,11 @@ namespace Minomino
         /// </summary>
         private Entity GetCurrentTetriminoEntity()
         {
-            var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+            var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
             foreach (var entity in tetriminoEntities)
             {
-                var tetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-                if (tetriminoComponent.State == BoardTetriminoState.Current)
+                var tetriminoComponent = entity.GetComponent<BoardTetrominoComponent>();
+                if (tetriminoComponent.State == BoardTetrominoState.Current)
                 {
                     return entity; // 현재 상태의 테트리미노 엔티티 반환
                 }
@@ -124,7 +124,7 @@ namespace Minomino
         /// </summary>
         private bool CanMoveTo(Entity tetrimino, Vector2Int newPosition)
         {
-            var tetriminoComponent = tetrimino.GetComponent<TetriminoComponent>();
+            var tetriminoComponent = tetrimino.GetComponent<TetrominoComponent>();
             var worldPositions = GetTetriminoWorldPositions(tetrimino, newPosition);
 
             for (int i = 0; i < worldPositions.Length && i < tetriminoComponent.Minos.Length; i++)
@@ -157,7 +157,7 @@ namespace Minomino
         /// </summary>
         private bool IsCurrentTetriminoMino(Entity tetrimino, int entityId)
         {
-            var tetriminoComponent = tetrimino.GetComponent<TetriminoComponent>();
+            var tetriminoComponent = tetrimino.GetComponent<TetrominoComponent>();
             foreach (int minoId in tetriminoComponent.Minos)
             {
                 if (minoId == entityId)
@@ -173,8 +173,8 @@ namespace Minomino
         /// </summary>
         private Vector2Int[] GetTetriminoWorldPositions(Entity tetrimino, Vector2Int position)
         {
-            var tetriminoComponent = tetrimino.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetrimino.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetrimino.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetrimino.GetComponent<BoardTetrominoComponent>();
 
             Vector2Int[] worldPositions = new Vector2Int[tetriminoComponent.Shape.Length];
 
@@ -220,8 +220,8 @@ namespace Minomino
 
             var board = Context.GetBoard();
 
-            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
 
             // 이동 방향 결정
             Vector2Int moveDirection = Vector2Int.zero;
@@ -264,8 +264,8 @@ namespace Minomino
             ClearTetriminoFromBoard(tetriminoEntity);
 
             var board = Context.GetBoard();
-            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
 
             // 회전 계산
             int originalRotation = boardTetrimino.Rotation;
@@ -333,8 +333,8 @@ namespace Minomino
             // 현재 위치에서 테트리미노 제거
             ClearTetriminoFromBoard(tetriminoEntity);
 
-            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
 
             // 아래로 한 칸 이동 시도
             Vector2Int newPosition = boardTetrimino.Position + Vector2Int.down;
@@ -365,8 +365,8 @@ namespace Minomino
 
             var board = Context.GetBoard();
 
-            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
 
             // 가능한 가장 아래까지 이동
             Vector2Int newPosition = boardTetrimino.Position;
@@ -402,8 +402,8 @@ namespace Minomino
         {
             var board = Context.GetBoard();
 
-            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
 
             // Shape과 Rotation 기반으로 실제 블록 위치들 계산
             var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
@@ -435,8 +435,8 @@ namespace Minomino
         {
             var board = Context.GetBoard();
 
-            var tetriminoComponent = tetriminoEntity.GetComponent<TetriminoComponent>();
-            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetriminoComponent>();
+            var tetriminoComponent = tetriminoEntity.GetComponent<TetrominoComponent>();
+            var boardTetrimino = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
 
             // Shape과 Rotation 기반으로 실제 블록 위치들 계산
             var blockPositions = GetTetriminoWorldPositions(tetriminoEntity, boardTetrimino.Position);
@@ -464,7 +464,7 @@ namespace Minomino
         private void FixTetrimino(Entity tetriminoEntity)
         {
             // 현재 위치에 테트리미노 표시 (고정)
-            tetriminoEntity.RemoveComponent<BoardTetriminoComponent>();
+            tetriminoEntity.RemoveComponent<BoardTetrominoComponent>();
             Debug.Log("Board System : 테트리스 고정할게~");
 
             // 게임 오버 감지 (테트리미노 고정 직후)

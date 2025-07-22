@@ -32,7 +32,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     [Header("미리보기 UI")]
     [SerializeField] private TetriminoImage[] holdTetriminoImages = new TetriminoImage[3];
     [SerializeField] private TetriminoImage[] nextTetriminoImages = new TetriminoImage[3];
-    
+
     [SerializeField] private TextMeshProUGUI restCountText;
     [SerializeField] private TextMeshProUGUI BakeCountText;
     [SerializeField] private TextMeshProUGUI TrashCountText;
@@ -282,13 +282,13 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     /// <summary>
     /// 다음에 올 테트리미노들을 가져오는 헬퍼 메서드 (큐에서 3개)
     /// </summary>
-    private TetriminoComponent[] GetNextTetriminos()
+    private TetrominoComponent[] GetNextTetriminos()
     {
-        var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+        var queueEntities = Context.GetEntitiesWithComponent<TetrominoQueueComponent>();
         if (queueEntities == null || queueEntities.Count == 0)
         {
             // 큐가 없으면 빈 배열 반환 (모든 미리보기 UI가 클리어됨)
-            return new TetriminoComponent[0];
+            return new TetrominoComponent[0];
         }
 
         if (queueEntities.Count > 1)
@@ -296,29 +296,29 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
             Debug.LogWarning($"TetriminoQueueComponent가 {queueEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
         }
 
-        var queueComponent = queueEntities[0].GetComponent<TetriminoQueueComponent>();
-        if (queueComponent?.TetriminoQueue == null)
+        var queueComponent = queueEntities[0].GetComponent<TetrominoQueueComponent>();
+        if (queueComponent?.TetrominoQueue == null)
         {
             // 큐 컴포넌트가 null이면 빈 배열 반환
-            return new TetriminoComponent[0];
+            return new TetrominoComponent[0];
         }
 
         // 큐에서 앞에서부터 최대 3개까지 가져오기 (큐를 수정하지 않고 미리보기만)
-        var queueArray = queueComponent.TetriminoQueue.ToArray();
+        var queueArray = queueComponent.TetrominoQueue.ToArray();
         var maxCount = Mathf.Min(3, queueArray.Length);
 
         if (maxCount == 0)
         {
             // 큐가 비어있으면 빈 배열 반환 (모든 미리보기 UI가 클리어됨)
-            return new TetriminoComponent[0];
+            return new TetrominoComponent[0];
         }
 
-        var nextTetriminos = new TetriminoComponent[maxCount];
+        var nextTetriminos = new TetrominoComponent[maxCount];
 
         for (int i = 0; i < maxCount; i++)
         {
             var entity = queueArray[i];
-            nextTetriminos[i] = entity?.GetComponent<TetriminoComponent>();
+            nextTetriminos[i] = entity?.GetComponent<TetrominoComponent>();
         }
 
         return nextTetriminos;
@@ -327,13 +327,13 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     /// <summary>
     /// 홀드된 테트리미노들을 가져오는 헬퍼 메서드 (최대 3개)
     /// </summary>
-    private TetriminoComponent[] GetHoldTetriminos()
+    private TetrominoComponent[] GetHoldTetriminos()
     {
         var holdQueueEntities = Context.GetEntitiesWithComponent<HoldQueueComponent>();
         if (holdQueueEntities == null || holdQueueEntities.Count == 0)
         {
             // 홀드 큐가 없으면 빈 배열 반환 (모든 홀드 UI가 클리어됨)
-            return new TetriminoComponent[0];
+            return new TetrominoComponent[0];
         }
 
         if (holdQueueEntities.Count > 1)
@@ -345,7 +345,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
         if (holdQueueComponent?.HoldQueue == null)
         {
             // 홀드 큐 컴포넌트가 null이면 빈 배열 반환
-            return new TetriminoComponent[0];
+            return new TetrominoComponent[0];
         }
 
         // 홀드 큐에서 앞에서부터 최대 3개까지 가져오기 (큐를 수정하지 않고 미리보기만)
@@ -355,15 +355,15 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
         if (maxCount == 0)
         {
             // 홀드 큐가 비어있으면 빈 배열 반환 (모든 홀드 UI가 클리어됨)
-            return new TetriminoComponent[0];
+            return new TetrominoComponent[0];
         }
 
-        var holdTetriminos = new TetriminoComponent[maxCount];
+        var holdTetriminos = new TetrominoComponent[maxCount];
 
         for (int i = 0; i < maxCount; i++)
         {
             var entity = holdQueueArray[i];
-            holdTetriminos[i] = entity?.GetComponent<TetriminoComponent>();
+            holdTetriminos[i] = entity?.GetComponent<TetrominoComponent>();
         }
 
         return holdTetriminos;
@@ -371,7 +371,7 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
 
     private void UpdateRestCountText()
     {
-        var queueEntities = Context.GetEntitiesWithComponent<TetriminoQueueComponent>();
+        var queueEntities = Context.GetEntitiesWithComponent<TetrominoQueueComponent>();
         if (queueEntities == null || queueEntities.Count == 0)
         {
             restCountText.text = "-----";
@@ -383,15 +383,15 @@ public class GameCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
             Debug.LogWarning($"TetriminoQueueComponent가 {queueEntities.Count}개 존재합니다. 첫 번째 것을 사용합니다.");
         }
 
-        var queueComponent = queueEntities[0].GetComponent<TetriminoQueueComponent>();
-        if (queueComponent?.TetriminoQueue == null)
+        var queueComponent = queueEntities[0].GetComponent<TetrominoQueueComponent>();
+        if (queueComponent?.TetrominoQueue == null)
         {
             restCountText.text = "+++++";
             return;
         }
 
         // 큐에 남은 테트리미노 개수 가져오기
-        int remainingCount = queueComponent.TetriminoQueue.Count;
+        int remainingCount = queueComponent.TetrominoQueue.Count;
         restCountText.text = $"{remainingCount}";
     }
 

@@ -46,24 +46,24 @@ namespace Minomino
         /// </summary>
         private void ProcessHoldCommand()
         {
-            // 만일 HoldQueue.Count도 0이고, TetriminoQueue.Count도 0이라면,
-            // 유일한 Tetrimino이므로 Hold를 하지 않고, 그냥 Return
+            // 만일 HoldQueue.Count도 0이고, TetrominoQueue.Count도 0이라면,
+            // 유일한 Tetromino이므로 Hold를 하지 않고, 그냥 Return
 
-            var tetriminoQueue = Context.GetTetriminoQueue();
+            var tetriminoQueue = Context.GetTetrominoQueue();
             var holdQueue = Context.GetHoldQueue();
-            if (tetriminoQueue.TetriminoQueue.Count == 0 && holdQueue.HoldQueue.Count == 0)
+            if (tetriminoQueue.TetrominoQueue.Count == 0 && holdQueue.HoldQueue.Count == 0)
             {
                 Debug.Log("유일한 테트리미노이므로 Hold를 하지 않습니다.");
                 return;
             }
 
-            var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+            var tetriminoEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
             Entity currentTetrimino = null;
 
             foreach (var entity in tetriminoEntities)
             {
-                var TetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-                if (TetriminoComponent.State == BoardTetriminoState.Current)
+                var TetriminoComponent = entity.GetComponent<BoardTetrominoComponent>();
+                if (TetriminoComponent.State == BoardTetrominoState.Current)
                 {
                     currentTetrimino = entity;
                     break;
@@ -76,9 +76,9 @@ namespace Minomino
             if (holdQueue.HoldQueue.Count < GlobalSettings.Instance.HoldSize)
             {
                 holdQueue.HoldQueue.Enqueue(currentTetrimino);
-                currentTetrimino.GetComponent<BoardTetriminoComponent>().State = BoardTetriminoState.Hold;
-                currentTetrimino.GetComponent<BoardTetriminoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-                currentTetrimino.GetComponent<BoardTetriminoComponent>().Rotation = 0; // 초기 회전 상태
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().State = BoardTetrominoState.Hold;
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().Rotation = 0; // 초기 회전 상태
 
                 Debug.Log("HoldQueue에 Tetrimino를 추가했습니다. 현재 HoldQueue 크기: " + holdQueue.HoldQueue.Count);
             }
@@ -88,14 +88,14 @@ namespace Minomino
                 // Current를 HoldQueue에 Enqueue하고, HoldQueue의 가장 오래된 요소를 Dequeue해서 Current로 State 변경
 
                 holdQueue.HoldQueue.Enqueue(currentTetrimino);
-                currentTetrimino.GetComponent<BoardTetriminoComponent>().State = BoardTetriminoState.Hold;
-                currentTetrimino.GetComponent<BoardTetriminoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-                currentTetrimino.GetComponent<BoardTetriminoComponent>().Rotation = 0; // 초기 회전 상태
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().State = BoardTetrominoState.Hold;
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().Rotation = 0; // 초기 회전 상태
 
                 var oldestHoldEntity = holdQueue.HoldQueue.Dequeue();
-                oldestHoldEntity.GetComponent<BoardTetriminoComponent>().State = BoardTetriminoState.Current;
-                oldestHoldEntity.GetComponent<BoardTetriminoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
-                oldestHoldEntity.GetComponent<BoardTetriminoComponent>().Rotation = 0; // 초기 회전 상태
+                oldestHoldEntity.GetComponent<BoardTetrominoComponent>().State = BoardTetrominoState.Current;
+                oldestHoldEntity.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                oldestHoldEntity.GetComponent<BoardTetrominoComponent>().Rotation = 0; // 초기 회전 상태
 
                 Debug.Log("HoldQueue에 Tetrimino를 추가하고, 가장 오래된 Hold를 Current로 변경했습니다. 현재 HoldQueue 크기: " + holdQueue.HoldQueue.Count);
             }

@@ -56,8 +56,8 @@ namespace Minomino
                 sb.Append("│");
                 for (int x = 0; x < width; x++)
                 {
-                    int entityId = board.Board[x, y];
-                    if (entityId == 0)
+                    int entityID = board.Board[x, y];
+                    if (entityID == 0)
                     {
                         sb.Append("□"); // 빈 칸
                     }
@@ -66,11 +66,11 @@ namespace Minomino
                         try
                         {
                             // Entity 찾기 (ID로 직접 검색)
-                            Entity entity = FindEntityById(context, entityId);
+                            Entity entity = context.FindEntityByID(entityID);
                             // entity ID와 이 Entity가 Context.GetEntities()에서의 index와 일치하는지 확인
                             if (entity == null)
                             {
-                                Debug.LogWarning($"Entity ID {entityId}를 찾을 수 없습니다. 위치: ({x}, {y})");
+                                Debug.LogWarning($"Entity ID {entityID}를 찾을 수 없습니다. 위치: ({x}, {y})");
                                 sb.Append("?"); // 오류 표시
                                 continue;
                             }
@@ -78,18 +78,17 @@ namespace Minomino
                             var minoComponent = entity.GetComponent<MinoComponent>();
                             if (minoComponent == null)
                             {
-                                Debug.LogWarning($"Entity {entityId}에 MinoComponent가 없습니다. 위치: ({x}, {y})");
+                                Debug.LogWarning($"Entity {entityID}에 MinoComponent가 없습니다. 위치: ({x}, {y})");
                                 sb.Append("E"); // 에러 블록 표시
                                 continue;
                             }
-                            var tetriminoComponent = FindEntityById(context, minoComponent.ParentID).GetComponent<TetriminoComponent>();
 
-                            TetriminoColor color = tetriminoComponent.Color;
-                            sb.Append(GetColorBlock(color));
+                            MinoState state = minoComponent.State;
+                            sb.Append(GetColorByState(state));
                         }
                         catch (System.Exception ex)
                         {
-                            Debug.LogError($"Entity {entityId} 처리 중 오류 발생 (위치: {x}, {y}): {ex.Message}");
+                            Debug.LogError($"Entity {entityID} 처리 중 오류 발생 (위치: {x}, {y}): {ex.Message}");
                             sb.Append("X"); // 예외 표시
                         }
                     }
@@ -111,50 +110,21 @@ namespace Minomino
         /// <summary>
         /// 색상에 따른 블록 문자 반환 (색상 코드 적용)
         /// </summary>
-        private static string GetColorBlock(TetriminoColor color)
+        private static string GetColorByState(MinoState state)
         {
-            string colorCode = GetColorName(color);
+            string colorCode = GetColorNameByState(state);
             return $"<color={colorCode}>■</color>";
         }
 
-        private static string GetColorName(TetriminoColor color)
+        private static string GetColorNameByState(MinoState state)
         {
-            return color switch
+            return state switch
             {
-                TetriminoColor.Red => "#8B0000",      // 진한 빨강 (DarkRed)
-                TetriminoColor.Green => "#006400",    // 진한 초록 (DarkGreen)
-                TetriminoColor.Blue => "#000080",     // 진한 파랑 (Navy)
-                TetriminoColor.Yellow => "#B8860B",   // 진한 노랑 (DarkGoldenrod)
-                _ => "#2F2F2F"                        // 진한 회색
+                MinoState.None => "#8B0000",      // 진한 빨강 (DarkRed)
+                MinoState.Empty => "#2F2F2F",     // 진한 회색
+                MinoState.Living => "#00FF00",    // 밝은 초록
+                _ => "#FFFFFF" // 기본 흰색
             };
-        }
-
-
-        /// <summary>
-        /// Entity ID로 Entity를 안전하게 찾기
-        /// </summary>
-        private static Entity FindEntityById(Context context, int entityId)
-        {
-            try
-            {
-                // GetEntities()로 직접 인덱스 접근 대신 안전한 검색
-                var allEntities = context.GetEntities();
-
-                foreach (var entity in allEntities)
-                {
-                    if (entity != null && entity.ID == entityId)
-                    {
-                        return entity;
-                    }
-                }
-
-                return null; // 찾지 못함
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"FindEntityById({entityId}) 오류: {ex.Message}");
-                return null;
-            }
         }
     }
 }

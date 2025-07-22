@@ -1,6 +1,6 @@
 namespace Minomino
 {
-    public class GenerateTetriminoCommand : ICommand
+    public class GenerateTetrominoCommand : ICommand
     {
         public object PayLoad { get; set; }
     }

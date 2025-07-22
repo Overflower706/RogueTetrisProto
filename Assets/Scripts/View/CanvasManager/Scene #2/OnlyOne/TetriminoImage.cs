@@ -47,7 +47,7 @@ public class TetriminoImage : MonoBehaviour
     /// <summary>
     /// 테트리미노 컴포넌트로부터 mino ID들을 받아 MinoComponent의 state에 맞는 스프라이트로 미리보기 이미지를 갱신
     /// </summary>
-    public void UpdateImage(TetriminoComponent tetrimino)
+    public void UpdateImage(TetrominoComponent tetrimino)
     {
         if (!_isInitialized) return;
         ClearDisplay();
@@ -70,7 +70,7 @@ public class TetriminoImage : MonoBehaviour
         {
             Vector2Int shapePos = tetrimino.Shape[i];
             int minoID = tetrimino.Minos[i];
-            
+
             Vector2Int gridPos = centerOffset + shapePos;
             if (IsValidGridPosition(gridPos))
             {
@@ -79,7 +79,7 @@ public class TetriminoImage : MonoBehaviour
                 {
                     go.SetActive(true);
                     var img = go.GetComponent<UnityEngine.UI.Image>();
-                    if (img != null) 
+                    if (img != null)
                     {
                         Sprite sprite = GetMinoSpriteFromID(minoID);
                         if (sprite != null)
@@ -108,27 +108,6 @@ public class TetriminoImage : MonoBehaviour
         for (int y = 0; y < GRID_SIZE; y++)
             for (int x = 0; x < GRID_SIZE; x++)
                 _images[x, y]?.SetActive(false);
-    }
-
-    /// <summary>
-    /// 테트리미노 색상 enum을 Sprite로 변환 (레거시 메서드)
-    /// </summary>
-    public Sprite GetTetriminoSpriteStatic(TetriminoColor tetriminoColor)
-    {
-        var sprites = GlobalSettings.Instance.tetriminoSprites;
-        switch (tetriminoColor)
-        {
-            case TetriminoColor.Red: 
-                return sprites.Length > 0 ? sprites[0] : null;
-            case TetriminoColor.Green: 
-                return sprites.Length > 1 ? sprites[1] : null;
-            case TetriminoColor.Blue: 
-                return sprites.Length > 2 ? sprites[2] : null;
-            case TetriminoColor.Yellow: 
-                return sprites.Length > 3 ? sprites[3] : null;
-            default: 
-                return sprites.Length > 0 ? sprites[0] : null;
-        }
     }
 
     /// <summary>

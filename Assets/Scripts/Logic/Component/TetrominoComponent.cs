@@ -3,15 +3,14 @@ using UnityEngine;
 
 namespace Minomino
 {
-    public class TetriminoComponent : IComponent
+    public class TetrominoComponent : IComponent
     {
-        public TetriminoType Type;      // 테트리미노 종류 (I, O, T, S, Z, J, L)
-        public TetriminoColor Color;          // 1~4 색상 값
+        public TetrominoType Type;      // 테트리미노 종류 (I, O, T, S, Z, J, L)
         public Vector2Int[] Shape;      // 테트리미노 형태
         public int[] Minos; // 해당 테트리미노에 속하는 미노들의 Entity ID 배열
     }
 
-    public enum TetriminoType
+    public enum TetrominoType
     {
         None = 0,
         I = 1,   // I 테트리미노
@@ -21,14 +20,5 @@ namespace Minomino
         Z = 5,   // Z 테트리미노
         J = 6,   // J 테트리미노
         L = 7    // L 테트리미노
-    }
-
-    public enum TetriminoColor
-    {
-        None = 0,
-        Red = 1,
-        Green = 2,
-        Blue = 3,
-        Yellow = 4
     }
 }

@@ -46,9 +46,9 @@ namespace Minomino
             return context.GetUniqueComponent<PlayerComponent>();
         }
 
-        public static TetriminoQueueComponent GetTetriminoQueue(this Context context)
+        public static TetrominoQueueComponent GetTetrominoQueue(this Context context)
         {
-            return context.GetUniqueComponent<TetriminoQueueComponent>();
+            return context.GetUniqueComponent<TetrominoQueueComponent>();
         }
 
         public static HoldQueueComponent GetHoldQueue(this Context context)

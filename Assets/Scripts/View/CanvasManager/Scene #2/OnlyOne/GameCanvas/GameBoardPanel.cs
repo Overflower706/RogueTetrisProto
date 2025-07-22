@@ -124,7 +124,7 @@ public class GameBoardPanel : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// 현재 활성화된 있는 테트리미노가 하드롭 했을 때의 예상 위치(월드 좌표 배열)를 반환
     /// </summary>
@@ -132,11 +132,11 @@ public class GameBoardPanel : MonoBehaviour
     {
         // 1. 현재 테트리미노 엔티티 찾기
         Entity currentEntity = null;
-        var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+        var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
         foreach (var boardTetriminoEntity in boardTetriminoEntities)
         {
-            var boardTetriminoComponent = boardTetriminoEntity.GetComponent<BoardTetriminoComponent>();
-            if (boardTetriminoComponent.State == BoardTetriminoState.Current)
+            var boardTetriminoComponent = boardTetriminoEntity.GetComponent<BoardTetrominoComponent>();
+            if (boardTetriminoComponent.State == BoardTetrominoState.Current)
             {
                 currentEntity = boardTetriminoEntity;
                 break;
@@ -149,8 +149,8 @@ public class GameBoardPanel : MonoBehaviour
             return null;
         }
 
-        var tetrimino = currentEntity.GetComponent<TetriminoComponent>();
-        var boardTetrimino = currentEntity.GetComponent<BoardTetriminoComponent>();
+        var tetrimino = currentEntity.GetComponent<TetrominoComponent>();
+        var boardTetrimino = currentEntity.GetComponent<BoardTetrominoComponent>();
         if (tetrimino == null || boardTetrimino == null)
             return null;
 
@@ -213,13 +213,13 @@ public class GameBoardPanel : MonoBehaviour
     /// <summary>
     /// 현재 테트리미노 정보를 가져오는 헬퍼 메서드
     /// </summary>
-    private (TetriminoComponent tetrimino, int entityId) GetCurrentTetriminoInfo()
+    private (TetrominoComponent tetrimino, int entityId) GetCurrentTetriminoInfo()
     {
-        var currentEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+        var currentEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
         if (currentEntities != null && currentEntities.Count > 0)
         {
             var entity = currentEntities[0];
-            return (entity.GetComponent<TetriminoComponent>(), entity.ID);
+            return (entity.GetComponent<TetrominoComponent>(), entity.ID);
         }
         return (null, 0);
     }
@@ -239,7 +239,7 @@ public class GameBoardPanel : MonoBehaviour
     /// <summary>
     /// 테트리미노 오브젝트 생성/업데이트 헬퍼 메서드
     /// </summary>
-    private void CreateOrUpdateTetriminoObject(Vector2Int pos, int tetriminoId, TetriminoComponent currentTetrimino, int currentEntityId)
+    private void CreateOrUpdateTetriminoObject(Vector2Int pos, int tetriminoId, TetrominoComponent currentTetrimino, int currentEntityId)
     {
         GameObject tetriminoObj = GetOrCreateTetriminoObject(pos);
         var image = tetriminoObj.GetComponent<Image>();
@@ -258,8 +258,8 @@ public class GameBoardPanel : MonoBehaviour
         }
         tetriminoObj.SetActive(true);
     }    /// <summary>
-    /// 테트리미노 오브젝트를 가져오거나 생성하는 헬퍼 메서드
-    /// </summary>
+         /// 테트리미노 오브젝트를 가져오거나 생성하는 헬퍼 메서드
+         /// </summary>
     private GameObject GetOrCreateTetriminoObject(Vector2Int pos)
     {
         if (_tetriminoObjects.TryGetValue(pos, out var tetriminoObj) && tetriminoObj != null)

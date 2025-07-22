@@ -35,13 +35,13 @@ namespace Minomino
             Systems.SetContext(Context);
 
             // 순서 중요
-            Systems.AddSystem<DataSystem>();
+            Systems.AddSystem<UniqueComponentSystem>();
             Systems.AddSystem<CommandSystem>();
 
             Systems.AddSystem<PlayerSystem>();
             Systems.AddSystem<GameStateSystem>();
 
-            Systems.AddSystem<TetriminoSystem>();
+            Systems.AddSystem<TetrominoSystem>();
 
             Systems.AddSystem<CurrentTetriminoSystem>();
 

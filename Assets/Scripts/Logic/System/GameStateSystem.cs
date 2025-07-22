@@ -50,25 +50,25 @@ namespace Minomino
                 return;
             }
 
-            var tetriminoQueue = Context.GetTetriminoQueue();
-            var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetriminoComponent>();
+            var tetriminoQueue = Context.GetTetrominoQueue();
+            var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
 
             int count = 0;
             foreach (var entity in boardTetriminoEntities)
             {
-                var boardTetriminoComponent = entity.GetComponent<BoardTetriminoComponent>();
-                if (boardTetriminoComponent.State == BoardTetriminoState.Current)
+                var boardTetriminoComponent = entity.GetComponent<BoardTetrominoComponent>();
+                if (boardTetriminoComponent.State == BoardTetrominoState.Current)
                 {
                     count++;
                 }
 
-                if (boardTetriminoComponent.State == BoardTetriminoState.Hold)
+                if (boardTetriminoComponent.State == BoardTetrominoState.Hold)
                 {
                     count++;
                 }
             }
 
-            if (tetriminoQueue.TetriminoQueue.Count == 0 && count == 0)
+            if (tetriminoQueue.TetrominoQueue.Count == 0 && count == 0)
             {
                 state.CurrentState = GameState.GameOver;
                 Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");

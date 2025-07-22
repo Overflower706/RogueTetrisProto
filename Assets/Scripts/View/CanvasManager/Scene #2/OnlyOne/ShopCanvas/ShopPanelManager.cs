@@ -52,7 +52,7 @@ namespace Minomino
 
                 RefreshCurrency();
 
-                var tetriminoEntities = Context.GetEntitiesWithComponent<TetriminoComponent>();
+                var tetriminoEntities = Context.GetEntitiesWithComponent<TetrominoComponent>();
                 Debug.Log($"선택된 테트리미노: {tetrimino_1.Type}, 현재 개수: {tetriminoEntities.Count}");
 
             });
@@ -70,7 +70,7 @@ namespace Minomino
 
                 RefreshCurrency();
 
-                var tetriminoEntities = Context.GetEntitiesWithComponent<TetriminoComponent>();
+                var tetriminoEntities = Context.GetEntitiesWithComponent<TetrominoComponent>();
                 Debug.Log($"선택된 테트리미노: {tetrimino_2.Type}, 현재 개수: {tetriminoEntities.Count}");
             });
             Button_Blueprint_3.onClick.AddListener(() =>
@@ -87,7 +87,7 @@ namespace Minomino
 
                 RefreshCurrency();
 
-                var tetriminoEntities = Context.GetEntitiesWithComponent<TetriminoComponent>();
+                var tetriminoEntities = Context.GetEntitiesWithComponent<TetrominoComponent>();
                 Debug.Log($"선택된 테트리미노: {tetrimino_3.Type}, 현재 개수: {tetriminoEntities.Count}");
             });
 
@@ -134,41 +134,38 @@ namespace Minomino
             }
         }
 
-        private TetriminoComponent GenerateRandomTetriminoComponent()
+        private TetrominoComponent GenerateRandomTetriminoComponent()
         {
-            TetriminoType[] types = { TetriminoType.I, TetriminoType.O, TetriminoType.T,
-                                    TetriminoType.S, TetriminoType.Z, TetriminoType.J, TetriminoType.L };
-            TetriminoColor[] colors = { TetriminoColor.Red, TetriminoColor.Green, TetriminoColor.Blue };
+            TetrominoType[] types = { TetrominoType.I, TetrominoType.O, TetrominoType.T,
+                                    TetrominoType.S, TetrominoType.Z, TetrominoType.J, TetrominoType.L };
 
-            TetriminoType randomType = types[Random.Range(0, types.Length)];
-            TetriminoColor randomColor = colors[Random.Range(0, colors.Length)];
+            TetrominoType randomType = types[Random.Range(0, types.Length)];
 
             Vector2Int[] shape = GetShapeForType(randomType);
 
-            var tetrimino = new TetriminoComponent();
+            var tetrimino = new TetrominoComponent();
             tetrimino.Type = randomType;
             tetrimino.Shape = shape;
-            tetrimino.Color = randomColor;
             return tetrimino;
         }
 
-        private static Vector2Int[] GetShapeForType(TetriminoType type)
+        private static Vector2Int[] GetShapeForType(TetrominoType type)
         {
             switch (type)
             {
-                case TetriminoType.I:
+                case TetrominoType.I:
                     return new Vector2Int[] { new Vector2Int(-1, 0), new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0) };
-                case TetriminoType.O:
+                case TetrominoType.O:
                     return new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1) };
-                case TetriminoType.T:
+                case TetrominoType.T:
                     return new Vector2Int[] { new Vector2Int(-1, 0), new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(0, 1) };
-                case TetriminoType.S:
+                case TetrominoType.S:
                     return new Vector2Int[] { new Vector2Int(-1, 0), new Vector2Int(0, 0), new Vector2Int(0, 1), new Vector2Int(1, 1) };
-                case TetriminoType.Z:
+                case TetrominoType.Z:
                     return new Vector2Int[] { new Vector2Int(-1, 1), new Vector2Int(0, 1), new Vector2Int(0, 0), new Vector2Int(1, 0) };
-                case TetriminoType.J:
+                case TetrominoType.J:
                     return new Vector2Int[] { new Vector2Int(-1, 1), new Vector2Int(-1, 0), new Vector2Int(0, 0), new Vector2Int(1, 0) };
-                case TetriminoType.L:
+                case TetrominoType.L:
                     return new Vector2Int[] { new Vector2Int(-1, 0), new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(1, 1) };
                 default:
                     return new Vector2Int[] { new Vector2Int(0, 0) };

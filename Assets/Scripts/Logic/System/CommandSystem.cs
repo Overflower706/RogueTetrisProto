@@ -94,21 +94,9 @@ namespace Minomino
                     break;
 
                 case CommandType.GenerateTetrimino:
-                    var generateCommand = new GenerateTetriminoCommand();
+                    var generateCommand = new GenerateTetrominoCommand();
                     generateCommand.PayLoad = request.PayLoad;
                     entity.AddComponent(generateCommand);
-                    break;
-
-                case CommandType.LineClear:
-                    var lineClearCommand = new LineClearCommand();
-                    // PayLoad에서 줄 클리어 정보 추출
-                    if (request.PayLoad is (int linesCleared, int tetriminoEntityId, TetriminoColor[][] completedLinesColors))
-                    {
-                        lineClearCommand.LinesCleared = linesCleared;
-                        lineClearCommand.TetriminoEntityId = tetriminoEntityId;
-                        lineClearCommand.CompletedLinesColors = completedLinesColors;
-                    }
-                    entity.AddComponent(lineClearCommand);
                     break;
 
                 // 향후 다른 명령 타입들 추가

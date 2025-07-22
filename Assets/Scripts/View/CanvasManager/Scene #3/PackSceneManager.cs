@@ -8,11 +8,9 @@ public class PackSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
 
     [Header("관리 캔버스")]
     [SerializeField] private PackCanvasManager CanvasManager_Pack;
-    private PanelSceneManager _panelSceneManager;
 
-    public void Init(PanelSceneManager panelSceneManager)
+    public void Init()
     {
-        _panelSceneManager = panelSceneManager;
     }
 
     public Tween LoadScene()
@@ -35,6 +33,5 @@ public class PackSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
 
     public void Clear()
     {
-        _panelSceneManager = null;
     }
 }

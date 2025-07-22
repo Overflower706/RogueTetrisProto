@@ -4,12 +4,15 @@ namespace Minomino
 {
     public class GlobalSettings : MonoSingleton<GlobalSettings>
     {
-        [Header("보드")]
+        [Header("보드 초기값")]
         public int BoardWidth = 10;
         public int BoardHeight = 20;
 
-        [Header("홀드")]
+        [Header("홀드 초기값")]
         public int HoldSize = 1;
+
+        [Header("가방 초기값")]
+        public int BagSize = 2;
 
         [Header("목표 점수")]
         public int RoundBonus = 10;

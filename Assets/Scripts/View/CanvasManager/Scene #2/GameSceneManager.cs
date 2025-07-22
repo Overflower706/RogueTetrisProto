@@ -1,6 +1,5 @@
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.UI;
 using OVFL.ECS;
 
 public class GameSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
@@ -17,12 +16,8 @@ public class GameSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
 
     private ICanvasManager _currentActiveCanvas;
 
-    private PanelSceneManager _panelSceneManager;
-
-
-    public void Init(PanelSceneManager panelSceneManager)
+    public void Init()
     {
-        _panelSceneManager = panelSceneManager;
         _currentActiveCanvas = null;
 
         gameObject.SetActive(false);
@@ -64,7 +59,7 @@ public class GameSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
 
     public void Clear()
     {
-        _panelSceneManager = null;
+        gameObject.SetActive(false);
     }
 
     public Tween ShowStageCanvas() => ShowOnlyOneCanvas(CanvasManager_Stage);

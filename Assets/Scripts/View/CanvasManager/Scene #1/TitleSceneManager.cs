@@ -9,11 +9,8 @@ public class TitleSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
     [Header("관리 캔버스")]
     [SerializeField] private TitleCanvasManager CanvasManager_Title;
 
-    private PanelSceneManager _panelSceneManager;
-
-    public void Init(PanelSceneManager panelSceneManager)
+    public void Init()
     {
-        _panelSceneManager = panelSceneManager;
         CanvasManager_Title.Init(this);
         gameObject.SetActive(false);
     }
@@ -37,6 +34,5 @@ public class TitleSceneManager : MonoBehaviour, IMiniSceneManager, ISystem
     public void Clear()
     {
         CanvasManager_Title.Clear();
-        _panelSceneManager = null;
     }
 }

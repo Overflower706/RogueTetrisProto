@@ -7,20 +7,19 @@ namespace Minomino
     {
         [SerializeField] private Image Image_Background;
 
-        public void Refresh(TetriminoColor color)
+        public void Refresh(MinoState color)
         {
-            Image_Background.color = GetColorFromEnum(color);
+            Image_Background.color = GetColorByState(color);
         }
 
-        private Color GetColorFromEnum(TetriminoColor tetriminoColor)
+        private Color GetColorByState(MinoState state)
         {
-            return tetriminoColor switch
+            return state switch
             {
-                TetriminoColor.Red => new Color(0.8f, 0.2f, 0.2f),      // 빨간색
-                TetriminoColor.Green => new Color(0.2f, 0.8f, 0.2f),    // 초록색
-                TetriminoColor.Blue => new Color(0.2f, 0.2f, 0.8f),     // 파란색
-                TetriminoColor.Yellow => new Color(0.8f, 0.8f, 0.2f),   // 노란색
-                _ => Color.white                                        // 기본색
+                MinoState.None => new Color(0.9f, 0.9f, 0.9f),     // 밝은 회색
+                MinoState.Empty => new Color(0.2f, 0.2f, 0.2f),    // 회색
+                MinoState.Living => new Color(0.2f, 0.8f, 0.2f),   // 초록색
+                _ => Color.white                                   // 기본색
             };
         }
     }

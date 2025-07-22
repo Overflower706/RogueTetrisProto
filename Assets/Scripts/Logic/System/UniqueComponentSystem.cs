@@ -2,7 +2,7 @@ using OVFL.ECS;
 
 namespace Minomino
 {
-    public class DataSystem : ISetupSystem
+    public class UniqueComponentSystem : ISetupSystem
     {
         public Context Context { get; set; }
         public void Setup()
@@ -15,6 +15,9 @@ namespace Minomino
             var playerEntity = Context.CreateEntity();
             playerEntity.AddComponent<PlayerComponent>();
             playerEntity.AddComponent<HoldQueueComponent>();
+
+            var tetriminoQueueEntity = Context.CreateEntity();
+            tetriminoQueueEntity.AddComponent<TetrominoQueueComponent>();
 
             var commandRequestEntity = Context.CreateEntity();
             commandRequestEntity.AddComponent<CommandRequestComponent>();
