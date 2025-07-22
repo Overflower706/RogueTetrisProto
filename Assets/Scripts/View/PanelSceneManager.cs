@@ -43,6 +43,7 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
         TitleSceneManager.Init();
         GameSceneManager.Init();
         PackSceneManager.Init();
+        GameExSceneManager.Init();
 
         LoadTitleScene();
     }

@@ -65,6 +65,8 @@ namespace Minomino
             Systems.AddSystem(gameSceneManager);
             var packSceneManager = FindFirstObjectByType<PackSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(packSceneManager);
+            var gameExSceneManager = FindFirstObjectByType<GameExSceneManager>(FindObjectsInactive.Include);
+            Systems.AddSystem(gameExSceneManager);
 
             var titleCanvasManager = FindFirstObjectByType<TitleCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(titleCanvasManager);
@@ -83,6 +85,13 @@ namespace Minomino
 
             var ShopPanelManager = FindFirstObjectByType<ShopPanelManager>(FindObjectsInactive.Include);
             Systems.AddSystem(ShopPanelManager);
+
+
+            var gameExCanvasManager = FindFirstObjectByType<GameExCanvasManager>(FindObjectsInactive.Include);
+            Systems.AddSystem(gameExCanvasManager);
+
+            var apartmentPanelManager = FindFirstObjectByType<ApartmentPanelManager>(FindObjectsInactive.Include);
+            Systems.AddSystem(apartmentPanelManager);
         }
     }
 }
