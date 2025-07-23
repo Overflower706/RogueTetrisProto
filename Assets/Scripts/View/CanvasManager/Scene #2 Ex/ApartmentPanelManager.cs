@@ -26,6 +26,8 @@ namespace Minomino
 
         public void Tick()
         {
+            if (!gameObject.activeSelf) return;
+
             var start = Context.GetEntitiesWithComponent<StartGameCommand>();
             if (start.Count > 0)
             {
