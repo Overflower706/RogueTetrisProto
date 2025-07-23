@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,21 +7,39 @@ namespace Minomino
     public class MinoView : MonoBehaviour
     {
         [SerializeField] private Image Image_Background;
+        [SerializeField] private List<Sprite> Images;
 
-        public void Refresh(MinoState color)
+        public void Refresh(MinoComponent minoComponent = null)
         {
-            Image_Background.color = GetColorByState(color);
+            if (minoComponent == null)
+            {
+                Image_Background.sprite = null;
+                Image_Background.color = new Color(0, 0, 0, 0); // 투명하게 설정
+                return;
+            }
+
+            Image_Background.color = new Color(1, 1, 1, 1); // 불투명하게 설정
+            GetSpriteByState(minoComponent.State);
         }
 
-        private Color GetColorByState(MinoState state)
+        private void GetSpriteByState(MinoState state)
         {
-            return state switch
+            switch (state)
             {
-                MinoState.None => new Color(0.9f, 0.9f, 0.9f),     // 밝은 회색
-                MinoState.Empty => new Color(0.2f, 0.2f, 0.2f),    // 회색
-                MinoState.Living => new Color(0.2f, 0.8f, 0.2f),   // 초록색
-                _ => Color.white                                   // 기본색
-            };
+                case MinoState.None:
+                    Debug.LogWarning($"None state MinoComponent");
+                    break;
+                case MinoState.Empty:
+                    Image_Background.sprite = Images[0];
+                    break;
+                case MinoState.Living:
+                    int randomIndex = Random.Range(1, 3);
+                    Image_Background.sprite = Images[randomIndex];
+                    break;
+                default:
+                    Debug.LogWarning($"Unknown MinoState: {state}");
+                    break;
+            }
         }
     }
 }

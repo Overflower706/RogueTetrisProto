@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Minomino
 {
-    public class GameExCanvasManager : MonoBehaviour, ICanvasManager, ISystem
+    public class GameExCanvasManager : MonoBehaviour, ICanvasManager, ITickSystem
     {
         public Context Context { get; set; }
 
@@ -17,7 +17,9 @@ namespace Minomino
         [SerializeField] private GameObject Panel_Ground;
         [SerializeField] private ApartmentPanelManager Panel_Apartment;
 
-        [Header("임시 Hide 버튼")]
+        [Header("결과 패널")]
+        [SerializeField] private GameObject Panel_Result;
+        [SerializeField] private GameObject Panel_Backblocker;
         [SerializeField] private Button Button_Hide;
 
         public IMiniSceneManager SceneManager { get; private set; }
@@ -26,8 +28,10 @@ namespace Minomino
         {
             SceneManager = sceneManager;
 
-            Panel_Ground.gameObject.SetActive(false);
-            Panel_Apartment.gameObject.SetActive(true);
+            Panel_Ground.SetActive(false);
+            Panel_Apartment.gameObject.SetActive(false);
+            Panel_Result.SetActive(false);
+            Panel_Backblocker.SetActive(false);
             Button_Hide.interactable = false;
 
             Button_Hide.onClick.AddListener(() =>
@@ -81,7 +85,6 @@ namespace Minomino
             showSequence.AppendCallback(() =>
             {
                 Debug.Log("GameExCanvasManager Show 애니메이션 완료");
-                Button_Hide.interactable = true; // Hide 버튼 활성화
                 var commandRequest = Context.GetCommandRequest();
                 commandRequest.Requests.Enqueue(new CommandRequest()
                 {
@@ -94,9 +97,24 @@ namespace Minomino
             return showSequence;
         }
 
+        public void Tick()
+        {
+            var end = Context.GetEntitiesWithComponent<EndGameCommand>();
+            if (end.Count > 0)
+            {
+                Panel_Result.SetActive(true);
+                Panel_Backblocker.SetActive(true);
+                Button_Hide.interactable = true;
+                return;
+            }
+        }
+
         public Tween Hide()
         {
             Debug.Log("GameExCanvasManager Hide 애니메이션 시작");
+            Panel_Result.SetActive(false);
+            Panel_Backblocker.SetActive(false);
+
             // 패널들의 RectTransform 가져오기
             RectTransform groundRect = Panel_Ground.GetComponent<RectTransform>();
             RectTransform apartmentRect = Panel_Apartment.GetComponent<RectTransform>();
@@ -137,6 +155,8 @@ namespace Minomino
                 groundRect.anchoredPosition = groundCurrentPos;
                 apartmentRect.anchoredPosition = apartmentCurrentPos;
 
+                Panel_Apartment.Hide();
+
                 // 패널들 비활성화
                 Panel_Ground.gameObject.SetActive(false);
                 Panel_Apartment.gameObject.SetActive(false);
@@ -150,8 +170,10 @@ namespace Minomino
         {
             SceneManager = null;
 
-            Panel_Ground.gameObject.SetActive(false);
-            Panel_Apartment.gameObject.SetActive(true);
+            Panel_Ground.SetActive(false);
+            Panel_Apartment.gameObject.SetActive(false);
+            Panel_Result.SetActive(false);
+            Panel_Backblocker.SetActive(false);
 
             Button_Hide.onClick.RemoveAllListeners();
             Button_Hide.interactable = false;

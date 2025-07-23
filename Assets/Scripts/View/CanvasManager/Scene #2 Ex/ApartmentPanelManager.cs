@@ -13,6 +13,10 @@ namespace Minomino
         [SerializeField] private RectTransform RectTransform_ApartmentPanel;
         [SerializeField] private GridLayoutGroup GridLayout_Layout;
         [SerializeField] private GameObject Prefab_Plot;
+        [SerializeField] private GridLayoutGroup GridLayout_Board;
+        [SerializeField] private MinoView Prefab_Mino;
+
+        private MinoView[,] minoViews;
 
         public void Setup()
         {
@@ -47,16 +51,70 @@ namespace Minomino
                         Instantiate(Prefab_Plot, GridLayout_Layout.transform);
                     }
                 }
+
+                GridLayout_Board.cellSize = new Vector2(GlobalSettings.Instance.MinoWidth, GlobalSettings.Instance.MinoHeight);
+                minoViews = new MinoView[GlobalSettings.Instance.BoardWidth, GlobalSettings.Instance.BoardHeight];
+
+                for (int h = 0; h < GlobalSettings.Instance.BoardHeight; h++)
+                {
+                    for (int w = 0; w < GlobalSettings.Instance.BoardWidth; w++)
+                    {
+                        var minoView = Instantiate(Prefab_Mino, GridLayout_Board.transform);
+                        minoView.name = $"MinoView_{w}_{h}";
+                        minoViews[w, h] = minoView;
+                    }
+                }
             }
 
             var state = Context.GetGameState();
 
             if (state.CurrentState != GameState.Playing) return;
+
+            var board = Context.GetBoard();
+
+            for (int h = 0; h < GlobalSettings.Instance.BoardHeight; h++)
+            {
+                for (int w = 0; w < GlobalSettings.Instance.BoardWidth; w++)
+                {
+                    var minoID = board.Board[w, h];
+
+                    if (minoID == 0)
+                    {
+                        minoViews[w, h].Refresh(null);
+                    }
+                    else
+                    {
+                        var minoView = minoViews[w, h];
+
+                        var minoEntity = Context.FindEntityByID(minoID);
+                        var minoComponent = minoEntity.GetComponent<MinoComponent>();
+                        minoView.Refresh(minoComponent);
+                    }
+                }
+            }
         }
 
         public void Hide()
         {
             Text_Stage.gameObject.SetActive(false);
+
+            minoViews = null;
+
+            // GridLayout_Board의 자식들 안전하게 제거
+            var layoutChildCount = GridLayout_Board.transform.childCount;
+            for (int i = layoutChildCount - 1; i >= 0; i--)
+            {
+                var child = GridLayout_Board.transform.GetChild(i);
+                Destroy(child.gameObject);
+            }
+
+            // GridLayout_Layout의 자식들 안전하게 제거
+            var minoChildCount = GridLayout_Layout.transform.childCount;
+            for (int i = minoChildCount - 1; i >= 0; i--)
+            {
+                var child = GridLayout_Layout.transform.GetChild(i);
+                Destroy(child.gameObject);
+            }
         }
     }
 }

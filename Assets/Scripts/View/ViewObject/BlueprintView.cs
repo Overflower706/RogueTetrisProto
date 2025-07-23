@@ -25,13 +25,13 @@ namespace Minomino
         /// </summary>
         public void Clear()
         {
-            for (int x = 0; x < 5; x++)
-            {
-                for (int y = 0; y < 5; y++)
-                {
-                    minoGrid[x * 5 + y].Refresh(MinoState.None);
-                }
-            }
+            // for (int x = 0; x < 5; x++)
+            // {
+            //     for (int y = 0; y < 5; y++)
+            //     {
+            //         minoGrid[x * 5 + y].Refresh(MinoState.None);
+            //     }
+            // }
         }
 
         /// <summary>
@@ -39,26 +39,26 @@ namespace Minomino
         /// </summary>
         private void DrawTetromino(TetrominoComponent tetromino)
         {
-            for (int i = 0; i < tetromino.Shape.Length; i++)
-            {
-                Vector2Int pos = tetromino.Shape[i];
+            // for (int i = 0; i < tetromino.Shape.Length; i++)
+            // {
+            //     Vector2Int pos = tetromino.Shape[i];
 
-                // 5x5 그리드의 중앙을 (2, 2)로 설정
-                int gridX = pos.x + 2;
-                int gridY = pos.y + 2;
+            //     // 5x5 그리드의 중앙을 (2, 2)로 설정
+            //     int gridX = pos.x + 2;
+            //     int gridY = pos.y + 2;
 
-                // 그리드 범위 확인
-                if (gridX >= 0 && gridX < 5 && gridY >= 0 && gridY < 5)
-                {
+            //     // 그리드 범위 확인
+            //     if (gridX >= 0 && gridX < 5 && gridY >= 0 && gridY < 5)
+            //     {
 
-                    minoGrid[gridX * 5 + gridY].Refresh(MinoState.Empty);
-                    Debug.Log($"그리드 위치 ({gridX}, {gridY})에 미노 상태 {MinoState.Empty} 적용");
-                }
-                else
-                {
-                    Debug.LogWarning($"테트로미노 블록이 5x5 그리드를 벗어났습니다: ({gridX}, {gridY})");
-                }
-            }
+            //         minoGrid[gridX * 5 + gridY].Refresh(MinoState.Empty);
+            //         Debug.Log($"그리드 위치 ({gridX}, {gridY})에 미노 상태 {MinoState.Empty} 적용");
+            //     }
+            //     else
+            //     {
+            //         Debug.LogWarning($"테트로미노 블록이 5x5 그리드를 벗어났습니다: ({gridX}, {gridY})");
+            //     }
+            // }
 
             Debug.Log($"BlueprintView가 새 테트로미노 {tetromino.Type}로 업데이트되었습니다.");
         }
