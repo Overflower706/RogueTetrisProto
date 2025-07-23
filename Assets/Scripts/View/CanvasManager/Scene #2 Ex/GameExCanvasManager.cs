@@ -1,5 +1,6 @@
 using DG.Tweening;
 using OVFL.ECS;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,7 @@ namespace Minomino
         [Header("결과 패널")]
         [SerializeField] private GameObject Panel_Result;
         [SerializeField] private GameObject Panel_Backblocker;
+        [SerializeField] private TMP_Text Text_Result;
         [SerializeField] private Button Button_Hide;
 
         public IMiniSceneManager SceneManager { get; private set; }
@@ -102,6 +104,21 @@ namespace Minomino
             var end = Context.GetEntitiesWithComponent<EndGameCommand>();
             if (end.Count > 0)
             {
+                var state = Context.GetGameState();
+
+                switch (state.CurrentState)
+                {
+                    case GameState.Victory:
+                        Text_Result.text = "완공!";
+                        break;
+                    case GameState.GameOver:
+                        Text_Result.text = "삐빅\n 위반입니다.\n면허 취소 ㅠㅠ";
+                        break;
+                    default:
+                        Debug.LogWarning("게임 종료 상태가 아닙니다. 현재 상태: " + state.CurrentState);
+                        break;
+                }
+
                 Panel_Result.SetActive(true);
                 Panel_Backblocker.SetActive(true);
                 Button_Hide.interactable = true;
