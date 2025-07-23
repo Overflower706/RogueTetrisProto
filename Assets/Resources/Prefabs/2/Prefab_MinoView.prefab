@@ -90,6 +90,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Image_Background: {fileID: 3696744863880010052}
   Images:
+  - {fileID: 9110319005210131651, guid: a49d18d20661c024baf8324bdb249c0a, type: 3}
   - {fileID: 2632398311536810851, guid: aea427a2117a42d42a814f3fb9e79028, type: 3}
-  - {fileID: -1969903928382244192, guid: e67e31ea9429e6140871a79a81e4ec59, type: 3}
-  - {fileID: 8138148901082231761, guid: 591f4ff638c626b4d91340a22c2c87bf, type: 3}
+  - {fileID: 2632398311536810851, guid: aea427a2117a42d42a814f3fb9e79028, type: 3}
