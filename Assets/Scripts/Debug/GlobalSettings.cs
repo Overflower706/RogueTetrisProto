@@ -7,6 +7,8 @@ namespace Minomino
         [Header("보드 초기값")]
         public int BoardWidth = 10;
         public int BoardHeight = 20;
+        public int MinoWidth = 120;
+        public int MinoHeight = 90;
 
         [Header("홀드 초기값")]
         public int HoldSize = 1;
