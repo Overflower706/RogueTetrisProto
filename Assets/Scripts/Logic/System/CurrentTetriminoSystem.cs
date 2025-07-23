@@ -40,7 +40,7 @@ namespace Minomino
                 var nextTetrimino = queueEntity.TetrominoQueue.Dequeue();
                 var boardTetriminoComponent = nextTetrimino.AddComponent<BoardTetrominoComponent>();
                 boardTetriminoComponent.State = BoardTetrominoState.Current;
-                boardTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                boardTetriminoComponent.Position = new Vector2Int(GlobalSettings.Instance.SafeWidth / 2 - 1, GlobalSettings.Instance.SafeHeight);
                 boardTetriminoComponent.Rotation = 0; // 초기 회전 상태
 
                 Debug.Log($"새로운 Current Tetrimino 생성: Type: {nextTetrimino.GetComponent<TetrominoComponent>().Type}, Position: {boardTetriminoComponent.Position}");
@@ -54,7 +54,7 @@ namespace Minomino
                     var holdTetriminoComponent = holdTetrimino.GetComponent<BoardTetrominoComponent>();
                     // Hold 상태의 Tetrimino를 Current로 변경
                     holdTetriminoComponent.State = BoardTetrominoState.Current;
-                    holdTetriminoComponent.Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                    holdTetriminoComponent.Position = new Vector2Int(GlobalSettings.Instance.SafeWidth / 2 - 1, GlobalSettings.Instance.SafeHeight);
                     holdTetriminoComponent.Rotation = 0; // 초기 회전 상태
 
                     Debug.Log($"Hold에서 Current Tetrimino로 변경: Type: {holdTetrimino.GetComponent<TetrominoComponent>().Type}, Position: {holdTetriminoComponent.Position}");

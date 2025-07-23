@@ -38,12 +38,11 @@ namespace Minomino
             if (completedLineComponentEntities.Count > 0)
             {
                 var board = Context.GetBoard();
-                var completedLineEntity = completedLineComponentEntities[0];
-                var completedLineComponent = completedLineEntity.GetComponent<CompletedLineComponent>();
+                var completedLineComponent = Context.GetCompletedLine();
 
                 foreach (var line in completedLineComponent.CompletedLine)
                 {
-                    for (int x = 0; x < BoardComponent.WIDTH; x++)
+                    for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
                     {
                         int entityID = board.Board[x, line];
                         if (entityID != 0)
@@ -60,8 +59,6 @@ namespace Minomino
                         }
                     }
                 }
-
-                Context.DestroyEntity(completedLineEntity);
             }
         }
     }

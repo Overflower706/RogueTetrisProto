@@ -43,7 +43,7 @@ namespace Minomino
                 // 왼쪽에서부터 순서대로 가져와서, MinoComponent의 State를 Linving으로 바꾼다.
                 foreach (var line in completedLineComponent.CompletedLine)
                 {
-                    for (int x = 0; x < BoardComponent.WIDTH; x++)
+                    for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
                     {
                         int entityID = board.Board[x, line];
                         if (entityID != 0)

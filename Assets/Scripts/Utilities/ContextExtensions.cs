@@ -66,6 +66,11 @@ namespace Minomino
             return context.GetUniqueComponent<NotifyQueueComponent>();
         }
 
+        public static CompletedLineComponent GetCompletedLine(this Context context)
+        {
+            return context.GetUniqueComponent<CompletedLineComponent>();
+        }
+
         /// <summary>
         /// Find an entity by its ID in the context.
         /// </summary>

@@ -136,18 +136,18 @@ public class TetriminoImage : MonoBehaviour
     /// </summary>
     private Sprite GetSpriteByMinoState(MinoState state)
     {
-        var sprites = GlobalSettings.Instance.tetriminoSprites;
-        if (sprites == null || sprites.Length == 0) return null;
-
         switch (state)
         {
             case MinoState.Living:
-                return sprites.Length > 0 ? sprites[0] : null;
+                return GlobalSettings.Instance.Sprites_Living[0];
             case MinoState.Empty:
-                return sprites.Length > 1 ? sprites[1] : null;
+                return GlobalSettings.Instance.Sprites_Empty[0];
             case MinoState.None:
+                Debug.LogWarning("MinoState is None, returning default sprite.");
+                return GlobalSettings.Instance.Sprites_Empty[0];
             default:
-                return sprites.Length > 0 ? sprites[0] : null;
+                Debug.LogWarning($"Unknown MinoState: {state}, returning default Living sprite.");
+                return GlobalSettings.Instance.Sprites_Empty[0];
         }
     }
 

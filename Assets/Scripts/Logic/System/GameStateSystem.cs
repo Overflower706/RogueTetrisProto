@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands;
 using OVFL.ECS;
 using UnityEngine;
 
@@ -31,25 +32,43 @@ namespace Minomino
 
             if (state.CurrentState != GameState.Playing) return;
 
-            var score = Context.GetScore();
+            var board = Context.GetBoard();
 
-            // 게임 종료 조건 예시: 점수가 목표 점수에 도달하면 게임 종료
-            if (score.CurrentScore >= score.TargetScore)
+            // 상위 2줄(18, 19줄)에 블록이 있는지 확인 (버퍼 존)
+            for (int y = GlobalSettings.Instance.SafeHeight; y < GlobalSettings.Instance.BoardHeight; y++)
             {
-                state.CurrentState = GameState.Victory;
-                Debug.Log("게임 종료, 목표 점수 도달");
-
-                // 게임 종료 명령 생성
-                var commandComponent = Context.GetCommandRequest();
-                commandComponent.Requests.Enqueue(new CommandRequest
+                for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
                 {
-                    Type = CommandType.EndGame,
-                    PayLoad = null
-                });
+                    if (board.Board[x, y] != 0)
+                    {
+                        // 검증
+                        var minoEntity = Context.FindEntityByID(board.Board[x, y]);
+                        var minoComponent = minoEntity.GetComponent<MinoComponent>();
+                        var tetriminoEntity = Context.FindEntityByID(minoComponent.ParentID);
+                        var boardComponent = tetriminoEntity.GetComponent<BoardTetrominoComponent>();
+                        if (boardComponent != null && boardComponent.State == BoardTetrominoState.Current)
+                        {
+                            continue; // 현재 테트리미노는 버퍼 존에 있어도 괜찮음
+                        }
 
-                return;
+                        // 버퍼 존에 블록이 있는 경우 게임 오버 상태로 전환
+                        state.CurrentState = GameState.GameOver;
+                        Debug.Log("게임 종료, 버퍼줄에 블록이 있습니다. 게임 오버 상태로 전환합니다.");
+
+                        // 게임 종료 명령 생성
+                        var commandComponent = Context.GetCommandRequest();
+                        commandComponent.Requests.Enqueue(new CommandRequest
+                        {
+                            Type = CommandType.EndGame,
+                            PayLoad = null
+                        });
+
+                        return;
+                    }
+                }
             }
 
+            var score = Context.GetScore();
             var tetriminoQueue = Context.GetTetrominoQueue();
             var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
 
@@ -70,20 +89,37 @@ namespace Minomino
 
             if (tetriminoQueue.TetrominoQueue.Count == 0 && count == 0)
             {
-                state.CurrentState = GameState.GameOver;
-                Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");
-
-                // 게임 종료 명령 생성
-                var commandComponent = Context.GetCommandRequest();
-                commandComponent.Requests.Enqueue(new CommandRequest
+                if (score.CurrentScore >= score.TargetScore)
                 {
-                    Type = CommandType.EndGame,
-                    PayLoad = null
-                });
+                    state.CurrentState = GameState.Victory;
+                    Debug.Log("게임 종료, 목표 점수 도달");
 
-                return;
+                    // 게임 종료 명령 생성
+                    var commandComponent = Context.GetCommandRequest();
+                    commandComponent.Requests.Enqueue(new CommandRequest
+                    {
+                        Type = CommandType.EndGame,
+                        PayLoad = null
+                    });
+
+                    return;
+                }
+                else
+                {
+                    state.CurrentState = GameState.GameOver;
+                    Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");
+
+                    // 게임 종료 명령 생성
+                    var commandComponent = Context.GetCommandRequest();
+                    commandComponent.Requests.Enqueue(new CommandRequest
+                    {
+                        Type = CommandType.EndGame,
+                        PayLoad = null
+                    });
+
+                    return;
+                }
             }
         }
-
     }
 }

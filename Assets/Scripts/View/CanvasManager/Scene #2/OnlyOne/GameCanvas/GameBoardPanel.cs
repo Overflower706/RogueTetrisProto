@@ -45,8 +45,8 @@ public class GameBoardPanel : MonoBehaviour
 
     private void InitGrid()
     {
-        _width = BoardComponent.WIDTH;
-        _height = BoardComponent.HEIGHT;
+        _width = GlobalSettings.Instance.SafeWidth;
+        _height = GlobalSettings.Instance.BoardHeight;
 
         // 기존 자식 삭제
         foreach (Transform child in GridParent)
@@ -77,9 +77,9 @@ public class GameBoardPanel : MonoBehaviour
         var (currentTetrimino, currentEntityId) = GetCurrentTetriminoInfo();
 
         // 기존 블록 UI 처리
-        for (int y = 0; y < BoardComponent.HEIGHT; y++)
+        for (int y = 0; y < GlobalSettings.Instance.BoardHeight; y++)
         {
-            for (int x = 0; x < BoardComponent.WIDTH; x++)
+            for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
             {
                 int tetriminoId = board.Board[x, y];
                 var pos = new Vector2Int(x, y);
@@ -170,13 +170,13 @@ public class GameBoardPanel : MonoBehaviour
             foreach (var local in rotatedShape)
             {
                 Vector2Int world = testPosition + local;
-                if (world.x < 0 || world.x >= BoardComponent.WIDTH || world.y < 0)
+                if (world.x < 0 || world.x >= GlobalSettings.Instance.SafeWidth || world.y < 0)
                 {
                     collision = true;
                     break;
                 }
                 // 자기 자신은 무시
-                if (world.y < BoardComponent.HEIGHT)
+                if (world.y < GlobalSettings.Instance.BoardHeight)
                 {
                     int cellId = board.Board[world.x, world.y];
                     if (cellId != 0 && cellId != entityId)
@@ -309,7 +309,7 @@ public class GameBoardPanel : MonoBehaviour
     private Sprite GetMinoSpriteById(int minoId)
     {
         var entity = FindEntityById(minoId);
-        var sprites = GlobalSettings.Instance.tetriminoSprites;
+        var sprites = GlobalSettings.Instance.Sprites_Living;
         if (entity == null)
         {
             Debug.LogWarning($"[GetMinoSpriteById] minoId({minoId})에 해당하는 엔티티를 찾을 수 없습니다.");

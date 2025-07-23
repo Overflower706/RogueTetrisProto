@@ -24,6 +24,9 @@ namespace Minomino
         [SerializeField] private TMP_Text Text_Result;
         [SerializeField] private Button Button_Hide;
 
+        [Header("미니맵")]
+        [SerializeField] private TMP_Text Text_Minimap;
+
         public IMiniSceneManager SceneManager { get; private set; }
 
         public void Init(IMiniSceneManager sceneManager)
@@ -35,6 +38,8 @@ namespace Minomino
             Panel_Result.SetActive(false);
             Panel_Backblocker.SetActive(false);
             Button_Hide.interactable = false;
+            Text_Minimap.text = string.Empty;
+            Text_Minimap.gameObject.SetActive(false);
 
             Button_Hide.onClick.AddListener(() =>
             {
@@ -94,6 +99,7 @@ namespace Minomino
                     PayLoad = null
                 });
                 Panel_Apartment.Show();
+                Text_Minimap.gameObject.SetActive(true);
             });
 
             return showSequence;
@@ -104,18 +110,17 @@ namespace Minomino
             var end = Context.GetEntitiesWithComponent<EndGameCommand>();
             if (end.Count > 0)
             {
-                var state = Context.GetGameState();
-
-                switch (state.CurrentState)
+                var terminalState = Context.GetGameState();
+                switch (terminalState.CurrentState)
                 {
                     case GameState.Victory:
                         Text_Result.text = "완공!";
                         break;
                     case GameState.GameOver:
-                        Text_Result.text = "삐빅\n 위반입니다.\n면허 취소 ㅠㅠ";
+                        Text_Result.text = "삐빅\n고도 제한\n위반입니다.\n면허 취소 ㅠㅠ";
                         break;
                     default:
-                        Debug.LogWarning("게임 종료 상태가 아닙니다. 현재 상태: " + state.CurrentState);
+                        Debug.LogWarning("게임 종료 상태가 아닙니다. 현재 상태: " + terminalState.CurrentState);
                         break;
                 }
 
@@ -124,6 +129,12 @@ namespace Minomino
                 Button_Hide.interactable = true;
                 return;
             }
+
+            var state = Context.GetGameState();
+            if (state.CurrentState != GameState.Playing) return;
+
+            var board = Context.GetBoard();
+            Text_Minimap.text = BoardLogger.VisualizeBoard(Context, board);
         }
 
         public Tween Hide()
@@ -131,6 +142,8 @@ namespace Minomino
             Debug.Log("GameExCanvasManager Hide 애니메이션 시작");
             Panel_Result.SetActive(false);
             Panel_Backblocker.SetActive(false);
+            Text_Minimap.gameObject.SetActive(false);
+            Text_Minimap.text = string.Empty;
 
             // 패널들의 RectTransform 가져오기
             RectTransform groundRect = Panel_Ground.GetComponent<RectTransform>();
@@ -191,6 +204,8 @@ namespace Minomino
             Panel_Apartment.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
             Panel_Backblocker.SetActive(false);
+            Text_Minimap.text = string.Empty;
+            Text_Minimap.gameObject.SetActive(false);
 
             Button_Hide.onClick.RemoveAllListeners();
             Button_Hide.interactable = false;

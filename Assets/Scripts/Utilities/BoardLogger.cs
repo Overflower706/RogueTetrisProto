@@ -39,8 +39,9 @@ namespace Minomino
         {
             StringBuilder sb = new StringBuilder();
 
-            int width = GlobalSettings.Instance.BoardWidth;
+            int width = GlobalSettings.Instance.SafeWidth;
             int height = GlobalSettings.Instance.BoardHeight;
+            int safeHeight = GlobalSettings.Instance.SafeHeight;
 
             // 상단 테두리
             sb.Append("┌");
@@ -53,6 +54,31 @@ namespace Minomino
             // 보드 내용 (위에서 아래로)
             for (int y = height - 1; y >= 0; y--)
             {
+                // SafeHeight와 BufferHeight 경계에 고도 제한 표시
+                if (y == safeHeight - 1)
+                {
+                    sb.Append("├");
+                    // 고도 제한 문구 중앙 정렬
+                    string limitText = "고도 제한";
+                    int padding = (width - limitText.Length) / 2;
+
+                    // 좌측 패딩
+                    for (int i = 0; i < padding; i++)
+                    {
+                        sb.Append("─");
+                    }
+
+                    // 고도 제한 텍스트
+                    sb.Append(limitText);
+
+                    // 우측 패딩 (남은 공간 채우기)
+                    for (int i = padding + limitText.Length; i < width; i++)
+                    {
+                        sb.Append("─");
+                    }
+                    sb.AppendLine("┤");
+                }
+
                 sb.Append("│");
                 for (int x = 0; x < width; x++)
                 {

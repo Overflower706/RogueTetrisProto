@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Minomino
@@ -5,10 +6,14 @@ namespace Minomino
     public class GlobalSettings : MonoSingleton<GlobalSettings>
     {
         [Header("보드 초기값")]
-        public int BoardWidth = 10;
-        public int BoardHeight = 20;
+        public int SafeWidth = 10;
+        public int SafeHeight = 20;
         public int MinoWidth = 120;
         public int MinoHeight = 90;
+        [Header("테트로미노가 등장할 버퍼입니다. 최소 2칸은 보장되어야합니다.")]
+        public int BoardBufferHeight = 2;
+        [Header("이건 Safe 높이 + 버퍼 최종값입니다. 건들지 마십쇼.")]
+        public int BoardHeight => SafeHeight + BoardBufferHeight;
 
         [Header("홀드 초기값")]
         public int HoldSize = 1;
@@ -34,7 +39,18 @@ namespace Minomino
         public int IcingCookieScore = 50;
         public int ChocoSoraBreadScore = 100;
 
-        [Header("UI Sprite")]
-        public Sprite[] tetriminoSprites;
+        [Header("특별 미뉴 보상 라인")]
+        public List<int> RewardLines;
+
+        [Header("보상 이미지")]
+        public Sprite Sprite_Reward_Alert;
+        public Sprite Sprite_Reward_Received;
+
+        [Header("특별 미뉴 설명")]
+        public List<string> SpecialMinueDescriptions;
+
+        [Header("간단한 미노 이미지들")]
+        public Sprite[] Sprites_Empty;
+        public Sprite[] Sprites_Living;
     }
 }

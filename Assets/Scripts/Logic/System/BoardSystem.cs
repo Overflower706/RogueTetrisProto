@@ -15,10 +15,10 @@ namespace Minomino
             {
                 // 초기 보드 설정 로직
                 var board = Context.GetBoard();
-                board.Board = new int[BoardComponent.WIDTH, BoardComponent.HEIGHT];
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                board.Board = new int[GlobalSettings.Instance.SafeWidth, GlobalSettings.Instance.BoardHeight];
+                for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
                 {
-                    for (int y = 0; y < BoardComponent.HEIGHT; y++)
+                    for (int y = 0; y < GlobalSettings.Instance.BoardHeight; y++)
                     {
                         board.Board[x, y] = 0; // 빈 칸을 0으로 초기화
                     }
@@ -33,10 +33,10 @@ namespace Minomino
                 // 게임 종료 로직
                 Debug.Log("게임 종료, 보드 초기화");
                 var board = Context.GetBoard();
-                board.Board = new int[BoardComponent.WIDTH, BoardComponent.HEIGHT];
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
+                board.Board = new int[GlobalSettings.Instance.SafeWidth, GlobalSettings.Instance.BoardHeight];
+                for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
                 {
-                    for (int y = 0; y < BoardComponent.HEIGHT; y++)
+                    for (int y = 0; y < GlobalSettings.Instance.BoardHeight; y++)
                     {
                         board.Board[x, y] = 0; // 빈 칸으로 초기화
                     }
@@ -207,8 +207,8 @@ namespace Minomino
         /// </summary>
         private bool IsValidPosition(Vector2Int position)
         {
-            return position.x >= 0 && position.x < BoardComponent.WIDTH &&
-                   position.y >= 0 && position.y < BoardComponent.HEIGHT;
+            return position.x >= 0 && position.x < GlobalSettings.Instance.SafeWidth &&
+                   position.y >= 0 && position.y < GlobalSettings.Instance.BoardHeight;
         }
 
         /// <summary>
@@ -467,8 +467,6 @@ namespace Minomino
             tetriminoEntity.RemoveComponent<BoardTetrominoComponent>();
             Debug.Log("Board System : 테트리스 고정할게~");
 
-            // 게임 오버 감지 (테트리미노 고정 직후)
-            if (IsGameOver(tetriminoEntity)) return;
             CheckCompletedLines();
         }
 
@@ -476,7 +474,7 @@ namespace Minomino
         {
             var completedLines = new List<int>();
 
-            for (int y = 0; y < BoardComponent.HEIGHT; y++)
+            for (int y = 0; y < GlobalSettings.Instance.SafeHeight; y++)
             {
                 if (IsLineCompleted(y))
                 {
@@ -500,14 +498,14 @@ namespace Minomino
         {
             var board = Context.GetBoard();
 
-            for (int x = 0; x < BoardComponent.WIDTH; x++)
+            for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
             {
                 if (board.Board[x, lineY] == 0) // 빈 칸이 있으면 완성되지 않음
                 {
                     return false;
                 }
 
-                var entity = FindEntityByID(board.Board[x, lineY]);
+                var entity = Context.FindEntityByID(board.Board[x, lineY]);
                 var minoComponent = entity.GetComponent<MinoComponent>();
                 if (minoComponent.State != MinoState.Empty)
                 {
@@ -516,218 +514,6 @@ namespace Minomino
             }
             return true; // 모든 칸이 채워짐
         }
-
-        /// <summary>
-        /// 완성된 줄들을 제거 (0으로 설정)
-        /// </summary>
-        private void ClearCompletedLines(BoardComponent board, List<int> completedLines)
-        {
-            foreach (int lineY in completedLines)
-            {
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
-                {
-                    board.Board[x, lineY] = 0;
-                }
-                Debug.Log($"줄 {lineY} 제거됨");
-            }
-        }
-
-        /// <summary>
-        /// 제거된 줄 위의 블록들을 아래로 떨어뜨리기
-        /// </summary>
-        private void DropLinesDown(BoardComponent board, List<int> clearedLines)
-        {
-            // 제거되지 않은 줄들을 아래부터 다시 배치
-            var remainingLines = new List<int[]>();
-
-            // 아래부터 위로 검사하면서 제거되지 않은 줄들을 수집
-            for (int y = 0; y < BoardComponent.HEIGHT; y++)
-            {
-                if (!clearedLines.Contains(y))
-                {
-                    // 이 줄은 제거되지 않았으므로 보존
-                    int[] line = new int[BoardComponent.WIDTH];
-                    for (int x = 0; x < BoardComponent.WIDTH; x++)
-                    {
-                        line[x] = board.Board[x, y];
-                    }
-                    remainingLines.Add(line);
-                }
-            }
-
-            // 보드를 모두 0으로 초기화
-            for (int y = 0; y < BoardComponent.HEIGHT; y++)
-            {
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
-                {
-                    board.Board[x, y] = 0;
-                }
-            }
-
-            // 남은 줄들을 아래부터 다시 배치
-            for (int i = 0; i < remainingLines.Count; i++)
-            {
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
-                {
-                    board.Board[x, i] = remainingLines[i][x];
-                }
-            }
-
-            Debug.Log($"줄 드롭 완료: {clearedLines.Count}줄 제거됨, {remainingLines.Count}줄 남음");
-        }
-
-        private PlayerComponent GetPlayer()
-        {
-            var playerEntities = Context.GetEntitiesWithComponent<PlayerComponent>();
-
-            if (playerEntities.Count == 0)
-            {
-                Debug.LogWarning("PlayerComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (playerEntities.Count > 1)
-            {
-                Debug.LogWarning("PlayerComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return playerEntities[0].GetComponent<PlayerComponent>();
-        }
-
-        private CommandRequestComponent GetCommandRequestComponent()
-        {
-            var commandEntities = Context.GetEntitiesWithComponent<CommandRequestComponent>();
-
-            if (commandEntities.Count == 0)
-            {
-                Debug.LogWarning("CommandRequestComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (commandEntities.Count > 1)
-            {
-                Debug.LogWarning("CommandRequestComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return commandEntities[0].GetComponent<CommandRequestComponent>();
-        }
-        private Entity FindEntityByID(int entityID)
-        {
-            var entities = Context.GetEntities();
-            foreach (var entity in entities)
-            {
-                if (entity.ID == entityID)
-                {
-                    return entity; // 해당 ID를 가진 엔티티 반환
-                }
-            }
-            return null; // 해당 ID를 가진 엔티티가 없으면 null 반환
-        }
-
-        #region Game Over Detection System
-
-        /// <summary>
-        /// 게임 오버 상태 감지 및 처리
-        /// </summary>
-        private bool IsGameOver(Entity tetriminoEntity)
-        {
-            // 하이브리드 게임 오버 감지
-            // 1. 높이 기반 감지 (버퍼 존 포함)
-            if (IsGameOverByHeight())
-            {
-                Debug.Log("게임 오버: 높이 기반 감지 (버퍼 존 초과)");
-                TriggerGameOver();
-                return true;
-            }
-
-            // 2. 스폰 위치 충돌 감지
-            if (IsGameOverBySpawnCollision())
-            {
-                Debug.Log("게임 오버: 스폰 위치 충돌 감지");
-                TriggerGameOver();
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 높이 기반 게임 오버 감지 (버퍼 존 포함)
-        /// </summary>
-        private bool IsGameOverByHeight()
-        {
-            var board = Context.GetBoard();
-
-            // 상위 2줄(18, 19줄)에 블록이 있는지 확인 (버퍼 존)
-            for (int y = BoardComponent.HEIGHT - 2; y < BoardComponent.HEIGHT; y++)
-            {
-                for (int x = 0; x < BoardComponent.WIDTH; x++)
-                {
-                    if (board.Board[x, y] != 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 스폰 위치 충돌 기반 게임 오버 감지
-        /// </summary>
-        private bool IsGameOverBySpawnCollision()
-        {
-            var board = Context.GetBoard();
-
-            // 일반적인 테트리미노 스폰 위치 (중앙 상단)
-            Vector2Int spawnPosition = new Vector2Int(BoardComponent.WIDTH / 2, BoardComponent.HEIGHT - 1);
-
-            // 스폰 위치와 주변 영역 확인
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                for (int dy = -1; dy <= 0; dy++)
-                {
-                    int x = spawnPosition.x + dx;
-                    int y = spawnPosition.y + dy;
-
-                    if (x >= 0 && x < BoardComponent.WIDTH && y >= 0 && y < BoardComponent.HEIGHT)
-                    {
-                        if (board.Board[x, y] != 0)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 게임 오버 상태 트리거
-        /// </summary>
-        private void TriggerGameOver()
-        {
-            var gameStateComponent = Context.GetGameState();
-            if (gameStateComponent != null)
-            {
-                gameStateComponent.CurrentState = GameState.GameOver;
-                Debug.Log("게임 오버 상태로 전환됨");
-            }
-
-            // 게임 오버 이벤트 전송
-            var commandRequest = GetCommandRequestComponent();
-            if (commandRequest != null)
-            {
-                commandRequest.Requests.Enqueue(new CommandRequest
-                {
-                    Type = CommandType.EndGame,
-                    PayLoad = null
-                });
-                Debug.Log("게임 오버 이벤트 전송됨");
-            }
-        }
-
-        #endregion
 
         // ========================================
         // Wall Kick System (Shape-Based Rotation)
@@ -966,27 +752,6 @@ namespace Minomino
             // 90도(수직) → 180도(수평) 또는 270도(수직) → 0도(수평)
             return (fromRotation == 1 && toRotation == 2) ||
                    (fromRotation == 3 && toRotation == 0);
-        }
-
-        /// <summary>
-        /// GameStateComponent 가져오기
-        /// </summary>
-        private GameStateComponent GetGameStateComponent()
-        {
-            var gameStateEntities = Context.GetEntitiesWithComponent<GameStateComponent>();
-
-            if (gameStateEntities.Count == 0)
-            {
-                Debug.LogWarning("GameStateComponent가 있는 엔티티가 없습니다.");
-                return null;
-            }
-            else if (gameStateEntities.Count > 1)
-            {
-                Debug.LogWarning("GameStateComponent가 여러 엔티티에 존재합니다. 하나의 엔티티만 사용해야 합니다.");
-                return null;
-            }
-
-            return gameStateEntities[0].GetComponent<GameStateComponent>();
         }
     }
 }

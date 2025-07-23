@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using OVFL.ECS;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,19 +7,23 @@ namespace Minomino
     public class MinoView : MonoBehaviour
     {
         [SerializeField] private Image Image_Background;
-        [SerializeField] private List<Sprite> Images;
+        private Entity _minoEntity;
+        private MinoComponent _minoComponent;
 
-        public void Refresh(MinoComponent minoComponent = null)
+        public void Refresh(Entity minoEntity = null)
         {
-            if (minoComponent == null)
+            if (minoEntity == null)
             {
+                _minoEntity = null;
                 Image_Background.sprite = null;
                 Image_Background.color = new Color(0, 0, 0, 0); // 투명하게 설정
                 return;
             }
 
+            // 새로운 엔티티가 설정되면 업데이트
+            _minoEntity = minoEntity;
             Image_Background.color = new Color(1, 1, 1, 1); // 불투명하게 설정
-            GetSpriteByState(minoComponent.State);
+            GetSpriteByState(_minoEntity.GetComponent<MinoComponent>().State);
         }
 
         private void GetSpriteByState(MinoState state)
@@ -30,11 +34,12 @@ namespace Minomino
                     Debug.LogWarning($"None state MinoComponent");
                     break;
                 case MinoState.Empty:
-                    Image_Background.sprite = Images[0];
+                    // int emptyIndex = Random.Range(0, GlobalSettings.Instance.Sprites_Empty.Length);
+                    Image_Background.sprite = GlobalSettings.Instance.Sprites_Empty[0];
                     break;
                 case MinoState.Living:
-                    int randomIndex = Random.Range(1, 3);
-                    Image_Background.sprite = Images[randomIndex];
+                    // int livingIndex = Random.Range(0, GlobalSettings.Instance.Sprites_Living.Length);
+                    Image_Background.sprite = GlobalSettings.Instance.Sprites_Living[0];
                     break;
                 default:
                     Debug.LogWarning($"Unknown MinoState: {state}");

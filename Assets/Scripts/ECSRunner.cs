@@ -47,9 +47,10 @@ namespace Minomino
 
             Systems.AddSystem<BoardSystem>(); // Board측에서 Hold에 대해 지우고나서 HoldSystem이 BoardTetriminoState를 바꿔야함
             Systems.AddSystem<HoldSystem>();
-            Systems.AddSystem<MinoSystem>();
+            Systems.AddSystem<MinoSystem>(); // GameState의 게임 오버 검증 이후 MinoSystem 업데이트
 
             Systems.AddSystem<ScoreSystem>();
+            Systems.AddSystem<RewardSystem>();
 
             Systems.AddSystem<NotifySystem>();
             Systems.AddSystem<ExampleInputSystem>();

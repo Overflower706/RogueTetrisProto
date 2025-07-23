@@ -77,7 +77,7 @@ namespace Minomino
             {
                 holdQueue.HoldQueue.Enqueue(currentTetrimino);
                 currentTetrimino.GetComponent<BoardTetrominoComponent>().State = BoardTetrominoState.Hold;
-                currentTetrimino.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(GlobalSettings.Instance.SafeWidth / 2 - 1, GlobalSettings.Instance.SafeHeight);
                 currentTetrimino.GetComponent<BoardTetrominoComponent>().Rotation = 0; // 초기 회전 상태
 
                 Debug.Log("HoldQueue에 Tetrimino를 추가했습니다. 현재 HoldQueue 크기: " + holdQueue.HoldQueue.Count);
@@ -89,12 +89,12 @@ namespace Minomino
 
                 holdQueue.HoldQueue.Enqueue(currentTetrimino);
                 currentTetrimino.GetComponent<BoardTetrominoComponent>().State = BoardTetrominoState.Hold;
-                currentTetrimino.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                currentTetrimino.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(GlobalSettings.Instance.SafeWidth / 2 - 1, GlobalSettings.Instance.SafeHeight);
                 currentTetrimino.GetComponent<BoardTetrominoComponent>().Rotation = 0; // 초기 회전 상태
 
                 var oldestHoldEntity = holdQueue.HoldQueue.Dequeue();
                 oldestHoldEntity.GetComponent<BoardTetrominoComponent>().State = BoardTetrominoState.Current;
-                oldestHoldEntity.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(BoardComponent.WIDTH / 2 - 1, BoardComponent.HEIGHT - 2);
+                oldestHoldEntity.GetComponent<BoardTetrominoComponent>().Position = new Vector2Int(GlobalSettings.Instance.SafeWidth / 2 - 1, GlobalSettings.Instance.SafeHeight);
                 oldestHoldEntity.GetComponent<BoardTetrominoComponent>().Rotation = 0; // 초기 회전 상태
 
                 Debug.Log("HoldQueue에 Tetrimino를 추가하고, 가장 오래된 Hold를 Current로 변경했습니다. 현재 HoldQueue 크기: " + holdQueue.HoldQueue.Count);
