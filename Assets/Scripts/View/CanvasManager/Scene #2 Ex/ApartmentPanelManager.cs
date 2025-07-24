@@ -11,7 +11,6 @@ namespace Minomino
         public Context Context { get; set; }
 
         [SerializeField] private TMP_Text Text_Stage;
-        [SerializeField] private TMP_Text Text_Limit;
         [SerializeField] private RectTransform RectTransform_ApartmentPanel;
         [SerializeField] private GridLayoutGroup GridLayout_Layout;
         [SerializeField] private GameObject Prefab_Plot;
@@ -27,7 +26,6 @@ namespace Minomino
         public void Setup()
         {
             Text_Stage.gameObject.SetActive(false);
-            Text_Limit.gameObject.SetActive(false);
         }
 
         public void Show()
@@ -45,7 +43,6 @@ namespace Minomino
                 var player = Context.GetPlayer();
                 Text_Stage.text = $"{player.Round}-{player.Stage}\n단지\n부지";
                 Text_Stage.gameObject.SetActive(true);
-                Text_Limit.gameObject.SetActive(true);
 
                 RectTransform_ApartmentPanel.sizeDelta = new Vector2(GlobalSettings.Instance.MinoWidth * GlobalSettings.Instance.SafeWidth + 10,
                                                                    GlobalSettings.Instance.MinoHeight + (GlobalSettings.Instance.MinoHeight - 5) * (GlobalSettings.Instance.SafeHeight - 1) + 10);
@@ -131,7 +128,6 @@ namespace Minomino
         public void Hide()
         {
             Text_Stage.gameObject.SetActive(false);
-            Text_Limit.gameObject.SetActive(false);
 
             minoViews = null;
 

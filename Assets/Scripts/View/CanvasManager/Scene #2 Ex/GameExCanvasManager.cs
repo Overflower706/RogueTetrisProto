@@ -17,6 +17,10 @@ namespace Minomino
         [SerializeField] private GameObject Panel_Game;
         [SerializeField] private GameObject Panel_Ground;
         [SerializeField] private ApartmentPanelManager Panel_Apartment;
+        [SerializeField] private RewardPanelManager Panel_Reward;
+        [SerializeField] private HoldPanelManager Panel_Hold;
+        [SerializeField] private NextQueuePanelManager Panel_NextQueue;
+        [SerializeField] private ScorePanelManager Panel_Score;
 
         [Header("결과 패널")]
         [SerializeField] private GameObject Panel_Result;
@@ -35,7 +39,10 @@ namespace Minomino
 
             Panel_Ground.SetActive(false);
             Panel_Apartment.gameObject.SetActive(false);
+            Panel_Reward.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
+            Panel_Score.gameObject.SetActive(false);
+
             Panel_Backblocker.SetActive(false);
             Button_Hide.interactable = false;
             Text_Minimap.text = string.Empty;
@@ -99,6 +106,7 @@ namespace Minomino
                     PayLoad = null
                 });
                 Panel_Apartment.Show();
+                Panel_Score.gameObject.SetActive(true);
                 Text_Minimap.gameObject.SetActive(true);
             });
 
@@ -107,40 +115,24 @@ namespace Minomino
 
         public void Tick()
         {
-            var end = Context.GetEntitiesWithComponent<EndGameCommand>();
-            if (end.Count > 0)
-            {
-                var terminalState = Context.GetGameState();
-                switch (terminalState.CurrentState)
-                {
-                    case GameState.Victory:
-                        Text_Result.text = "완공!";
-                        break;
-                    case GameState.GameOver:
-                        Text_Result.text = "삐빅\n고도 제한\n위반입니다.\n면허 취소 ㅠㅠ";
-                        break;
-                    default:
-                        Debug.LogWarning("게임 종료 상태가 아닙니다. 현재 상태: " + terminalState.CurrentState);
-                        break;
-                }
-
-                Panel_Result.SetActive(true);
-                Panel_Backblocker.SetActive(true);
-                Button_Hide.interactable = true;
-                return;
-            }
+            ObserveEndGame();
 
             var state = Context.GetGameState();
             if (state.CurrentState != GameState.Playing) return;
 
             var board = Context.GetBoard();
             Text_Minimap.text = BoardLogger.VisualizeBoard(Context, board);
+
+            ObserveRewardNotify();
         }
 
         public Tween Hide()
         {
             Debug.Log("GameExCanvasManager Hide 애니메이션 시작");
+            Panel_Reward.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
+            Panel_Score.gameObject.SetActive(false);
+
             Panel_Backblocker.SetActive(false);
             Text_Minimap.gameObject.SetActive(false);
             Text_Minimap.text = string.Empty;
@@ -202,13 +194,54 @@ namespace Minomino
 
             Panel_Ground.SetActive(false);
             Panel_Apartment.gameObject.SetActive(false);
+            Panel_Reward.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
+            Panel_Score.gameObject.SetActive(false);
+
             Panel_Backblocker.SetActive(false);
             Text_Minimap.text = string.Empty;
             Text_Minimap.gameObject.SetActive(false);
 
             Button_Hide.onClick.RemoveAllListeners();
             Button_Hide.interactable = false;
+        }
+
+        private void ObserveEndGame()
+        {
+            var end = Context.GetEntitiesWithComponent<EndGameCommand>();
+            if (end.Count > 0)
+            {
+                var terminalState = Context.GetGameState();
+                switch (terminalState.CurrentState)
+                {
+                    case GameState.Victory:
+                        Text_Result.text = "완공!";
+                        break;
+                    case GameState.GameOver:
+                        Text_Result.text = "삐빅\n고도 제한\n위반입니다.\n면허 취소 ㅠㅠ";
+                        break;
+                    default:
+                        Debug.LogWarning("게임 종료 상태가 아닙니다. 현재 상태: " + terminalState.CurrentState);
+                        break;
+                }
+
+                Panel_Result.SetActive(true);
+                Panel_Backblocker.SetActive(true);
+                Button_Hide.interactable = true;
+                return;
+            }
+        }
+
+        private void ObserveRewardNotify()
+        {
+            var notify = Context.GetEntitiesWithComponent<RewardNotify>();
+            if (notify.Count > 0)
+            {
+                Panel_Reward.gameObject.SetActive(true);
+                var rewardComponent = notify[0].GetComponent<RewardNotify>().Reward;
+                Debug.Log($"Canvas 보상 알림");
+                Panel_Reward.Show(rewardComponent);
+            }
         }
     }
 }

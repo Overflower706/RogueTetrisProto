@@ -22,8 +22,9 @@ namespace Minomino
 
             // 새로운 엔티티가 설정되면 업데이트
             _minoEntity = minoEntity;
+            _minoComponent = _minoEntity.GetComponent<MinoComponent>();
             Image_Background.color = new Color(1, 1, 1, 1); // 불투명하게 설정
-            GetSpriteByState(_minoEntity.GetComponent<MinoComponent>().State);
+            GetSpriteByState(_minoComponent.State);
         }
 
         private void GetSpriteByState(MinoState state)
