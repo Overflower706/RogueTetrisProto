@@ -20,9 +20,6 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
     [SerializeField] private GameObject Panel_Shop;
     [SerializeField] private Button Button_NextRound;
 
-    [Header("폴리오미노 패널")]
-    [SerializeField] private ShopPanelManager PanelManager_Shop;
-
     private RectTransform _shopRectTransform;
     private Vector2 _shopOriginalPosition;
 
@@ -58,7 +55,6 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
             {
                 Canvas_Shop.GetComponent<CanvasGroup>().interactable = true;
                 Button_NextRound.interactable = true; // 버튼 활성화
-                PanelManager_Shop.Show();
             });
     }
 
@@ -73,7 +69,6 @@ public class ShopCanvasManager : MonoBehaviour, ICanvasManager, ISystem
             .SetEase(Ease.InCubic)
             .OnComplete(() =>
             {
-                PanelManager_Shop.Hide();
                 Panel_Shop.SetActive(false);
                 Canvas_Shop.gameObject.SetActive(false);
             });

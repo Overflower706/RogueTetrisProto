@@ -59,7 +59,7 @@ namespace Minomino
                 {
                     sb.Append("├");
                     // 고도 제한 문구 중앙 정렬
-                    string limitText = "고도 제한";
+                    string limitText = "-고도 제한-";
                     int padding = (width - limitText.Length) / 2;
 
                     // 좌측 패딩

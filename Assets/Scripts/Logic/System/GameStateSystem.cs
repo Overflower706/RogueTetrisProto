@@ -16,14 +16,9 @@ namespace Minomino
 
         public void Tick()
         {
-            var state = Context.GetGameState();
-
-            var commandEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
-            if (commandEntities.Count > 0)
-            {
-                state.CurrentState = GameState.Playing;
-                Debug.Log("게임 시작");
-            }
+            ObserveStartGame();
+            ObserveRewardNotify();
+            ObserveEndReward();
         }
 
         public void Cleanup()
@@ -31,10 +26,26 @@ namespace Minomino
             var state = Context.GetGameState();
 
             if (state.CurrentState != GameState.Playing) return;
+            var score = Context.GetScore();
+
+            if (score.CurrentScore >= score.TargetScore)
+            {
+                state.CurrentState = GameState.Victory;
+                Debug.Log("게임 종료, 목표 점수 도달");
+
+                // 게임 종료 명령 생성
+                var commandComponent = Context.GetCommandRequest();
+                commandComponent.Requests.Enqueue(new CommandRequest
+                {
+                    Type = CommandType.EndGame,
+                    PayLoad = null
+                });
+
+                return;
+            }
 
             var board = Context.GetBoard();
 
-            // 상위 2줄(18, 19줄)에 블록이 있는지 확인 (버퍼 존)
             for (int y = GlobalSettings.Instance.SafeHeight; y < GlobalSettings.Instance.BoardHeight; y++)
             {
                 for (int x = 0; x < GlobalSettings.Instance.SafeWidth; x++)
@@ -68,7 +79,7 @@ namespace Minomino
                 }
             }
 
-            var score = Context.GetScore();
+
             var tetriminoQueue = Context.GetTetrominoQueue();
             var boardTetriminoEntities = Context.GetEntitiesWithComponent<BoardTetrominoComponent>();
 
@@ -89,35 +100,65 @@ namespace Minomino
 
             if (tetriminoQueue.TetrominoQueue.Count == 0 && count == 0)
             {
-                if (score.CurrentScore >= score.TargetScore)
+                state.CurrentState = GameState.GameOver;
+                Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");
+
+                // 게임 종료 명령 생성
+                var commandComponent = Context.GetCommandRequest();
+                commandComponent.Requests.Enqueue(new CommandRequest
                 {
-                    state.CurrentState = GameState.Victory;
-                    Debug.Log("게임 종료, 목표 점수 도달");
+                    Type = CommandType.EndGame,
+                    PayLoad = null
+                });
 
-                    // 게임 종료 명령 생성
-                    var commandComponent = Context.GetCommandRequest();
-                    commandComponent.Requests.Enqueue(new CommandRequest
-                    {
-                        Type = CommandType.EndGame,
-                        PayLoad = null
-                    });
+                return;
+            }
+        }
 
-                    return;
+        private void ObserveStartGame()
+        {
+            var state = Context.GetGameState();
+
+            var commandEntities = Context.GetEntitiesWithComponent<StartGameCommand>();
+            if (commandEntities.Count > 0)
+            {
+                state.CurrentState = GameState.Playing;
+                Debug.Log("게임 시작");
+            }
+        }
+
+        private void ObserveRewardNotify()
+        {
+            var rewardNotify = Context.GetEntitiesWithComponent<RewardNotify>();
+
+            if (rewardNotify.Count > 0)
+            {
+                Debug.Log("보상 알림이 감지되었습니다.");
+                // 게임 상태를 바꿀겁니다.
+                var state = Context.GetGameState();
+                if (state.CurrentState == GameState.Playing)
+                {
+                    state.CurrentState = GameState.Reward;
+                    Debug.Log("보상 알림 상태로 전환되었습니다.");
                 }
-                else
+
+                foreach (var notify in rewardNotify)
                 {
-                    state.CurrentState = GameState.GameOver;
-                    Debug.Log("게임 종료, 테트리미노를 다 썼지만 점수를 넘지 못했습니다.");
+                    Context.DestroyEntity(notify);
+                }
+            }
+        }
 
-                    // 게임 종료 명령 생성
-                    var commandComponent = Context.GetCommandRequest();
-                    commandComponent.Requests.Enqueue(new CommandRequest
-                    {
-                        Type = CommandType.EndGame,
-                        PayLoad = null
-                    });
-
-                    return;
+        private void ObserveEndReward()
+        {
+            var endRewardCommand = Context.GetEntitiesWithComponent<EndRewardCommand>();
+            if (endRewardCommand.Count > 0)
+            {
+                var state = Context.GetGameState();
+                if (state.CurrentState == GameState.Reward)
+                {
+                    state.CurrentState = GameState.Playing;
+                    Debug.Log("보상 알림 상태에서 게임 플레이 상태로 전환되었습니다.");
                 }
             }
         }

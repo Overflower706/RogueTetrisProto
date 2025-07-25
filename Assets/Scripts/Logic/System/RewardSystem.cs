@@ -36,6 +36,8 @@ namespace Minomino
                 }
             }
 
+            ObserveChooseReward();
+
             var state = Context.GetGameState();
             if (state.CurrentState != GameState.Playing) return;
 
@@ -50,12 +52,14 @@ namespace Minomino
                         // 해당 줄에 대한 보상을 생성합니다.
                         var rewardEntity = Context.GetEntitiesWithComponent<RewardComponent>()
                             .Find(r => r.GetComponent<RewardComponent>().Line == completedLine);
+                        var rewardComponent = rewardEntity.GetComponent<RewardComponent>();
 
-                        var reward = rewardEntity.GetComponent<RewardComponent>();
-                        if (reward.IsReceived) continue; // 이미 보상을 받은 경우는 건너뜁니다.
-                        reward.IsReceived = true; // 보상을 받았음을 표시
+                        var commandEntity = Context.CreateEntity();
+                        var rewardNotify = commandEntity.AddComponent<RewardNotify>();
 
-                        Debug.Log($"{completedLine}째 줄에 보상 : {string.Join(", ", rewardEntity.GetComponent<RewardComponent>().Rewards)}");
+                        rewardNotify.Reward = rewardComponent;
+
+                        Debug.Log($"{completedLine}째 줄에 보상 : {string.Join(", ", rewardComponent.Rewards)}");
                     }
                 }
             }
@@ -99,6 +103,26 @@ namespace Minomino
             }
 
             return selectedRewards;
+        }
+
+        private void ObserveChooseReward()
+        {
+            var chooseRewardEntities = Context.GetEntitiesWithComponent<ChooseRewardCommand>();
+            if (chooseRewardEntities.Count > 0)
+            {
+                var state = Context.GetGameState();
+                if (state.CurrentState != GameState.Reward)
+                {
+                    Debug.LogWarning($"보상 상태가 아닙니다. 보상 선택을 처리하지 않습니다. 현재 상태 : {state.CurrentState}");
+                    return;
+                }
+
+                var command = chooseRewardEntities[0].GetComponent<ChooseRewardCommand>();
+                var lineIndex = command.LineIndex;
+                var chooseIndex = command.ChooseIndex;
+
+                Debug.Log($"{lineIndex}번째 줄 보상 선택 : {chooseIndex}번째 보상을 선택했습니다.");
+            }
         }
     }
 }
