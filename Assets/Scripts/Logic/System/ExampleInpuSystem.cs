@@ -76,7 +76,7 @@ namespace Minomino
             }
 
             // 방향키 아래 (소프트 드롭)
-            if (keyboard.downArrowKey.wasPressedThisFrame)
+            if (keyboard.sKey.wasPressedThisFrame)
             {
                 Debug.Log("입력: 소프트 드롭 (↓)");
                 commandRequest.Requests.Enqueue(new CommandRequest
