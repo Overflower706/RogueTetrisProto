@@ -19,7 +19,6 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
 
     [Header("각각의 씬 담당들")]
     [SerializeField] private TitleSceneManager TitleSceneManager;
-    [SerializeField] private GameSceneManager GameSceneManager;
     [SerializeField] private GameExSceneManager GameExSceneManager;
     [SerializeField] private PackSceneManager PackSceneManager;
 
@@ -31,7 +30,6 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
         return _currentSceneManager switch
         {
             _ when (Object)_currentSceneManager == TitleSceneManager => SceneType.Title,
-            _ when (Object)_currentSceneManager == GameSceneManager => SceneType.Game,
             _ when (Object)_currentSceneManager == GameExSceneManager => SceneType.Game,
             _ when (Object)_currentSceneManager == PackSceneManager => SceneType.Pack,
             _ => SceneType.None
@@ -41,7 +39,6 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
     public void Setup()
     {
         TitleSceneManager.Init();
-        GameSceneManager.Init();
         PackSceneManager.Init();
         GameExSceneManager.Init();
 
@@ -65,22 +62,6 @@ public class PanelSceneManager : MonoSingleton<PanelSceneManager>, ISetupSystem
     }
 
     public void LoadGameScene()
-    {
-        var sequence = DOTween.Sequence();
-        if (_currentSceneManager != null)
-        {
-            // 현재 SceneManager가 있다면 UnloadScene 호출
-            sequence.Append(_currentSceneManager.UnloadScene());
-        }
-        sequence.Append(GameSceneManager.LoadScene());
-        sequence.AppendCallback(() =>
-        {
-            _currentSceneManager = GameSceneManager;
-            CurrentSceneType = GetCurrentSceneType();
-        });
-    }
-
-    public void LoadGameExScene()
     {
         var sequence = DOTween.Sequence();
         if (_currentSceneManager != null)

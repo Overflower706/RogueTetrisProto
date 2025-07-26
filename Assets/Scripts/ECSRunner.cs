@@ -61,8 +61,6 @@ namespace Minomino
 
             var titleSceneManager = FindFirstObjectByType<TitleSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(titleSceneManager);
-            var gameSceneManager = FindFirstObjectByType<GameSceneManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(gameSceneManager);
             var packSceneManager = FindFirstObjectByType<PackSceneManager>(FindObjectsInactive.Include);
             Systems.AddSystem(packSceneManager);
             var gameExSceneManager = FindFirstObjectByType<GameExSceneManager>(FindObjectsInactive.Include);
@@ -70,18 +68,6 @@ namespace Minomino
 
             var titleCanvasManager = FindFirstObjectByType<TitleCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(titleCanvasManager);
-
-            var bannerCanvasManager = FindFirstObjectByType<BannerCanvasManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(bannerCanvasManager);
-            var gameCanvasManager = FindFirstObjectByType<GameCanvasManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(gameCanvasManager);
-            var shopCanvasManager = FindFirstObjectByType<ShopCanvasManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(shopCanvasManager);
-            var stageCanvasManager = FindFirstObjectByType<StageCanvasManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(stageCanvasManager);
-
-            var packCanvasManager = FindFirstObjectByType<PackCanvasManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(packCanvasManager);
 
             var gameExCanvasManager = FindFirstObjectByType<GameExCanvasManager>(FindObjectsInactive.Include);
             Systems.AddSystem(gameExCanvasManager);
