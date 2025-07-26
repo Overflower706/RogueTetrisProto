@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b0d2f99d72dc6ac43b94b4cf314e95e3
+guid: 7c47cc3055dfd2e4490c99a70945b081
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8572361685516856771
-    second: Minew_Middle_0
+      213: 6548981852498269466
+    second: Minew_Angel_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -135,30 +135,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Minew_Middle_0
+      name: Minew_Angel_0
       rect:
         serializedVersion: 2
-        x: 129
-        y: 45
-        width: 242
-        height: 405
+        x: 0
+        y: 0
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -167,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3cda66fd88527f670800000000000000
-      internalID: 8572361685516856771
+      spriteID: a1593aefb48a2ea50800000000000000
+      internalID: 6548981852498269466
       vertices: []
       indices: 
       edges: []
@@ -186,8 +173,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Minew_Middle_0: 8572361685516856771
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
