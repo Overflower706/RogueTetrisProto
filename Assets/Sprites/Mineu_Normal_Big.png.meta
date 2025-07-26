@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3991c9b43992c574987bb9f2eb89e63c
+guid: 36f6d94c51ca6e24f9188dcbbf5db333
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2597642756615157145
-    second: Minew_Sun_0
+      213: -354040624958280718
+    second: Minew_Normal_Big_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Minew_Sun_0
+      name: Minew_Normal_Big_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 512
-        height: 512
+        x: 115
+        y: 10
+        width: 289
+        height: 500
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 76a469efca153fbd0800000000000000
-      internalID: -2597642756615157145
+      spriteID: 2fbed496de1361bf0800000000000000
+      internalID: -354040624958280718
       vertices: []
       indices: 
       edges: []
@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Minew_Normal_Big_0: -354040624958280718
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

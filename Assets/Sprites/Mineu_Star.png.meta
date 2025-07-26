@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9cc2e73f117fdd740a0859c01810fd08
+guid: 140f4a28331a1854fa1366a7baf7cb1e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6756758092993665097
-    second: Minew_Moon_0
+      213: -3392232698334500991
+    second: Minew_Star_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,7 +139,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Minew_Moon_0
+      name: Minew_Star_0
       rect:
         serializedVersion: 2
         x: 0
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7b7edd1305c2b32a0800000000000000
-      internalID: -6756758092993665097
+      spriteID: 187ae4c655e5ce0d0800000000000000
+      internalID: -3392232698334500991
       vertices: []
       indices: 
       edges: []
@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Minew_Star_0: -3392232698334500991
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
