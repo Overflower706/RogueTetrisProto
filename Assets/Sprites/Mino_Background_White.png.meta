@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c204e107c3f67334ea1e74fd5e023b2b
+guid: 84e981ba8bd0c414897e2e26c5b8d555
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7906570786069539079
-    second: Minew_Big_0
+      213: 4235467970321959403
+    second: Mino_Background_White_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -135,30 +135,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Minew_Big_0
+      name: Mino_Background_White_0
       rect:
         serializedVersion: 2
-        x: 115
-        y: 10
-        width: 289
-        height: 500
+        x: 8
+        y: 153
+        width: 1008
+        height: 749
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -167,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9f618d8c2c7364290800000000000000
-      internalID: -7906570786069539079
+      spriteID: be9c594bda767ca30800000000000000
+      internalID: 4235467970321959403
       vertices: []
       indices: 
       edges: []
@@ -186,8 +173,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Minew_Big_0: -7906570786069539079
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

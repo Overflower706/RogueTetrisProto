@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: b0d2f99d72dc6ac43b94b4cf314e95e3
+guid: 9abdc9bab561fd24897f243b8a71487e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8572361685516856771
-    second: Minew_Middle_0
+      213: -5744712683164315650
+    second: Title_Title_0
+  - first:
+      213: -4359213630374621519
+    second: Title_Title_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -135,30 +138,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Minew_Middle_0
+      name: Title_Title_0
       rect:
         serializedVersion: 2
-        x: 129
-        y: 45
-        width: 242
-        height: 405
+        x: 529
+        y: 586
+        width: 805
+        height: 445
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -167,8 +157,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3cda66fd88527f670800000000000000
-      internalID: 8572361685516856771
+      spriteID: eff4f4f504ea640b0800000000000000
+      internalID: -5744712683164315650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Title_Title_1
+      rect:
+        serializedVersion: 2
+        x: 1230
+        y: 553
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1beca7d9c46f083c0800000000000000
+      internalID: -4359213630374621519
       vertices: []
       indices: 
       edges: []
@@ -186,8 +198,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Minew_Middle_0: 8572361685516856771
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
