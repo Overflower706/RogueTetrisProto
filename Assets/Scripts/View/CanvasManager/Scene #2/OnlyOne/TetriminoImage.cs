@@ -139,15 +139,15 @@ public class TetriminoImage : MonoBehaviour
         switch (state)
         {
             case MinoState.Living:
-                return GlobalSettings.Instance.Sprites_Living[0];
+                return SpriteSettings.Instance.Sprites_Living[0];
             case MinoState.Empty:
-                return GlobalSettings.Instance.Sprites_Empty[0];
+                return SpriteSettings.Instance.Sprites_Empty[0];
             case MinoState.None:
                 Debug.LogWarning("MinoState is None, returning default sprite.");
-                return GlobalSettings.Instance.Sprites_Empty[0];
+                return SpriteSettings.Instance.Sprites_Empty[0];
             default:
                 Debug.LogWarning($"Unknown MinoState: {state}, returning default Living sprite.");
-                return GlobalSettings.Instance.Sprites_Empty[0];
+                return SpriteSettings.Instance.Sprites_Living[0];
         }
     }
 

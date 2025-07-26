@@ -16,6 +16,5 @@ namespace Minomino
         Playing,
         GameOver,
         Victory,
-        Reward
     }
 }

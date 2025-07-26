@@ -100,23 +100,6 @@ namespace Minomino
                     entity.AddComponent(generateCommand);
                     break;
 
-                case CommandType.ChooseReward:
-                    var chooseRewardCommand = new ChooseRewardCommand();
-                    if (request.PayLoad is Tuple<int, int> tuple)
-                    {
-                        // PayLoad가 Tuple<int, int>인 경우
-                        chooseRewardCommand.LineIndex = tuple.Item1;
-                        chooseRewardCommand.ChooseIndex = tuple.Item2;
-                    }
-                    entity.AddComponent(chooseRewardCommand);
-                    break;
-
-                case CommandType.EndReward:
-                    var endRewardCommand = new EndRewardCommand();
-                    endRewardCommand.PayLoad = request.PayLoad;
-                    entity.AddComponent(endRewardCommand);
-                    break;
-
                 // 향후 다른 명령 타입들 추가
                 default:
                     Debug.LogWarning($"알 수 없는 명령 타입: {request.Type}");

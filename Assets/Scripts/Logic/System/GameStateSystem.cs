@@ -17,8 +17,6 @@ namespace Minomino
         public void Tick()
         {
             ObserveStartGame();
-            ObserveRewardNotify();
-            ObserveEndReward();
         }
 
         public void Cleanup()
@@ -124,42 +122,6 @@ namespace Minomino
             {
                 state.CurrentState = GameState.Playing;
                 Debug.Log("게임 시작");
-            }
-        }
-
-        private void ObserveRewardNotify()
-        {
-            var rewardNotify = Context.GetEntitiesWithComponent<RewardNotify>();
-
-            if (rewardNotify.Count > 0)
-            {
-                Debug.Log("보상 알림이 감지되었습니다.");
-                // 게임 상태를 바꿀겁니다.
-                var state = Context.GetGameState();
-                if (state.CurrentState == GameState.Playing)
-                {
-                    state.CurrentState = GameState.Reward;
-                    Debug.Log("보상 알림 상태로 전환되었습니다.");
-                }
-
-                foreach (var notify in rewardNotify)
-                {
-                    Context.DestroyEntity(notify);
-                }
-            }
-        }
-
-        private void ObserveEndReward()
-        {
-            var endRewardCommand = Context.GetEntitiesWithComponent<EndRewardCommand>();
-            if (endRewardCommand.Count > 0)
-            {
-                var state = Context.GetGameState();
-                if (state.CurrentState == GameState.Reward)
-                {
-                    state.CurrentState = GameState.Playing;
-                    Debug.Log("보상 알림 상태에서 게임 플레이 상태로 전환되었습니다.");
-                }
             }
         }
     }

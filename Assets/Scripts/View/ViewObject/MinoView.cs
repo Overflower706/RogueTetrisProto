@@ -6,23 +6,22 @@ namespace Minomino
 {
     public class MinoView : MonoBehaviour
     {
+        [SerializeField] private Image Image_Minue;
         [SerializeField] private Image Image_Background;
-        private Entity _minoEntity;
         private MinoComponent _minoComponent;
 
-        public void Refresh(Entity minoEntity = null)
+        public void Refresh(MinoComponent minoComponent = null)
         {
-            if (minoEntity == null)
+            if (minoComponent == null)
             {
-                _minoEntity = null;
+                _minoComponent = null;
                 Image_Background.sprite = null;
                 Image_Background.color = new Color(0, 0, 0, 0); // 투명하게 설정
                 return;
             }
 
             // 새로운 엔티티가 설정되면 업데이트
-            _minoEntity = minoEntity;
-            _minoComponent = _minoEntity.GetComponent<MinoComponent>();
+            _minoComponent = minoComponent;
             Image_Background.color = new Color(1, 1, 1, 1); // 불투명하게 설정
             GetSpriteByState(_minoComponent.State);
         }
@@ -35,12 +34,10 @@ namespace Minomino
                     Debug.LogWarning($"None state MinoComponent");
                     break;
                 case MinoState.Empty:
-                    // int emptyIndex = Random.Range(0, GlobalSettings.Instance.Sprites_Empty.Length);
-                    Image_Background.sprite = GlobalSettings.Instance.Sprites_Empty[0];
+                    Image_Background.sprite = SpriteSettings.Instance.Sprites_Empty[0];
                     break;
                 case MinoState.Living:
-                    // int livingIndex = Random.Range(0, GlobalSettings.Instance.Sprites_Living.Length);
-                    Image_Background.sprite = GlobalSettings.Instance.Sprites_Living[0];
+                    Image_Background.sprite = SpriteSettings.Instance.Sprites_Living[0];
                     break;
                 default:
                     Debug.LogWarning($"Unknown MinoState: {state}");

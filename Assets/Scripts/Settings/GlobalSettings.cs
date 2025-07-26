@@ -39,18 +39,11 @@ namespace Minomino
         public int IcingCookieScore = 50;
         public int ChocoSoraBreadScore = 100;
 
-        [Header("특별 미뉴 보상 라인")]
-        public List<int> RewardLines;
-
         [Header("보상 이미지")]
         public Sprite Sprite_Reward_Alert;
         public Sprite Sprite_Reward_Received;
 
         [Header("특별 미뉴 설명")]
         public List<string> SpecialMinueDescriptions;
-
-        [Header("간단한 미노 이미지들")]
-        public Sprite[] Sprites_Empty;
-        public Sprite[] Sprites_Living;
     }
 }

@@ -16,12 +16,8 @@ namespace Minomino
         [SerializeField] private GameObject Prefab_Plot;
         [SerializeField] private GridLayoutGroup GridLayout_Board;
         [SerializeField] private MinoView Prefab_Mino;
-        [SerializeField] private RectTransform RectTransform_Reward;
-        [SerializeField] private GridLayoutGroup GridLayout_Reward;
-        [SerializeField] private RewardView Prefab_Reward;
 
         private MinoView[,] minoViews;
-        private List<RewardView> rewardViews;
 
         public void Setup()
         {
@@ -47,16 +43,6 @@ namespace Minomino
                 RectTransform_ApartmentPanel.sizeDelta = new Vector2(GlobalSettings.Instance.MinoWidth * GlobalSettings.Instance.SafeWidth + 10,
                                                                    GlobalSettings.Instance.MinoHeight + (GlobalSettings.Instance.MinoHeight - 5) * (GlobalSettings.Instance.SafeHeight - 1) + 10);
 
-                RectTransform_Reward.sizeDelta = new Vector2(GlobalSettings.Instance.MinoWidth, GlobalSettings.Instance.MinoHeight * GlobalSettings.Instance.SafeHeight + 15);
-                GridLayout_Reward.cellSize = new Vector2(GlobalSettings.Instance.MinoWidth, GlobalSettings.Instance.MinoHeight);
-                rewardViews = new List<RewardView>();
-                for (int i = 0; i < GlobalSettings.Instance.SafeHeight; i++)
-                {
-                    var rewardView = Instantiate(Prefab_Reward, RectTransform_Reward.transform);
-                    rewardView.name = $"RewardView_{i}";
-                    rewardViews.Add(rewardView);
-                    rewardView.SetTransparency(true);
-                }
 
                 GridLayout_Layout.cellSize = new Vector2(GlobalSettings.Instance.MinoWidth, GlobalSettings.Instance.MinoHeight);
 
@@ -79,13 +65,6 @@ namespace Minomino
                         var minoView = Instantiate(Prefab_Mino, GridLayout_Board.transform);
                         minoView.name = $"MinoView_{w}_{h}";
                         minoViews[w, h] = minoView;
-                    }
-
-                    if (GlobalSettings.Instance.RewardLines.Contains(h))
-                    {
-                        // 보상 라인에 해당하는 경우
-                        var rewardView = rewardViews[h];
-                        rewardView.SetTransparency(false);
                     }
                 }
             }
@@ -111,17 +90,9 @@ namespace Minomino
                         var minoView = minoViews[w, h];
 
                         var minoEntity = Context.FindEntityByID(minoID);
-                        minoView.Refresh(minoEntity);
+                        minoView.Refresh(minoEntity.GetComponent<MinoComponent>());
                     }
                 }
-            }
-
-            var rewards = Context.GetEntitiesWithComponent<RewardComponent>();
-            foreach (var rewardEntity in rewards)
-            {
-                var rewardComponent = rewardEntity.GetComponent<RewardComponent>();
-                var rewardView = rewardViews[rewardComponent.Line];
-                rewardView.Refresh(rewardComponent.IsReceived);
             }
         }
 
@@ -146,14 +117,6 @@ namespace Minomino
                 var child = GridLayout_Layout.transform.GetChild(i);
                 Destroy(child.gameObject);
             }
-
-            var rewardChildCount = RectTransform_Reward.transform.childCount;
-            for (int i = rewardChildCount - 1; i >= 0; i--)
-            {
-                var child = RectTransform_Reward.transform.GetChild(i);
-                Destroy(child.gameObject);
-            }
-            rewardViews.Clear();
         }
     }
 }

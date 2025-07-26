@@ -309,7 +309,7 @@ public class GameBoardPanel : MonoBehaviour
     private Sprite GetMinoSpriteById(int minoId)
     {
         var entity = FindEntityById(minoId);
-        var sprites = GlobalSettings.Instance.Sprites_Living;
+        var sprites = SpriteSettings.Instance.Sprites_Living;
         if (entity == null)
         {
             Debug.LogWarning($"[GetMinoSpriteById] minoId({minoId})에 해당하는 엔티티를 찾을 수 없습니다.");

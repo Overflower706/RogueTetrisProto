@@ -17,7 +17,6 @@ namespace Minomino
         [SerializeField] private GameObject Panel_Game;
         [SerializeField] private GameObject Panel_Ground;
         [SerializeField] private ApartmentPanelManager Panel_Apartment;
-        [SerializeField] private RewardPanelManager Panel_Reward;
         [SerializeField] private HoldPanelManager Panel_Hold;
         [SerializeField] private NextQueuePanelManager Panel_NextQueue;
         [SerializeField] private ScorePanelManager Panel_Score;
@@ -39,7 +38,6 @@ namespace Minomino
 
             Panel_Ground.SetActive(false);
             Panel_Apartment.gameObject.SetActive(false);
-            Panel_Reward.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
             Panel_Score.gameObject.SetActive(false);
 
@@ -122,14 +120,11 @@ namespace Minomino
 
             var board = Context.GetBoard();
             Text_Minimap.text = BoardLogger.VisualizeBoard(Context, board);
-
-            ObserveRewardNotify();
         }
 
         public Tween Hide()
         {
             Debug.Log("GameExCanvasManager Hide 애니메이션 시작");
-            Panel_Reward.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
             Panel_Score.gameObject.SetActive(false);
 
@@ -194,7 +189,6 @@ namespace Minomino
 
             Panel_Ground.SetActive(false);
             Panel_Apartment.gameObject.SetActive(false);
-            Panel_Reward.gameObject.SetActive(false);
             Panel_Result.SetActive(false);
             Panel_Score.gameObject.SetActive(false);
 
@@ -229,18 +223,6 @@ namespace Minomino
                 Panel_Backblocker.SetActive(true);
                 Button_Hide.interactable = true;
                 return;
-            }
-        }
-
-        private void ObserveRewardNotify()
-        {
-            var notify = Context.GetEntitiesWithComponent<RewardNotify>();
-            if (notify.Count > 0)
-            {
-                Panel_Reward.gameObject.SetActive(true);
-                var rewardComponent = notify[0].GetComponent<RewardNotify>().Reward;
-                Debug.Log($"Canvas 보상 알림");
-                Panel_Reward.Show(rewardComponent);
             }
         }
     }

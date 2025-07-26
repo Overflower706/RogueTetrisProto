@@ -50,7 +50,6 @@ namespace Minomino
             Systems.AddSystem<MinoSystem>(); // GameState의 게임 오버 검증 이후 MinoSystem 업데이트
 
             Systems.AddSystem<ScoreSystem>();
-            Systems.AddSystem<RewardSystem>();
 
             Systems.AddSystem<NotifySystem>();
             Systems.AddSystem<ExampleInputSystem>();
@@ -89,9 +88,6 @@ namespace Minomino
 
             var apartmentPanelManager = FindFirstObjectByType<ApartmentPanelManager>(FindObjectsInactive.Include);
             Systems.AddSystem(apartmentPanelManager);
-
-            var rewardPanelManager = FindFirstObjectByType<RewardPanelManager>(FindObjectsInactive.Include);
-            Systems.AddSystem(rewardPanelManager);
 
             var holdPanelManager = FindFirstObjectByType<HoldPanelManager>(FindObjectsInactive.Include);
             Systems.AddSystem(holdPanelManager);
