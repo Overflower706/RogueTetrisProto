@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Minomino
 {
-    public class BoardSystem : ITickSystem
+    public class BoardSystem : ITickSystem, ICleanupSystem
     {
         public Context Context { get; set; }
 
@@ -98,6 +98,15 @@ namespace Minomino
             if (holdEntities.Count > 0)
             {
                 ClearTetriminoFromBoard(currentEntity);
+            }
+        }
+
+        public void Cleanup()
+        {
+            var completedLines = Context.GetEntitiesWithComponent<CompletedLineComponent>();
+            foreach (var entity in completedLines)
+            {
+                Context.DestroyEntity(entity);
             }
         }
 

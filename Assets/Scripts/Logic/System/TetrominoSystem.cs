@@ -16,9 +16,26 @@ namespace Minomino
                 TetrominoType.S, TetrominoType.Z, TetrominoType.J, TetrominoType.L
             };
 
+            // 테트리미노 색상
+            MinoColor[] colors = {
+                MinoColor.Bright, MinoColor.Beige, MinoColor.Dark
+            };
+
+            // 테트리미노에 속하는 미뉴의 종류
+            MinueType[] minueTypes = {
+                MinueType.ValSmallSunMineu, MinueType.ValMidiumSunMineu, MinueType.ValBigSunMineu,
+                MinueType.MulSmallSunMineu, MinueType.MulMidiumSunMineu, MinueType.MulBigSunMineu,
+                MinueType.ValSmallMoonMineu, MinueType.ValMidiumMoonMineu, MinueType.ValBigMoonMineu,
+                MinueType.MulSmallMoonMineu, MinueType.MulMidiumMoonMineu, MinueType.MulBigMoonMineu,
+                MinueType.ValSmallStarMineu, MinueType.ValMidiumStarMineu, MinueType.ValBigStarMineu,
+                MinueType.MulSmallStarMineu, MinueType.MulMidiumStarMineu, MinueType.MulBigStarMineu,
+                MinueType.ValAngelMineu, MinueType.MulAngelMineu, MinueType.ValDevilMineu, MinueType.MulDevilMineu
+            };
+
             int createdCount = 0;
 
             // 모든 타입을 가방 값만큼 생성
+            // 색상과 미뉴 종류는 순서대로 반복
             for (int i = 0; i < GlobalSettings.Instance.BagSize; i++)
             {
                 foreach (var type in types)
@@ -30,6 +47,8 @@ namespace Minomino
                     var tetrominoComponent = tetrominoEntity.AddComponent<TetrominoComponent>();
                     tetrominoComponent.Type = type;
                     tetrominoComponent.Shape = GetBaseShapeForType(type);
+                    tetrominoComponent.Color = colors[i % colors.Length];
+                    tetrominoComponent.MinueType = minueTypes[i % minueTypes.Length];
 
                     // 미노 Entity들 생성 및 연결
                     CreateMinoEntities(tetrominoEntity, tetrominoComponent);
@@ -50,7 +69,7 @@ namespace Minomino
             if (startEntities.Count > 0)
             {
                 // 게임 시작 로직
-                Queue<Entity> tetriminoQueue = GenerateSevenBagQueue();
+                Queue<Entity> tetriminoQueue = GenerateRandomQueue();
 
                 // TetriminoQueueComponent가 있는 엔티티 찾기
                 var queueComponent = Context.GetTetrominoQueue();
@@ -108,6 +127,8 @@ namespace Minomino
                 var minoComponent = minoEntity.AddComponent<MinoComponent>();
                 minoComponent.ParentID = tetriminoEntity.ID;
                 minoComponent.State = MinoState.Empty;
+                minoComponent.MinoColor = tetrominoComponent.Color; // 테트리미노 색상 설정
+                minoComponent.MinueType = tetrominoComponent.MinueType; // 테트리미노에 속하는 미뉴의 종류 설정
 
                 // Tetrimino에 속하는 미노 ID 추가
                 tetrominoComponent.Minos[i] = minoEntity.ID;

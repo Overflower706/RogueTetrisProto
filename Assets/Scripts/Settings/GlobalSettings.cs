@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,7 +44,16 @@ namespace Minomino
         public Sprite Sprite_Reward_Alert;
         public Sprite Sprite_Reward_Received;
 
-        [Header("특별 미뉴 설명")]
-        public List<string> SpecialMinueDescriptions;
+        [Header("특별 미뉴 효과")]
+        public int AngelVal = 5;
+        public float AngelMul = 0.1f;
+        public int DevilVal = 30;
+        public float DevilMul = 1f;
+        public int SunVal = 100;
+        public float SunMul = 2;
+        public int MoonVal = 50;
+        public float MoonMul = 1f;
+        public int StarVal = 10;
+        public float StarMul = 0.2f;
     }
 }

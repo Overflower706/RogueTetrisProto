@@ -768,17 +768,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7257394529cf5e14dabcbb1ce669f7b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WhiteCream: {r: 0.99215686, g: 0.9882353, b: 0.93333334, a: 1}
-  Butter: {r: 0.9882353, g: 0.9843137, b: 0.8627451, a: 1}
-  Beige: {r: 0.93333334, g: 0.92941177, b: 0.7529412, a: 1}
-  MinueBody: {r: 0.78039217, g: 0.77254903, b: 0.5921569, a: 1}
-  Shadow: {r: 0.65882355, g: 0.6509804, b: 0.47058824, a: 1}
-  Dark: {r: 0.42352942, g: 0.42352942, b: 0.31764707, a: 1}
-  Font: {r: 0.2627451, g: 0.25882354, b: 0.20392157, a: 1}
-  Sprites_Empty:
-  - {fileID: -8738808999595854974, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
-  Sprites_Living:
-  - {fileID: 2220586306974586619, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
+  WhiteCreamColor: {r: 0.99215686, g: 0.9882353, b: 0.93333334, a: 1}
+  ButterColor: {r: 0.9882353, g: 0.9843137, b: 0.8627451, a: 1}
+  BeigeColor: {r: 0.93333334, g: 0.92941177, b: 0.7529412, a: 1}
+  MinueBodyColor: {r: 0.78039217, g: 0.77254903, b: 0.5921569, a: 1}
+  ShadowColor: {r: 0.65882355, g: 0.6509804, b: 0.47058824, a: 1}
+  DarkColor: {r: 0.42352942, g: 0.42352942, b: 0.31764707, a: 1}
+  FontColor: {r: 0.2627451, g: 0.25882354, b: 0.20392157, a: 1}
+  Sprites_Special_Minue:
+  - {fileID: 6548981852498269466, guid: 7c47cc3055dfd2e4490c99a70945b081, type: 3}
+  - {fileID: -8533928443954945733, guid: 98ba581089ab1904cbe968d7ae1a2dec, type: 3}
+  - {fileID: -2597642756615157145, guid: 3991c9b43992c574987bb9f2eb89e63c, type: 3}
+  - {fileID: -6756758092993665097, guid: 9cc2e73f117fdd740a0859c01810fd08, type: 3}
+  - {fileID: -3392232698334500991, guid: 140f4a28331a1854fa1366a7baf7cb1e, type: 3}
 --- !u!1 &1912994647
 GameObject:
   m_ObjectHideFlags: 0
