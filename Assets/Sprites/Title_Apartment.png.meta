@@ -219,6 +219,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -873,7 +886,36 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Title_Apartment_0: -3188906389536967839
+      Title_Apartment_1: 4696893264627102878
+      Title_Apartment_10: 433675699633738499
+      Title_Apartment_11: -66088274974050446
+      Title_Apartment_12: -4900216024740289907
+      Title_Apartment_13: 3229500864579652207
+      Title_Apartment_14: 2690065806583697778
+      Title_Apartment_15: -7093729611098360778
+      Title_Apartment_16: -8417517011947377431
+      Title_Apartment_17: 6502459793551791025
+      Title_Apartment_18: 1916307620374074480
+      Title_Apartment_19: 6966105414164306707
+      Title_Apartment_2: -5936673863511089650
+      Title_Apartment_20: -1225254707584395788
+      Title_Apartment_21: -6919520557855248174
+      Title_Apartment_22: -211807048242462085
+      Title_Apartment_23: -4055613868833704963
+      Title_Apartment_24: 6359553163708596494
+      Title_Apartment_25: 7303565124214757168
+      Title_Apartment_26: -7784747040124004258
+      Title_Apartment_27: 2088319029577109489
+      Title_Apartment_28: 6469773217659454354
+      Title_Apartment_3: 3337163434569615192
+      Title_Apartment_4: 4399919494345774734
+      Title_Apartment_5: 1375003538421713518
+      Title_Apartment_6: -3044851980083415848
+      Title_Apartment_7: -5369150388890687017
+      Title_Apartment_8: 4203721047984181248
+      Title_Apartment_9: 8026343575236428745
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
