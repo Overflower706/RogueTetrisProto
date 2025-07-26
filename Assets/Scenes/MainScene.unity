@@ -12365,13 +12365,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13680767f39a01447aa1c0905cc7b933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SafeWidth: 7
+  SafeWidth: 6
   SafeHeight: 10
   MinoWidth: 120
   MinoHeight: 90
   BoardBufferHeight: 2
   HoldSize: 1
-  BagSize: 2
+  BagSize: 7
   RoundBonus: 1
   StageBonus: 10
   CurrencyBase: 10
@@ -12411,13 +12411,13 @@ MonoBehaviour:
   - "<b>\uCC9C\uC0AC \uBBF8\uB274</b>\\n"
   - "<b>\uBE45 \uBBF8\uB274</b>\\n"
   Sprites_Empty:
-  - {fileID: -8738808999595854974, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
+  - {fileID: 2632398311536810851, guid: aea427a2117a42d42a814f3fb9e79028, type: 3}
   - {fileID: 230453193148059873, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: -6685101342295513176, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: -881574208294414941, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: 2632398311536810851, guid: aea427a2117a42d42a814f3fb9e79028, type: 3}
   Sprites_Living:
-  - {fileID: 3667795298676726750, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
+  - {fileID: -1969903928382244192, guid: e67e31ea9429e6140871a79a81e4ec59, type: 3}
   - {fileID: 7465062294144104994, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: 2220586306974586619, guid: 6187f7c0969a75042bce6c951fdd6293, type: 3}
   - {fileID: -1969903928382244192, guid: e67e31ea9429e6140871a79a81e4ec59, type: 3}
